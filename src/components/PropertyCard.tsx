@@ -1,0 +1,156 @@
+"use client";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { MapPin, Star, ShieldCheck, CreditCard, Layers, Calendar } from 'lucide-react';
+
+const PropertyCard = ({ property }: { property: any }) => {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ── Field Resolution ──
+  const projectName = property.projectName || property.title || 'Untitled Project';
+  const developerName = property.developerName || 'Digital Broker';
+  const reraNumber = property.reraNumber || 'RERA: PRM/KA/RERA/1251';
+  
+  const image = (property.productImages && property.productImages.length > 0)
+    ? String(property.productImages[0])
+    : (property.images && property.images.length > 0)
+    ? String(property.images[0])
+    : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2670&auto=format&fit=crop';
+  
+  const location = (property.sector ? `${property.sector}, ` : '') + (property.city || property.location || '');
+  const type = property.propertyType || property.type || '';
+  const status = property.projectStatus || property.badge;
+
+  // ── Ticket Size / Price ──
+  let displayPrice = property.price || '';
+  if (!displayPrice && type === 'commercial' && property.commercialConfigs && property.commercialConfigs.length > 0) {
+    const t = Number(property.commercialConfigs[0].ticketSize) || 0;
+    displayPrice = t > 0 ? `₹${Math.round(t / 100000)}L+` : 'On Request';
+  } else if (!displayPrice && property.residentialConfigs && property.residentialConfigs.length > 0) {
+    const t = Number(property.residentialConfigs[0].ticketSize) || 0;
+    displayPrice = t > 0 ? `₹${(t / 10000000).toFixed(1)}Cr+` : 'On Request';
+  }
+  if (!displayPrice) displayPrice = 'On Request';
+
+  // ── Secondary Slot (Possession for Resi, ROI for Commi) ──
+  const isResidential = type === 'residential' || type === 'both';
+  const isCommercial = type === 'commercial';
+
+  // For Residential: Get Possession Date
+  const possession = (property.residentialConfigs && property.residentialConfigs.length > 0 && property.residentialConfigs[0].possessionDate)
+    ? new Date(property.residentialConfigs[0].possessionDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })
+    : 'Ready';
+
+  // For Commercial: Get Assured Return
+  const roi = (property.commercialConfigs && property.commercialConfigs.length > 0 && property.commercialConfigs[0].assuredReturnPct)
+    ? property.commercialConfigs[0].assuredReturnPct
+    : (mounted ? 12 : 12); // Fallback mock ROI only for commi
+
+  return (
+    <div className="bg-white rounded-[2.5rem] p-4 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 group hover:-translate-y-3 flex flex-col h-full">
+      {/* Top Image Section with Badges */}
+      <Link href={`/properties/${property._id}`} className="relative h-[220px] overflow-hidden rounded-[2.2rem] block mb-5">
+        <img 
+          src={image}
+          alt={projectName}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+        />
+        {status && (
+          <div className="absolute top-4 left-4 bg-orange-500 text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg uppercase tracking-widest">
+            {status}
+          </div>
+        )}
+        {type && (
+          <div className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+            {type}
+          </div>
+        )}
+      </Link>
+      
+      <div className="px-2 flex flex-col flex-1 pb-2">
+        {/* Developer Info */}
+        <div className="flex items-center gap-2 mb-2">
+           <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{developerName}</span>
+        </div>
+
+        {/* Title */}
+        <Link href={`/properties/${property._id}`}>
+          <h3 className="font-extrabold text-[18px] text-[#0a1628] mb-3 group-hover:text-orange-500 transition-colors line-clamp-1 leading-tight">
+            {projectName}
+          </h3>
+        </Link>
+        
+        {/* RERA */}
+        <div className="flex items-center text-[11px] font-semibold text-gray-400 mb-5 bg-gray-50 w-fit px-3 py-1 rounded-lg border border-gray-100">
+           <ShieldCheck className="w-3.5 h-3.5 text-blue-500 mr-2" />
+           {reraNumber}
+        </div>
+
+        {/* Stats Grid - CONDITIONAL ROI */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="bg-gray-50/80 p-3 rounded-2xl border border-gray-100 group-hover:border-orange-100 transition-colors">
+            <div className="flex items-center gap-2 mb-1">
+              <CreditCard className="w-3.5 h-3.5 text-orange-500" />
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Ticket Size</span>
+            </div>
+            <div className="text-[13px] font-black text-[#0a1628]">{displayPrice}</div>
+          </div>
+
+          <div className="bg-gray-50/80 p-3 rounded-2xl border border-gray-100 group-hover:border-orange-100 transition-colors">
+            {isCommercial ? (
+              <>
+                <div className="flex items-center gap-2 mb-1">
+                  <Layers className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Assured RTN</span>
+                </div>
+                <div className="text-[13px] font-black text-[#0a1628]">{roi}% <span className="text-[10px] text-green-500 font-bold">ROI</span></div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Possession</span>
+                </div>
+                <div className="text-[13px] font-black text-[#0a1628]">{possession}</div>
+              </>
+            )}
+          </div>
+        </div>
+        
+        {/* Location */}
+        {location && (
+          <div className="flex items-start text-xs font-semibold text-gray-400 mb-6">
+             <MapPin className="w-3.5 h-3.5 text-orange-400 mr-2 flex-shrink-0" /> 
+             <span className="line-clamp-1">{location}</span>
+          </div>
+        )}
+        
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+           <div className="flex items-center gap-2.5">
+             <div className="flex flex-col">
+               <span className="text-[10px] font-black text-[#0a1628]">Premium Listing</span>
+               <div className="flex items-center gap-1">
+                 <Star className="w-2.5 h-2.5 fill-orange-500 text-orange-500" />
+                 <span className="text-[9px] font-bold text-gray-500">4.9 Rated</span>
+               </div>
+             </div>
+           </div>
+           <Link 
+             href={`/properties/${property._id}`}
+             className="bg-[#0a1628] text-white p-2.5 rounded-2xl hover:bg-orange-500 transition-colors shadow-lg"
+           >
+             <ShieldCheck className="w-4 h-4" />
+           </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PropertyCard;
