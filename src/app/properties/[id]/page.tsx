@@ -3,7 +3,14 @@ import Navbar from '@/components/Navbar';
 import ChatWidget from '@/components/ChatWidget';
 import dbConnect from '@/lib/mongodb';
 import Property from '@/models/Property';
-import { MapPin, CheckCircle, Star, Calendar, Shield, Share2, Heart, Info } from 'lucide-react';
+import {
+  MapPin, CheckCircle, Star, Calendar, Shield, Share2, Heart, Info,
+  Phone, Download, ArrowRight, ChevronRight, Building, Ruler,
+  DollarSign, Layers, Home, Clock, FileText, Image as ImageIcon,
+  Wifi, Car, Dumbbell, TreePine, ShieldCheck, Zap, Wind, Droplets,
+  Users, Baby, Dog, Bike, Coffee, UtensilsCrossed, Gamepad2,
+  PlayCircle, TrendingUp, Calculator, Navigation, ExternalLink
+} from 'lucide-react';
 import { Metadata } from 'next';
 import LeadForm from '@/components/LeadForm';
 
@@ -34,6 +41,15 @@ async function getProperty(id: string) {
   return Property.findById(id).lean();
 }
 
+async function getSimilarProperties(city: string, propType: string, excludeId: string) {
+  await dbConnect();
+  return Property.find({
+    city,
+    propertyType: propType,
+    _id: { $ne: excludeId }
+  }).limit(4).lean();
+}
+
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const property = await getProperty(id);
@@ -49,41 +65,42 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  // Safe plain object — no Mongoose DocumentArray quirks
   const p: any = JSON.parse(JSON.stringify(property));
 
-  // ── Extract ALL data safely BEFORE JSX — no array[0] in the render tree ──
+  // ── Extract data ──
   const productImgs: string[] = Array.isArray(p.productImages) ? p.productImages.map(String) : [];
-  const oldImgs: string[]     = Array.isArray(p.images)        ? p.images.map(String)        : [];
-  const allImgs                = productImgs.length > 0 ? productImgs : oldImgs;
-  const heroImage              = allImgs.length > 0 ? allImgs[0] : FALLBACK_IMG;
+  const oldImgs: string[] = Array.isArray(p.images) ? p.images.map(String) : [];
+  const allImgs = productImgs.length > 0 ? productImgs : oldImgs;
+  const heroImage = allImgs.length > 0 ? allImgs[0] : FALLBACK_IMG;
 
-  const title       = String(p.projectName   || p.title    || 'Property');
-  const city        = String(p.city          || '');
-  const sector      = String(p.sector        || p.location || '');
+  const title = String(p.projectName || p.title || 'Property');
+  const developerName = String(p.developerName || 'Premium Developer');
+  const developerLogo = p.developerLogo || null;
+  const city = String(p.city || '');
+  const sector = String(p.sector || p.location || '');
   const locationStr = sector ? `${sector}, ${city}` : city;
-  const propType    = String(p.propertyType  || p.type     || '');
-  const status      = String(p.projectStatus || p.badge    || 'New Launch');
-  const rera        = String(p.reraNumber    || 'RERA Registration Pending');
+  const propType = String(p.propertyType || p.type || '');
+  const status = String(p.projectStatus || p.badge || 'New Launch');
+  const rera = String(p.reraNumber || 'RERA Registration Pending');
   const projectSize = p.projectSize ? `${p.projectSize} Acres` : p.sqft ? `${p.sqft} sqft` : '--';
 
   const resConfigs: any[] = Array.isArray(p.residentialConfigs) ? p.residentialConfigs : [];
-  const comConfigs: any[] = Array.isArray(p.commercialConfigs)  ? p.commercialConfigs  : [];
+  const comConfigs: any[] = Array.isArray(p.commercialConfigs) ? p.commercialConfigs : [];
 
-  const isResidential = propType === 'residential' || propType === 'both' || p.type === 'residential';
+  const isResidential = propType === 'residential' || propType === 'both';
   const isCommercial = propType === 'commercial';
-  const possession = (p.residentialConfigs && p.residentialConfigs.length > 0 && p.residentialConfigs[0].possessionDate)
-    ? new Date(p.residentialConfigs[0].possessionDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })
-    : 'Ready';
+  const possession = (resConfigs.length > 0 && resConfigs[0].possessionDate)
+    ? new Date(resConfigs[0].possessionDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })
+    : 'Ready to Move';
 
   const resTypologies = resConfigs.length > 0
     ? resConfigs.map((c: any) => String(c.typology || '')).filter(Boolean).join(', ')
     : `${p.bedrooms || '--'} BHK`;
   const resUnitSize = resConfigs.length > 0 ? String(resConfigs[0].unitSize || '--') : String(p.sqft || '--');
-  const comTypes    = comConfigs.length > 0
+  const comTypes = comConfigs.length > 0
     ? comConfigs.map((c: any) => String(c.commercialType || '')).filter(Boolean).join(', ')
     : String(p.category || '--');
-  const comReturn   = comConfigs.length > 0 ? String(comConfigs[0].assuredReturnPct || '--') : '--';
+  const comReturn = comConfigs.length > 0 ? String(comConfigs[0].assuredReturnPct || '--') : '--';
 
   const resTicket = resConfigs.length > 0 ? (Number(resConfigs[0].ticketSize) || 0) : 0;
   const comTicket = comConfigs.length > 0 ? (Number(comConfigs[0].ticketSize) || 0) : 0;
@@ -92,175 +109,525 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   if (propType === 'commercial') {
     ticketDisplay = comTicket > 0 ? `₹ ${Math.round(comTicket / 100000).toLocaleString()}L+` : (p.price || 'On Request');
   } else if (isResidential) {
-    ticketDisplay = resTicket > 0 ? `₹ ${Math.round(resTicket / 10000000).toLocaleString()}Cr+` : (p.price || 'On Request');
+    ticketDisplay = resTicket > 0 ? `₹ ${(resTicket / 10000000).toFixed(1)}Cr+` : (p.price || 'On Request');
   } else {
     ticketDisplay = p.price || 'On Request';
   }
 
+  const pricePerSqft = resConfigs.length > 0 ? resConfigs[0].pricePerSqft : comConfigs.length > 0 ? comConfigs[0].pricePerSqft : null;
+
   const agentAvatar = String((p.agent && p.agent.avatar) ? p.agent.avatar : 'https://randomuser.me/api/portraits/men/32.jpg');
-  const agentName   = String((p.agent && p.agent.name)   ? p.agent.name   : 'Relationship Manager');
+  const agentName = String((p.agent && p.agent.name) ? p.agent.name : 'Relationship Manager');
   const agentRating = String((p.agent && p.agent.rating) ? p.agent.rating : '4.8');
-  const propId      = String(p._id || '');
+  const propId = String(p._id || '');
+
+  const brochureUrl = p.brochureUrl || null;
+  const priceListUrl = p.priceListUrl || null;
+  const sitePlanUrl = p.sitePlanUrl || null;
+  const layoutPlanUrl = p.layoutPlanUrl || null;
+
+  // Get similar properties
+  let similarProperties: any[] = [];
+  try {
+    const similar = await getSimilarProperties(city, propType, propId);
+    similarProperties = JSON.parse(JSON.stringify(similar));
+  } catch {
+    similarProperties = [];
+  }
+
+  // Amenities
+  const amenityIcons: Record<string, any> = {
+    'Swimming Pool': Droplets, 'Gym & Fitness': Dumbbell, '24/7 Security': ShieldCheck,
+    'Power Backup': Zap, 'Covered Parking': Car, 'Landscaped Garden': TreePine,
+    'Children Play Area': Baby, 'Clubhouse': Users, 'Jogging Track': Bike,
+    'Wi-Fi Connectivity': Wifi, 'Cafeteria': Coffee, 'Indoor Games': Gamepad2,
+    'Pet Friendly': Dog, 'Restaurant': UtensilsCrossed, 'Theatre': PlayCircle,
+    'Central AC': Wind
+  };
+
+  const amenities = Object.keys(amenityIcons);
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 overflow-x-hidden">
+    <div className="min-h-screen bg-[#fafafa] font-sans text-gray-900 overflow-x-hidden">
       <Navbar />
 
-      <div className="container mx-auto px-6 md:px-12 pt-32 pb-24">
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 1: HERO IMAGE GALLERY
+      ═══════════════════════════════════════════════════════════════ */}
+      <div className="pt-24 pb-4 container mx-auto px-4 md:px-8 lg:px-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8 overflow-x-auto whitespace-nowrap pb-2">
-          <a href="/" className="hover:text-orange-500">Home</a>
-          <span>/</span>
-          <a href="/search" className="hover:text-orange-500">{isResidential ? 'Residential' : 'Commercial'}</a>
-          <span>/</span>
-          <span className="text-[#0a1628] font-bold">{title}</span>
+        <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6 overflow-x-auto whitespace-nowrap">
+          <a href="/" className="hover:text-orange-500 transition-colors">Home</a>
+          <ChevronRight className="w-3.5 h-3.5" />
+          <a href="/search" className="hover:text-orange-500 transition-colors">{isResidential ? 'Residential' : 'Commercial'}</a>
+          <ChevronRight className="w-3.5 h-3.5" />
+          <span className="text-[#0a1628] font-semibold">{title}</span>
         </nav>
 
-        {/* Hero Gallery */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-12">
-          <div className="lg:col-span-3 h-[400px] md:h-[600px] rounded-[2.5rem] overflow-hidden relative group">
-            <img
-              src={heroImage}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              alt={title}
-            />
+        {/* Gallery Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 mb-8 rounded-3xl overflow-hidden">
+          {/* Main Image */}
+          <div className="lg:col-span-2 lg:row-span-2 h-[300px] lg:h-full min-h-[400px] relative group cursor-pointer">
+            <img src={heroImage} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={title} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             {status && (
-              <div className="absolute top-6 left-6 bg-orange-500 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+              <div className="absolute top-5 left-5 bg-orange-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
                 {status}
               </div>
             )}
-            <div className="absolute bottom-6 left-6 right-6 flex justify-between items-center bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/20">
-              <div className="flex gap-4">
-                <button className="bg-white/20 hover:bg-white text-white hover:text-[#0a1628] p-3 rounded-full transition-all">
-                  <Heart className="w-5 h-5" />
-                </button>
-                <button className="bg-white/20 hover:bg-white text-white hover:text-[#0a1628] p-3 rounded-full transition-all">
-                  <Share2 className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="text-white text-sm font-bold bg-[#0a1628]/40 px-5 py-2.5 rounded-full border border-white/10">
-                {allImgs.length} Photo{allImgs.length !== 1 ? 's' : ''}
-              </div>
+            <div className="absolute bottom-5 left-5 flex gap-3">
+              <button className="bg-white/15 backdrop-blur-md hover:bg-white/30 text-white p-2.5 rounded-xl transition-all border border-white/20">
+                <Heart className="w-4 h-4" />
+              </button>
+              <button className="bg-white/15 backdrop-blur-md hover:bg-white/30 text-white p-2.5 rounded-xl transition-all border border-white/20">
+                <Share2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
-          <div className="hidden lg:flex flex-col gap-4">
-            <div className="flex-1 rounded-[2rem] bg-gray-50 flex flex-col items-center justify-center p-8 border border-gray-100 group hover:border-orange-200 transition-colors">
-              <Shield className="w-10 h-10 text-orange-500 mb-4" />
-              <h4 className="font-bold text-center text-[#0a1628]">Verified <br/>Listing</h4>
-            </div>
-            <div className="flex-1 rounded-[2rem] bg-[#0a1628] flex flex-col items-center justify-center p-8 border border-white/5 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-orange-500/10 scale-0 group-hover:scale-100 transition-transform rounded-full blur-3xl"></div>
-              <div className="relative z-10 text-white font-bold text-lg text-center mb-1">
-                {isCommercial ? '8.5%' : (possession || 'Ready')}
-              </div>
-              <div className="relative z-10 text-blue-200 text-xs text-center">
-                {isCommercial ? 'Avg. Rental Yield' : 'Possession Date'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-          <div className="lg:col-span-2 space-y-12">
-            {/* Header */}
-            <div className="animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">{status}</span>
-                <span className="text-gray-300">|</span>
-                <span className="text-gray-400 text-sm font-medium flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {propType}</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0a1628] mb-6 leading-tight">
-                {title}
-              </h1>
-              <div className="flex items-center text-lg text-gray-500 gap-2">
-                <MapPin className="w-5 h-5 text-orange-500" />
-                {locationStr}
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-10 border-y border-gray-100">
-              <div className="space-y-1">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Project Size</p>
-                <p className="text-[#0a1628] font-bold text-lg">{projectSize}</p>
-              </div>
-              {isResidential ? (
-                <>
-                  <div className="space-y-1">
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Configurations</p>
-                    <p className="text-[#0a1628] font-bold text-lg">{resTypologies}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Unit Size</p>
-                    <p className="text-[#0a1628] font-bold text-lg">{resUnitSize} sqft</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="space-y-1">
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Com. Types</p>
-                    <p className="text-[#0a1628] font-bold text-lg">{comTypes}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Assured Return</p>
-                    <p className="text-[#0a1628] font-bold text-lg">{comReturn}%</p>
-                  </div>
-                </>
+          {/* Side images */}
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`h-[200px] relative group cursor-pointer overflow-hidden ${i > 2 ? 'hidden lg:block' : ''}`}>
+              <img
+                src={allImgs[i] || FALLBACK_IMG}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                alt={`${title} ${i + 1}`}
+              />
+              {i === 4 && allImgs.length > 5 && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">+{allImgs.length - 5} Photos</span>
+                </div>
               )}
-              <div className="space-y-1">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Price</p>
-                <p className="text-[#0a1628] font-bold text-lg">{ticketDisplay}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 2: MAIN CONTENT + SIDEBAR
+      ═══════════════════════════════════════════════════════════════ */}
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+          {/* ── LEFT COLUMN ── */}
+          <div className="lg:col-span-2 space-y-10">
+
+            {/* ─── Property Header ─── */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                <div className="flex-1">
+                  {/* Developer Badge */}
+                  <div className="flex items-center gap-3 mb-4">
+                    {developerLogo && (
+                      <img src={developerLogo} alt={developerName} className="w-8 h-8 rounded-lg object-contain bg-gray-50 border border-gray-100" />
+                    )}
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{developerName}</span>
+                    <span className="bg-green-50 text-green-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Verified</span>
+                  </div>
+
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#0a1628] mb-3 leading-tight">
+                    {title}
+                  </h1>
+
+                  <div className="flex items-center gap-2 text-gray-500 mb-4">
+                    <MapPin className="w-4 h-4 text-orange-500" />
+                    <span className="text-sm font-medium">{locationStr}</span>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">{status}</span>
+                    <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">{propType}</span>
+                    <span className="bg-gray-50 text-gray-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" />{rera}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Price Badge */}
+                <div className="bg-[#0a1628] rounded-2xl p-6 text-white min-w-[200px]">
+                  <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest mb-1">Starting From</p>
+                  <p className="text-3xl font-black mb-1">{ticketDisplay}</p>
+                  {pricePerSqft && <p className="text-blue-300 text-xs">₹{pricePerSqft.toLocaleString()} / sq.ft.</p>}
+                </div>
               </div>
             </div>
 
-            {/* Overview */}
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-[#0a1628]">Overview</h3>
-              <p className="text-gray-500 leading-relaxed text-lg">
+            {/* ─── Quick Stats Bar ─── */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
+                    <Ruler className="w-5 h-5 text-orange-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Project Size</p>
+                    <p className="text-[#0a1628] font-bold text-lg">{projectSize}</p>
+                  </div>
+                </div>
+
+                {isResidential ? (
+                  <>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
+                        <Home className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Config</p>
+                        <p className="text-[#0a1628] font-bold text-lg">{resTypologies}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
+                        <Layers className="w-5 h-5 text-green-500" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Unit Size</p>
+                        <p className="text-[#0a1628] font-bold text-lg">{resUnitSize} sqft</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
+                        <Building className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</p>
+                        <p className="text-[#0a1628] font-bold text-lg">{comTypes}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-green-500" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Return</p>
+                        <p className="text-[#0a1628] font-bold text-lg">{comReturn}%</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Possession</p>
+                    <p className="text-[#0a1628] font-bold text-lg">{possession}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ─── About / Overview ─── */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                About {title}
+              </h2>
+              <p className="text-gray-500 leading-relaxed text-[15px] mb-6">
                 Setting new benchmarks in luxury living, {title} offers an unparalleled lifestyle in the heart of {city || 'India'}.
-                Designed by award-winning architects, this {status} development combines contemporary aesthetics with world-class amenities.
+                Designed by award-winning architects, this {status.toLowerCase()} development combines contemporary aesthetics with world-class amenities.
                 Whether you&apos;re looking for an investment or a home for your family, this project provides exceptional value and long-term appreciation potential.
               </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-6 border-t border-gray-100">
+                <div className="flex items-center gap-3">
+                  <Building className="w-4 h-4 text-orange-500" />
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">Developer</p>
+                    <p className="text-sm font-bold text-[#0a1628]">{developerName}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ShieldCheck className="w-4 h-4 text-green-500" />
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">RERA</p>
+                    <p className="text-sm font-bold text-[#0a1628]">{rera}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Clock className="w-4 h-4 text-blue-500" />
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">Status</p>
+                    <p className="text-sm font-bold text-[#0a1628]">{status}</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Amenities */}
-            <div className="space-y-8">
-              <h3 className="text-2xl font-bold text-[#0a1628]">Key Amenities</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {['Infinity Pool', 'Private Gym', '24/7 Security', 'Concierge Service', 'Garden Lounge', 'Automated Parking'].map((amenity, idx) => (
-                  <div key={idx} className="flex items-center gap-4 bg-gray-50 p-5 rounded-3xl border border-gray-100 group hover:border-orange-200 transition-colors">
-                    <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-orange-500 shadow-sm">
-                      <CheckCircle className="w-5 h-5" />
+            {/* ─── Price Breakup Table ─── */}
+            {(resConfigs.length > 0 || comConfigs.length > 0) && (
+              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                  <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                  Price Breakup
+                </h2>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 rounded-xl">
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-l-xl">Type</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Unit Size</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Price/sqft</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-r-xl">Ticket Size</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {resConfigs.map((c: any, i: number) => (
+                        <tr key={`res-${i}`} className="border-b border-gray-50 hover:bg-orange-50/30 transition-colors">
+                          <td className="p-4 font-bold text-[#0a1628]">{c.typology}</td>
+                          <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
+                          <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
+                          <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 10000000).toFixed(1)}Cr</td>
+                        </tr>
+                      ))}
+                      {comConfigs.map((c: any, i: number) => (
+                        <tr key={`com-${i}`} className="border-b border-gray-50 hover:bg-orange-50/30 transition-colors">
+                          <td className="p-4 font-bold text-[#0a1628]">{c.commercialType}</td>
+                          <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
+                          <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
+                          <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 100000).toFixed(0)}L</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Amenities ─── */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                Amenities &amp; Facilities
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {amenities.map((amenity, i) => {
+                  const IconComp = amenityIcons[amenity] || CheckCircle;
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all group cursor-default"
+                    >
+                      <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                        <IconComp className="w-4 h-4 text-orange-500" />
+                      </div>
+                      <span className="text-[13px] font-semibold text-[#0a1628]">{amenity}</span>
                     </div>
-                    <span className="font-bold text-[#0a1628] text-sm">{amenity}</span>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ─── Documents / Downloads ─── */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                Documents &amp; Plans
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { label: 'Brochure', url: brochureUrl, icon: FileText, color: 'orange' },
+                  { label: 'Price List', url: priceListUrl, icon: DollarSign, color: 'green' },
+                  { label: 'Site Plan', url: sitePlanUrl, icon: Navigation, color: 'blue' },
+                  { label: 'Layout Plan', url: layoutPlanUrl, icon: Layers, color: 'purple' },
+                ].map((doc, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${doc.url
+                      ? 'bg-white border-gray-100 hover:border-orange-200 cursor-pointer'
+                      : 'bg-gray-50 border-gray-100 opacity-60'
+                      }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-${doc.color}-50`}>
+                        <doc.icon className={`w-5 h-5 text-${doc.color}-500`} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-[#0a1628] text-sm">{doc.label}</p>
+                        <p className="text-[10px] text-gray-400 uppercase tracking-wider">{doc.url ? 'PDF Available' : 'Coming Soon'}</p>
+                      </div>
+                    </div>
+                    {doc.url ? (
+                      <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Download
+                      </a>
+                    ) : (
+                      <span className="text-gray-300 text-xs font-bold">N/A</span>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* ─── Location Map ─── */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                Location &amp; Connectivity
+              </h2>
+              {/* Map Placeholder */}
+              <div className="w-full h-[300px] rounded-2xl bg-gray-100 overflow-hidden relative mb-6">
+                <iframe
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(locationStr)}&output=embed`}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  allowFullScreen
+                  title="Property Location"
+                />
+              </div>
+              {/* Nearby Landmarks */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  { name: 'Metro Station', dist: '500m', icon: Navigation },
+                  { name: 'Hospital', dist: '1.2 km', icon: ShieldCheck },
+                  { name: 'Schools', dist: '800m', icon: Users },
+                  { name: 'Shopping Mall', dist: '1.5 km', icon: Building },
+                  { name: 'Airport', dist: '25 km', icon: Wind },
+                  { name: 'Highway', dist: '2 km', icon: ArrowRight },
+                ].map((l, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                    <l.icon className="w-4 h-4 text-orange-500" />
+                    <div>
+                      <p className="text-sm font-bold text-[#0a1628]">{l.name}</p>
+                      <p className="text-[10px] text-gray-400 font-bold">{l.dist}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ─── EMI Calculator ─── */}
+            {isResidential && !isCommercial && (
+              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 animate-fade-in">
+                <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                  <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                  EMI Calculator
+                </h2>
+                <div className="bg-gradient-to-br from-[#0a1628] to-[#142240] rounded-2xl p-8 text-white shadow-xl">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                      <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mb-2">Loan Amount</p>
+                      <p className="text-2xl font-black">{ticketDisplay}</p>
+                    </div>
+                    <div>
+                      <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mb-2">Interest Rate</p>
+                      <p className="text-2xl font-black">8.5% p.a.</p>
+                    </div>
+                    <div>
+                      <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mb-2">Tenure</p>
+                      <p className="text-2xl font-black">20 Years</p>
+                    </div>
+                  </div>
+                  <div className="border-t border-white/10 pt-6 flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mb-1">Estimated Monthly EMI</p>
+                      <p className="text-3xl font-black text-orange-400">
+                        ₹{resTicket > 0
+                          ? Math.round((resTicket * 0.8 * (0.085 / 12) * Math.pow(1 + 0.085 / 12, 240)) / (Math.pow(1 + 0.085 / 12, 240) - 1)).toLocaleString()
+                          : '--'
+                        }
+                      </p>
+                    </div>
+                    <Calculator className="w-12 h-12 text-white/10" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Similar Properties ─── */}
+            {similarProperties.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
+                  <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                  Similar Properties
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {similarProperties.map((sp: any) => {
+                    const spImg = (sp.productImages && sp.productImages.length > 0)
+                      ? String(sp.productImages[0])
+                      : FALLBACK_IMG;
+                    const spName = sp.projectName || sp.title || 'Property';
+                    const spLoc = sp.sector ? `${sp.sector}, ${sp.city}` : sp.city || '';
+                    const spResTicket = sp.residentialConfigs?.[0]?.ticketSize || 0;
+                    const spComTicket = sp.commercialConfigs?.[0]?.ticketSize || 0;
+                    let spPrice = 'On Request';
+                    if (sp.propertyType === 'commercial' && spComTicket > 0) {
+                      spPrice = `₹${Math.round(spComTicket / 100000)}L+`;
+                    } else if (spResTicket > 0) {
+                      spPrice = `₹${(spResTicket / 10000000).toFixed(1)}Cr+`;
+                    }
+
+                    return (
+                      <a key={sp._id} href={`/properties/${sp._id}`}
+                        className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group"
+                      >
+                        <div className="h-[180px] relative overflow-hidden">
+                          <img src={spImg} alt={spName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          {sp.projectStatus && (
+                            <div className="absolute top-3 left-3 bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase">{sp.projectStatus}</div>
+                          )}
+                        </div>
+                        <div className="p-5">
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">{sp.developerName || 'Developer'}</p>
+                          <h3 className="font-bold text-[#0a1628] mb-2 group-hover:text-orange-500 transition-colors">{spName}</h3>
+                          <div className="flex items-center gap-1.5 text-gray-400 text-xs mb-3">
+                            <MapPin className="w-3 h-3" />{spLoc}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="font-black text-[#0a1628] text-lg">{spPrice}</span>
+                            <span className="text-orange-500 text-xs font-bold flex items-center gap-1">View <ArrowRight className="w-3 h-3" /></span>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Sticky Sidebar */}
+          {/* ── RIGHT COLUMN / SIDEBAR ── */}
           <div className="lg:col-span-1">
-            <div className="sticky top-32 space-y-8">
-              {/* Pricing Card */}
-              <div className="bg-[#0a1628] rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="relative z-10 space-y-8">
+            <div className="sticky top-28 space-y-6">
+
+              {/* Pricing + Lead Form Card */}
+              <div className="bg-[#0a1628] rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="relative z-10 space-y-6">
                   <div>
-                    <p className="text-blue-200 text-xs font-bold uppercase tracking-widest mb-3">Starting Ticket Size</p>
-                    <div className="text-5xl font-bold mb-2">{ticketDisplay}</div>
-                    <p className="text-blue-300 text-sm italic">inclusive of all taxes &amp; parking</p>
+                    <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mb-2">Starting Price</p>
+                    <div className="text-4xl font-black mb-1">{ticketDisplay}</div>
+                    {pricePerSqft && <p className="text-blue-300 text-xs">₹{pricePerSqft.toLocaleString()} per sqft</p>}
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <LeadForm propertyId={propId} propertyTitle={title} />
-                    <button className="w-full bg-white/10 hover:bg-white/20 border border-white/10 text-white py-5 rounded-full font-bold text-lg transition-all">
+                    <button className="w-full bg-white/10 hover:bg-white/20 border border-white/10 text-white py-4 rounded-full font-bold text-sm transition-all flex items-center justify-center gap-2">
+                      <Download className="w-4 h-4" />
                       Download Brochure
                     </button>
+                    {/* WhatsApp Button */}
+                    <a
+                      href={`https://wa.me/916375232264?text=Hi, I am interested in ${title} at ${locationStr}. Please share more details.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white py-4 rounded-full font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                      </svg>
+                      WhatsApp Us
+                    </a>
                   </div>
-                  <div className="flex items-center gap-4 pt-4 border-t border-white/5">
-                    <Info className="w-5 h-5 text-blue-300" />
-                    <p className="text-xs text-blue-200 font-medium leading-relaxed">
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+                    <Info className="w-4 h-4 text-blue-300 shrink-0" />
+                    <p className="text-[11px] text-blue-200 font-medium leading-relaxed">
                       Our expert consultants are available for a private site visit this weekend.
                     </p>
                   </div>
@@ -268,22 +635,46 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
 
               {/* Agent Card */}
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-lg">
-                <div className="flex items-center gap-5 mb-6">
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex items-center gap-4 mb-4">
                   <div className="relative">
-                    <img src={agentAvatar} className="w-16 h-16 rounded-3xl object-cover ring-4 ring-gray-50" alt={agentName} />
-                    <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-4 border-white"></div>
+                    <img src={agentAvatar} className="w-14 h-14 rounded-2xl object-cover ring-4 ring-gray-50" alt={agentName} />
+                    <div className="absolute -bottom-1 -right-1 bg-green-500 w-3.5 h-3.5 rounded-full border-[3px] border-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-[#0a1628]">{agentName}</h4>
-                    <div className="flex items-center gap-2 text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">
+                    <h4 className="font-bold text-[#0a1628] text-sm">{agentName}</h4>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
                       <Star className="w-3 h-3 fill-orange-500 text-orange-500" />
                       {agentRating} Rated Expert
                     </div>
                   </div>
                 </div>
+                <p className="text-xs text-gray-500 leading-relaxed italic mb-4">
+                  &quot;Specializing in luxury portfolios and commercial high-yield investments for over 10 years.&quot;
+                </p>
+                {/* Contact support info instead of call button */}
+                <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest font-bold">
+                  Expert Consultation Reserved for You
+                </p>
+              </div>
+
+              {/* Why Choose Us */}
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+                <h4 className="font-bold text-[#0a1628] text-sm mb-4 uppercase tracking-wider">Why Digital Broker?</h4>
                 <div className="space-y-3">
-                  <p className="text-xs text-gray-500 leading-relaxed italic">&quot;Specializing in luxury portfolios and commercial high-yield investments for over 10 years.&quot;</p>
+                  {[
+                    { icon: ShieldCheck, text: '100% Verified Properties', color: 'green' },
+                    { icon: DollarSign, text: '0% Brokerage', color: 'orange' },
+                    { icon: Users, text: 'Expert Consultation', color: 'blue' },
+                    { icon: Clock, text: 'Instant Site Visits', color: 'purple' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className={`w-8 h-8 bg-${item.color}-50 rounded-lg flex items-center justify-center`}>
+                        <item.icon className={`w-4 h-4 text-${item.color}-500`} />
+                      </div>
+                      <span className="text-sm font-semibold text-[#0a1628]">{item.text}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -291,11 +682,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      <footer className="bg-white pt-24 pb-12 border-t border-gray-100 container mx-auto px-6 md:px-12">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-[#0a1628] mb-4">Digital Broker</h2>
-          <p className="text-gray-500 text-sm mb-12">Luxury Real Estate Solutions &amp; Commercial Investments</p>
-          <div className="text-center text-xs text-gray-400 pt-8 border-t border-gray-50">
+      {/* ── FOOTER ── */}
+      <footer className="bg-white pt-16 pb-10 border-t border-gray-100">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 text-center">
+          <h2 className="text-2xl font-bold text-[#0a1628] mb-3">Digital Broker</h2>
+          <p className="text-gray-500 text-sm mb-8">Luxury Real Estate Solutions &amp; Commercial Investments</p>
+          <div className="text-xs text-gray-400 pt-6 border-t border-gray-50">
             &copy; 2024 Digital Broker. RERA: {rera}
           </div>
         </div>

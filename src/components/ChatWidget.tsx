@@ -68,6 +68,13 @@ const ChatWidget = () => {
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
                 <input
+                  type="email"
+                  placeholder="Email Address"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-orange-500 transition-colors"
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+                <input
                   type="tel"
                   placeholder="Phone Number"
                   required

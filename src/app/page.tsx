@@ -34,8 +34,6 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div className="animate-fade-in-up">
               <p className="text-sm font-bold text-orange-500 tracking-widest uppercase mb-2">Prime Recommendations</p>
-              <h2 className="text-4xl font-bold text-[#0a1628]">Promoted Selection</h2>
-              <p className="text-gray-500 mt-2">Exclusive hand-picked properties for sophisticated investors.</p>
             </div>
             <a href="/search" className="text-orange-500 font-bold hover:text-orange-600 transition-colors flex items-center">
               View All Promoted <ArrowRight className="w-4 h-4 ml-1" />
@@ -93,10 +91,10 @@ export default async function HomePage() {
         <div className="container mx-auto px-6 md:px-12">
           <div className="bg-[#0a1628] rounded-[2.5rem] p-10 md:p-16 flex flex-col lg:flex-row items-center gap-16 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 animate-pulse"></div>
-            
+
             <div className="lg:w-1/2 relative z-10 text-left">
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-12">
-                Beyond Real Estate <br/>— We Build <br/>Legacies.
+                Beyond Real Estate <br />— We Build <br />Legacies.
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
                 <div className="group transition-all">
@@ -130,10 +128,10 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="lg:w-1/2 w-full relative z-10">
-              <img 
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop" 
-                alt="Business" 
-                className="rounded-3xl w-full h-auto object-cover shadow-2xl border-4 border-white/5" 
+              <img
+                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop"
+                alt="Business"
+                className="rounded-3xl w-full h-auto object-cover shadow-2xl border-4 border-white/5"
               />
             </div>
           </div>
@@ -150,9 +148,6 @@ export default async function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-full font-bold text-lg transition-all animate-float">
                   Request Property
-                </button>
-                <button className="border-2 border-white text-white hover:bg-white hover:text-[#0a1628] px-10 py-4 rounded-full font-bold text-lg transition-all">
-                  Call Us Now
                 </button>
               </div>
             </div>
@@ -183,7 +178,7 @@ export default async function HomePage() {
           </div>
           <div>
             <h4 className="font-bold text-[#0a1628] mb-6 uppercase text-xs tracking-widest">Contact</h4>
-            <p className="text-sm text-gray-500">BKC, Mumbai, India<br/>hello@digitalbroker.tech</p>
+            <p className="text-sm text-gray-500">BKC, Mumbai, India<br />hello@digitalbroker.tech</p>
           </div>
         </div>
         <div className="text-center text-sm text-gray-400 pt-8 border-t border-gray-50">

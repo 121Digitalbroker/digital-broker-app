@@ -50,6 +50,11 @@ export interface IProperty extends Document {
   priceListUrl?: string;
   sitePlanUrl?: string;
   layoutPlanUrl?: string;
+  googleMapsUrl?: string;
+
+  // Additional Details
+  aboutProject?: string;
+  amenities?: string[];
 
   // Metadata for listing compatibility
   isFeatured: boolean;
@@ -102,6 +107,10 @@ const PropertySchema = new Schema<IProperty>(
     priceListUrl: { type: String },
     sitePlanUrl: { type: String },
     layoutPlanUrl: { type: String },
+    googleMapsUrl: { type: String },
+
+    aboutProject: { type: String },
+    amenities: [{ type: String }],
 
     isFeatured: { type: Boolean, default: false },
     isPromoted: { type: Boolean, default: false },

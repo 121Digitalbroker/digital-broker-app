@@ -14,24 +14,34 @@ export async function GET(request: Request) {
     const bedrooms = searchParams.get('bedrooms'); // '1', '2', '3', '4+' or 'All'
     const minSqft = searchParams.get('minSqft');
     const maxSqft = searchParams.get('maxSqft');
+    const q = searchParams.get('q');
     
-    // Additional parameters we can just parse to show they're accepted
-    // const floors = searchParams.get('floors');
-    // const condition = searchParams.get('condition');
+    let andConditions: any[] = [];
     
-    let query: any = {};
-    
+    if (q && q.trim() !== '') {
+      andConditions.push({
+        $or: [
+          { projectName: { $regex: q.trim(), $options: 'i' } },
+          { city: { $regex: q.trim(), $options: 'i' } },
+          { sector: { $regex: q.trim(), $options: 'i' } },
+          { developerName: { $regex: q.trim(), $options: 'i' } }
+        ]
+      });
+    }
+
     if (type && type !== 'All') {
-      query.propertyType = { $in: [type, 'both'] };
+      andConditions.push({ propertyType: { $in: [type, 'both'] } });
     }
     
     // Category mapping
     if (category && category !== 'All') {
-       // Just a relaxed fuzzy match since actual schema uses "typology" and "commercialType"
-       // We'll just leave it out to not break results if it doesn't match perfectly,
-       // or we can query against a 'category' field if it was added. 
-       // For now, if the user explicitly clicks a category we could try:
-       // query.$or = [{ 'residentialConfigs.typology': category }, { 'commercialConfigs.commercialType': category }];
+       andConditions.push({
+         $or: [
+           { 'commercialConfigs.commercialType': category },
+           { 'residentialConfigs.typology': category },
+           { 'category': category }
+         ]
+       });
     }
 
     // Since min/max price & sqft apply to two different config arrays, we construct dynamic checks
@@ -41,10 +51,12 @@ export async function GET(request: Request) {
       if (maxPrice && maxPrice.trim() !== '') priceQ.$lte = Number(maxPrice);
       
       if (Object.keys(priceQ).length > 0) {
-        query.$or = [
-          { 'residentialConfigs.ticketSize': priceQ },
-          { 'commercialConfigs.ticketSize': priceQ }
-        ];
+        andConditions.push({
+          $or: [
+            { 'residentialConfigs.ticketSize': priceQ },
+            { 'commercialConfigs.ticketSize': priceQ }
+          ]
+        });
       }
     }
 
@@ -54,24 +66,13 @@ export async function GET(request: Request) {
       if (maxSqft && maxSqft.trim() !== '') sqftQ.$lte = Number(maxSqft);
       
       if (Object.keys(sqftQ).length > 0) {
-        const sqftOr = [
-          { 'residentialConfigs.unitSize': sqftQ },
-          { 'commercialConfigs.unitSize': sqftQ },
-          { projectSize: sqftQ }
-        ];
-        
-        if (query.$or) {
-          // If we already have price OR, we need to wrap in $and
-          query = {
-             $and: [
-                { $or: query.$or },
-                { $or: sqftOr }
-             ]
-          };
-          delete query.$or;
-        } else {
-          query.$or = sqftOr;
-        }
+        andConditions.push({
+          $or: [
+            { 'residentialConfigs.unitSize': sqftQ },
+            { 'commercialConfigs.unitSize': sqftQ },
+            { projectSize: sqftQ }
+          ]
+        });
       }
     }
 
@@ -83,8 +84,13 @@ export async function GET(request: Request) {
        if (bedrooms === '4+') typologyMap = '4BHK';
        
        if (typologyMap) {
-         query['residentialConfigs.typology'] = typologyMap;
+         andConditions.push({ 'residentialConfigs.typology': typologyMap });
        }
+    }
+
+    let query = {};
+    if (andConditions.length > 0) {
+      query = { $and: andConditions };
     }
 
     const properties = await Property.find(query).sort({ createdAt: -1 });

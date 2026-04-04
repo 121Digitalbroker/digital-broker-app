@@ -42,6 +42,11 @@ export default function CreateProperty() {
     priceListUrl: '',
     sitePlanUrl: '',
     layoutPlanUrl: '',
+    googleMapsUrl: '',
+
+    // Section 7 — Additional Details
+    aboutProject: '',
+    amenities: [] as string[],
 
     // Internal Metadata/Settings
     isFeatured: false,
@@ -49,11 +54,47 @@ export default function CreateProperty() {
   });
 
   const [saving, setSaving] = useState(false);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   useEffect(() => {
     const auth = localStorage.getItem('admin_auth');
     if (auth !== 'true') router.push('/admin');
   }, []);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string, index?: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingField(index !== undefined ? `${fieldName}-${index}` : fieldName);
+    
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (index !== undefined) {
+          const newArray = [...(formData as any)[fieldName]];
+          newArray[index] = data.url;
+          setFormData({ ...formData, [fieldName]: newArray });
+        } else {
+          setFormData({ ...formData, [fieldName]: data.url });
+        }
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error!");
+    } finally {
+      setUploadingField(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +152,6 @@ export default function CreateProperty() {
     setFormData({ ...formData, productImages: newImages });
   };
 
-  // Res Config Helpers
   const addResidentialConfig = () => {
     setFormData({
       ...formData,
@@ -125,7 +165,6 @@ export default function CreateProperty() {
   const updateResidentialConfig = (index: number, field: string, value: any) => {
     const configs = [...formData.residentialConfigs];
     configs[index] = { ...configs[index], [field]: value };
-    // Auto-calculate ticket size
     if (field === 'unitSize' || field === 'pricePerSqft') {
       const sqft = field === 'unitSize' ? Number(value) : Number(configs[index].unitSize || 0);
       const price = field === 'pricePerSqft' ? Number(value) : Number(configs[index].pricePerSqft || 0);
@@ -141,7 +180,6 @@ export default function CreateProperty() {
     });
   };
 
-  // Com Config Helpers
   const addCommercialConfig = () => {
     setFormData({
       ...formData,
@@ -155,7 +193,6 @@ export default function CreateProperty() {
   const updateCommercialConfig = (index: number, field: string, value: any) => {
     const configs = [...formData.commercialConfigs];
     configs[index] = { ...configs[index], [field]: value };
-    // Auto-calculate ticket size
     if (field === 'unitSize' || field === 'pricePerSqft') {
       const sqft = field === 'unitSize' ? Number(value) : Number(configs[index].unitSize || 0);
       const price = field === 'pricePerSqft' ? Number(value) : Number(configs[index].pricePerSqft || 0);
@@ -215,14 +252,21 @@ export default function CreateProperty() {
                  />
               </div>
               <div className="space-y-2">
-                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Developer Logo (URL)</label>
-                 <input 
-                   type="text" 
-                   placeholder="https://..." 
-                   className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-blue-500 transition-all font-medium text-[#0a1628]"
-                   value={formData.developerLogo}
-                   onChange={(e) => setFormData({...formData, developerLogo: e.target.value})}
-                 />
+                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Developer Logo</label>
+                 <div className="flex gap-4">
+                   <input 
+                     type="text" 
+                     placeholder="https://..." 
+                     className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-blue-500 transition-all font-medium text-[#0a1628]"
+                     value={formData.developerLogo}
+                     onChange={(e) => setFormData({...formData, developerLogo: e.target.value})}
+                   />
+                   <label className={`cursor-pointer px-6 py-5 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${uploadingField === 'developerLogo' ? 'bg-gray-200 text-gray-400' : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'}`}>
+                     <Upload className="w-4 h-4" />
+                     {uploadingField === 'developerLogo' ? '...' : 'Upload'}
+                     <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'developerLogo')} />
+                   </label>
+                 </div>
               </div>
             </div>
           </div>
@@ -352,13 +396,6 @@ export default function CreateProperty() {
                 </button>
               </div>
 
-              {formData.residentialConfigs.length === 0 && (
-                <div className="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                  <p className="text-gray-400 font-bold">No Residential Configurations Added.</p>
-                  <button type="button" onClick={addResidentialConfig} className="mt-4 text-green-600 font-bold uppercase text-sm">Add First Configuration</button>
-                </div>
-              )}
-
               <div className="space-y-6">
                 {formData.residentialConfigs.map((config, index) => (
                   <div key={index} className="p-6 rounded-2xl border border-gray-100 bg-gray-50/50 relative">
@@ -367,7 +404,6 @@ export default function CreateProperty() {
                     </button>
                     <h4 className="font-bold uppercase text-sm text-gray-500 mb-4">Config #{index + 1}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Typology</label>
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
@@ -377,56 +413,21 @@ export default function CreateProperty() {
                           <option value="4BHK">4BHK</option>
                         </select>
                       </div>
-
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Unit Size (Sq.Ft)</label>
                         <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                                value={config.unitSize || ''} onChange={(e) => updateResidentialConfig(index, 'unitSize', e.target.value)} />
                       </div>
-
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Price per Sq.Ft (₹)</label>
                         <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                                value={config.pricePerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'pricePerSqft', e.target.value)} />
                       </div>
-
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-green-600 uppercase">Ticket Size (Auto)</label>
                         <input type="text" readOnly className="w-full bg-green-50 border border-green-200 rounded-xl p-3 font-black text-green-700 pointer-events-none"
                                value={`₹ ${config.ticketSize?.toLocaleString() || 0}`} />
                       </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Price Range Min (₹)</label>
-                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                               value={config.priceRangeMin || ''} onChange={(e) => updateResidentialConfig(index, 'priceRangeMin', e.target.value)} />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Price Range Max (₹)</label>
-                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                               value={config.priceRangeMax || ''} onChange={(e) => updateResidentialConfig(index, 'priceRangeMax', e.target.value)} />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">PLC Charges</label>
-                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                               value={config.plcCharges || ''} onChange={(e) => updateResidentialConfig(index, 'plcCharges', e.target.value)} />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Other Charges</label>
-                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                               value={config.otherCharges || ''} onChange={(e) => updateResidentialConfig(index, 'otherCharges', e.target.value)} />
-                      </div>
-
-                      <div className="space-y-1 md:col-span-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Possession Date</label>
-                        <input type="date" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                               value={config.possessionDate ? new Date(config.possessionDate).toISOString().substr(0,10) : ''} 
-                               onChange={(e) => updateResidentialConfig(index, 'possessionDate', e.target.value)} />
-                      </div>
-
                     </div>
                   </div>
                 ))}
@@ -448,84 +449,35 @@ export default function CreateProperty() {
                     <Plus className="w-5 h-5"/> Add Configuration
                   </button>
                 </div>
-
-                {formData.commercialConfigs.length === 0 && (
-                  <div className="text-center py-10 bg-white/5 rounded-2xl border-2 border-dashed border-white/10">
-                    <p className="text-gray-400 font-bold">No Commercial Configurations Added.</p>
-                    <button type="button" onClick={addCommercialConfig} className="mt-4 text-yellow-400 font-bold uppercase text-sm">Add First Configuration</button>
-                  </div>
-                )}
-
                 <div className="space-y-6">
                   {formData.commercialConfigs.map((config, index) => (
                     <div key={index} className="p-6 rounded-2xl border border-white/10 bg-white/5 relative">
                       <button type="button" onClick={() => removeCommercialConfig(index)} className="absolute top-4 right-4 text-red-400 hover:text-red-300">
                         <Trash2 className="w-5 h-5" />
                       </button>
-                      <h4 className="font-bold uppercase text-sm text-yellow-500/80 mb-4">Config #{index + 1}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        
                         <div className="space-y-1">
                           <label className="text-[10px] font-black text-gray-400 uppercase">Property Type</label>
-                          <select className="w-full bg-[#0a1628] border border-white/20 rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white"
+                          <select className="w-full bg-[#0a1628] border border-white/20 rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white font-medium"
                                   value={config.commercialType} onChange={(e) => updateCommercialConfig(index, 'commercialType', e.target.value)}>
                             <option value="Retail">Retail</option>
                             <option value="Studio">Studio</option>
                             <option value="Office">Office</option>
                             <option value="Food Court">Food Court</option>
-                            <option value="Gaming Zone">Gaming Zone</option>
-                            <option value="Industrial">Industrial</option>
                           </select>
                         </div>
-
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black text-gray-400 uppercase">Unit Size (Sq.Ft)</label>
-                          <input type="number" className="w-full bg-[#0a1628] border border-white/20 rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white"
-                                 value={config.unitSize || ''} onChange={(e) => updateCommercialConfig(index, 'unitSize', e.target.value)} />
+                          <label className="text-[10px] font-black text-gray-400 uppercase">Unit Size</label>
+                          <input type="number" className="w-full bg-white/5 border-none rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white" value={config.unitSize || ''} onChange={(e) => updateCommercialConfig(index, 'unitSize', e.target.value)} />
                         </div>
-
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black text-gray-400 uppercase">Price per Sq.Ft (₹)</label>
-                          <input type="number" className="w-full bg-[#0a1628] border border-white/20 rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white"
-                                 value={config.pricePerSqft || ''} onChange={(e) => updateCommercialConfig(index, 'pricePerSqft', e.target.value)} />
+                          <label className="text-[10px] font-black text-gray-400 uppercase">Price per Sqft</label>
+                          <input type="number" className="w-full bg-white/5 border-none rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white" value={config.pricePerSqft || ''} onChange={(e) => updateCommercialConfig(index, 'pricePerSqft', e.target.value)} />
                         </div>
-
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black text-yellow-400 uppercase">Ticket Size (Auto)</label>
-                          <input type="text" readOnly className="w-full bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-3 font-black text-yellow-400 pointer-events-none"
-                                 value={`₹ ${config.ticketSize?.toLocaleString() || 0}`} />
+                          <label className="text-[10px] font-black text-yellow-400 uppercase">Ticket Size</label>
+                          <div className="w-full bg-yellow-400/10 rounded-xl p-3 font-black text-yellow-400">₹ {(config.ticketSize || 0).toLocaleString()}</div>
                         </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-black text-gray-400 uppercase">Lease Commitment (Yrs)</label>
-                          <input type="number" className="w-full bg-[#0a1628] border border-white/20 rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white"
-                                 value={config.leaseYears || ''} onChange={(e) => updateCommercialConfig(index, 'leaseYears', e.target.value)} />
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-black text-gray-400 uppercase">Assured Return (%)</label>
-                          <input type="number" className="w-full bg-[#0a1628] border border-white/20 rounded-xl p-3 focus:ring-2 focus:ring-yellow-400 font-bold text-white"
-                                 value={config.assuredReturnPct || ''} onChange={(e) => updateCommercialConfig(index, 'assuredReturnPct', e.target.value)} />
-                        </div>
-
-                        <div className="space-y-4 md:col-span-2 pt-4">
-                           <label className="flex items-center gap-3 cursor-pointer group">
-                             <div className="relative">
-                               <input 
-                                 type="checkbox" 
-                                 className="sr-only" 
-                                 checked={config.preLeased}
-                                 onChange={(e) => updateCommercialConfig(index, 'preLeased', e.target.checked)}
-                               />
-                               <div className={`w-14 h-8 rounded-full border-2 transition-all ${config.preLeased ? 'border-yellow-400 bg-yellow-400' : 'bg-white/10 border-transparent'}`}></div>
-                               <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform flex items-center justify-center ${config.preLeased ? 'translate-x-6' : ''}`}>
-                                 {config.preLeased && <Check className="w-4 h-4 text-[#0a1628]" />}
-                               </div>
-                             </div>
-                             <span className="font-bold text-white text-sm group-hover:text-yellow-400 transition-colors uppercase tracking-tight">Pre-Leased Property</span>
-                           </label>
-                        </div>
-
                       </div>
                     </div>
                   ))}
@@ -540,40 +492,22 @@ export default function CreateProperty() {
                 <div className="w-2 h-8 bg-cyan-500 rounded-full"></div>
                 <h3 className="text-xl font-black tracking-tight uppercase">6. Document Uploads</h3>
              </div>
-             <p className="text-sm text-gray-500 mb-8">Provide URLs for the property assets and PDF brochures.</p>
-
              <div className="space-y-8">
-                {/* Images */}
                 <div>
                    <div className="flex items-center justify-between mb-4">
                       <h4 className="font-bold text-[#0a1628]">Product Images</h4>
-                      <button 
-                        type="button" 
-                        onClick={() => setFormData({...formData, productImages: [...formData.productImages, '']})}
-                        className="text-cyan-600 font-bold flex items-center gap-2 hover:text-cyan-700 text-sm"
-                      >
-                        <Plus className="w-4 h-4" /> Add Image URL
+                      <button type="button" onClick={() => setFormData({...formData, productImages: [...formData.productImages, '']})} className="text-cyan-600 font-bold flex items-center gap-2 hover:text-cyan-700 text-sm">
+                        <Plus className="w-4 h-4" /> Add Slot
                       </button>
                    </div>
                    <div className="space-y-3">
                       {formData.productImages.map((url, idx) => (
-                        <div key={idx} className="flex gap-4 items-center">
-                           <input 
-                             type="text" 
-                             placeholder="https://..." 
-                             className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                             value={url}
-                             onChange={(e) => handleImageUrlChange(idx, e.target.value)}
-                           />
-                           {formData.productImages.length > 1 && (
-                             <button 
-                               type="button" 
-                               onClick={() => setFormData({...formData, productImages: formData.productImages.filter((_, i) => i !== idx)})}
-                               className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors shrink-0"
-                             >
-                               <X className="w-5 h-5" />
-                             </button>
-                           )}
+                        <div key={idx} className="flex gap-4">
+                          <input type="text" placeholder="Image URL" value={url} onChange={(e) => handleImageUrlChange(idx, e.target.value)} className="flex-1 bg-gray-50 border-none rounded-xl p-4 font-medium" />
+                          <label className={`cursor-pointer px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 ${uploadingField === `productImages-${idx}` ? 'bg-gray-200' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-600 hover:text-white transition-all'}`}>
+                            <Upload className="w-4 h-4" />
+                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'productImages', idx)} />
+                          </label>
                         </div>
                       ))}
                    </div>
@@ -581,45 +515,119 @@ export default function CreateProperty() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
                     <div className="space-y-2">
-                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Brochure PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.brochureUrl}
-                         onChange={(e) => setFormData({...formData, brochureUrl: e.target.value})}
-                       />
+                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Brochure PDF</label>
+                       <div className="flex gap-3">
+                         <input type="text" className="flex-1 bg-gray-50 border-none rounded-2xl p-5" value={formData.brochureUrl} onChange={(e) => setFormData({...formData, brochureUrl: e.target.value})} />
+                         <label className="cursor-pointer px-5 py-5 bg-cyan-100 text-cyan-700 rounded-2xl hover:bg-cyan-700 hover:text-white transition-all">
+                           <Upload className="w-5 h-5" />
+                           <input type="file" className="hidden" accept=".pdf" onChange={(e) => handleFileUpload(e, 'brochureUrl')} />
+                         </label>
+                       </div>
                     </div>
                     <div className="space-y-2">
-                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Price List PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.priceListUrl}
-                         onChange={(e) => setFormData({...formData, priceListUrl: e.target.value})}
-                       />
+                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Price List</label>
+                       <div className="flex gap-3">
+                         <input type="text" className="flex-1 bg-gray-50 border-none rounded-2xl p-5" value={formData.priceListUrl} onChange={(e) => setFormData({...formData, priceListUrl: e.target.value})} />
+                         <label className="cursor-pointer px-5 py-5 bg-cyan-100 text-cyan-700 rounded-2xl hover:bg-cyan-700 hover:text-white transition-all">
+                           <Upload className="w-5 h-5" />
+                           <input type="file" className="hidden" accept=".pdf" onChange={(e) => handleFileUpload(e, 'priceListUrl')} />
+                         </label>
+                       </div>
                     </div>
                     <div className="space-y-2">
-                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Site Plan Image/PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.sitePlanUrl}
-                         onChange={(e) => setFormData({...formData, sitePlanUrl: e.target.value})}
-                       />
+                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Site Plan</label>
+                       <div className="flex gap-3">
+                         <input type="text" className="flex-1 bg-gray-50 border-none rounded-2xl p-5" value={formData.sitePlanUrl} onChange={(e) => setFormData({...formData, sitePlanUrl: e.target.value})} />
+                         <label className="cursor-pointer px-5 py-5 bg-cyan-100 text-cyan-700 rounded-2xl hover:bg-cyan-700 hover:text-white transition-all">
+                           <Upload className="w-5 h-5" />
+                           <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileUpload(e, 'sitePlanUrl')} />
+                         </label>
+                       </div>
                     </div>
                     <div className="space-y-2">
-                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Layout Plan Image/PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.layoutPlanUrl}
-                         onChange={(e) => setFormData({...formData, layoutPlanUrl: e.target.value})}
-                       />
+                       <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Layout Plan</label>
+                       <div className="flex gap-3">
+                         <input type="text" className="flex-1 bg-gray-50 border-none rounded-2xl p-5" value={formData.layoutPlanUrl} onChange={(e) => setFormData({...formData, layoutPlanUrl: e.target.value})} />
+                         <label className="cursor-pointer px-5 py-5 bg-cyan-100 text-cyan-700 rounded-2xl hover:bg-cyan-700 hover:text-white transition-all">
+                           <Upload className="w-5 h-5" />
+                           <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileUpload(e, 'layoutPlanUrl')} />
+                         </label>
+                       </div>
                     </div>
                 </div>
              </div>
           </div>
 
+          {/* SECTION 7: Description & Maps */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
+             <div className="flex items-center gap-3 mb-6">
+                <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
+                <h3 className="text-xl font-black tracking-tight uppercase">7. Description & Location</h3>
+             </div>
+             <div className="space-y-6">
+                <div className="space-y-2">
+                   <label className="text-xs font-black text-gray-400 uppercase tracking-widest">About the Project</label>
+                   <textarea rows={5} placeholder="Describe the project..." className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.aboutProject} onChange={(e) => setFormData({...formData, aboutProject: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                   <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Google Maps URL</label>
+                   <input type="text" placeholder="URL" className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.googleMapsUrl} onChange={(e) => setFormData({...formData, googleMapsUrl: e.target.value})} />
+                </div>
+             </div>
+          </div>
+
+          {/* SECTION 8: Amenities & Promotion */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm border-t-8 border-t-orange-500">
+             <div className="flex items-center gap-3 mb-8">
+                <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
+                <h3 className="text-xl font-black tracking-tight uppercase">8. Promotion & Amenities</h3>
+             </div>
+             
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+               <div>
+                  <h4 className="text-sm font-black text-[#0a1628] uppercase tracking-widest mb-6">Key Amenities</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {['Swimming Pool', 'Gymnasium', 'Clubhouse', 'Childrens Play Area', 'Covered Parking', '24/7 Security', 'Power Backup', 'Landscaped Gardens'].map((amenity) => (
+                      <label key={amenity} className="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500" checked={formData.amenities.includes(amenity)} onChange={(e) => {
+                            const newAmenities = e.target.checked ? [...formData.amenities, amenity] : formData.amenities.filter(a => a !== amenity);
+                            setFormData({...formData, amenities: newAmenities});
+                          }} />
+                        <span className="text-sm font-bold text-gray-600 group-hover:text-[#0a1628]">{amenity}</span>
+                      </label>
+                    ))}
+                  </div>
+               </div>
+
+               <div className="bg-gray-50 rounded-3xl p-8 space-y-8">
+                  <div className="space-y-6">
+                    <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[#0a1628]">Promoted Selection</span>
+                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Show in top homepage</span>
+                      </div>
+                      <div className="relative">
+                        <input type="checkbox" className="sr-only" checked={formData.isPromoted} onChange={(e) => setFormData({...formData, isPromoted: e.target.checked})} />
+                        <div className={`w-14 h-8 rounded-full transition-all ${formData.isPromoted ? 'bg-orange-500' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isPromoted ? 'translate-x-6' : ''}`}></div>
+                      </div>
+                    </label>
+
+                    <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[#0a1628]">Featured Project</span>
+                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Mark as premium</span>
+                      </div>
+                      <div className="relative">
+                        <input type="checkbox" className="sr-only" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} />
+                        <div className={`w-14 h-8 rounded-full transition-all ${formData.isFeatured ? 'bg-blue-500' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isFeatured ? 'translate-x-6' : ''}`}></div>
+                      </div>
+                    </label>
+                  </div>
+               </div>
+             </div>
+          </div>
         </form>
       </div>
     </div>
