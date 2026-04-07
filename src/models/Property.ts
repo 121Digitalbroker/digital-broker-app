@@ -4,6 +4,15 @@ export interface IResidentialConfig {
   typology: '2BHK' | '3BHK' | '4BHK';
   unitSize: number;
   pricePerSqft: number;
+  // Furnishing-specific prices
+  unfurnishedPriceSqft?: number;
+  semiFurnishedPriceSqft?: number;
+  fullyFurnishedPriceSqft?: number;
+  // Per SqFt charges
+  plcPerSqft?: number;
+  otherChargesPerSqft?: number;
+  customPricePerSqft?: number;
+  // Existing fields
   priceRangeMin?: number;
   priceRangeMax?: number;
   plcCharges?: number;
@@ -60,6 +69,7 @@ export interface IProperty extends Document {
   // Metadata for listing compatibility
   isFeatured: boolean;
   isPromoted: boolean;
+  showOnYamunaExpressway: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -68,6 +78,15 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   typology: { type: String, enum: ['2BHK', '3BHK', '4BHK'], required: true },
   unitSize: { type: Number, required: true },
   pricePerSqft: { type: Number, required: true },
+  // Furnishing-specific prices
+  unfurnishedPriceSqft: { type: Number },
+  semiFurnishedPriceSqft: { type: Number },
+  fullyFurnishedPriceSqft: { type: Number },
+  // Per SqFt charges
+  plcPerSqft: { type: Number },
+  otherChargesPerSqft: { type: Number },
+  customPricePerSqft: { type: Number },
+  // Existing fields
   priceRangeMin: { type: Number },
   priceRangeMax: { type: Number },
   plcCharges: { type: Number },
@@ -116,6 +135,7 @@ const PropertySchema = new Schema<IProperty>(
 
     isFeatured: { type: Boolean, default: false },
     isPromoted: { type: Boolean, default: false },
+    showOnYamunaExpressway: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

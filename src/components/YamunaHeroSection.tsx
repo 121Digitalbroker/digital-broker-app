@@ -6,11 +6,11 @@ import MultiRangeSlider from './MultiRangeSlider';
 
 const slides = [
   {
-    image: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2670&auto=format&fit=crop",
+    image: "/uploads/airport.jpg",
     title: "India's Biggest Airport"
   },
   {
-    image: "https://images.unsplash.com/photo-1473839224629-f424603490b2?q=80&w=2670&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2670&auto=format&fit=crop",
     title: "India's Biggest Multi Modal Transport Hub"
   },
   {
@@ -31,10 +31,11 @@ const slides = [
   }
 ];
 
-const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory = (c: string) => {} }: { activeCategory?: string, setActiveCategory?: (c: string) => void }) => {
+const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory = (c: string) => { } }: { activeCategory?: string, setActiveCategory?: (c: string) => void }) => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [heroSlides, setHeroSlides] = useState(slides);
 
   // Search bar states
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -52,12 +53,23 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
 
   useEffect(() => {
     setMounted(true);
+    
+    // Fetch dynamic banners
+    fetch('/api/yamuna-banners')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          setHeroSlides(data);
+        }
+      })
+      .catch(err => console.error('Error fetching banners:', err));
+
     // Cycle every 5 seconds
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSlides.length]);
 
   if (!mounted) return null;
 
@@ -66,7 +78,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
       {/* Hero Banner Area */}
       <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-20 px-6 md:px-12 bg-black">
         {/* Background Images Crossfade */}
-        {slides.map((slide, index) => (
+        {heroSlides.map((slide, index) => (
           <div
             key={index}
             className="absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out"
@@ -98,7 +110,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
           </h1>
 
           <div className="relative h-20 w-full max-w-5xl mx-auto overflow-hidden mt-12 mb-4">
-            {slides.map((slide, idx) => (
+            {heroSlides.map((slide, idx) => (
               <p
                 key={idx}
                 className="absolute inset-0 text-orange-500 text-xl md:text-3xl font-black tracking-[0.3em] uppercase transition-all duration-1000 flex items-center justify-center pt-2"
@@ -116,7 +128,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
 
           {/* Dots indicating current sliding background */}
           <div className="mt-20 flex gap-2 animate-fade-in-up" style={{ animationDelay: '900ms' }}>
-            {slides.map((_, idx) => (
+            {heroSlides.map((_, idx) => (
               <div
                 key={idx}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-orange-500 w-6' : 'bg-white/40'}`}

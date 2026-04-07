@@ -61,6 +61,12 @@ export default function EditProperty() {
         ...c,
         unitSize: Number(c.unitSize) || 0,
         pricePerSqft: Number(c.pricePerSqft) || 0,
+        unfurnishedPriceSqft: Number(c.unfurnishedPriceSqft) || 0,
+        semiFurnishedPriceSqft: Number(c.semiFurnishedPriceSqft) || 0,
+        fullyFurnishedPriceSqft: Number(c.fullyFurnishedPriceSqft) || 0,
+        plcPerSqft: Number(c.plcPerSqft) || 0,
+        otherChargesPerSqft: Number(c.otherChargesPerSqft) || 0,
+        customPricePerSqft: Number(c.customPricePerSqft) || 0,
         possessionDate: c.possessionDate ? new Date(c.possessionDate) : undefined
       }));
 
@@ -178,7 +184,24 @@ export default function EditProperty() {
       ...formData,
       residentialConfigs: [
         ...formData.residentialConfigs,
-        { typology: '2BHK', unitSize: 0, pricePerSqft: 0, priceRangeMin: 0, priceRangeMax: 0, plcCharges: 0, otherCharges: 0, possessionDate: '', ticketSize: 0, sitePlanUrl: '' }
+        { 
+          typology: '2BHK', 
+          unitSize: 0, 
+          pricePerSqft: 0, 
+          unfurnishedPriceSqft: 0,
+          semiFurnishedPriceSqft: 0,
+          fullyFurnishedPriceSqft: 0,
+          plcPerSqft: 0,
+          otherChargesPerSqft: 0,
+          customPricePerSqft: 0,
+          priceRangeMin: 0, 
+          priceRangeMax: 0, 
+          plcCharges: 0, 
+          otherCharges: 0, 
+          possessionDate: '', 
+          ticketSize: 0, 
+          sitePlanUrl: '' 
+        }
       ]
     });
   };
@@ -490,7 +513,39 @@ export default function EditProperty() {
                                value={config.otherCharges || ''} onChange={(e) => updateResidentialConfig(index, 'otherCharges', e.target.value)} />
                       </div>
 
-                      <div className="space-y-1 md:col-span-2">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Unfurnished Price/Sqft</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.unfurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'unfurnishedPriceSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Semi-Furnished Price/Sqft</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.semiFurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'semiFurnishedPriceSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Fully Furnished Price/Sqft</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.fullyFurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'fullyFurnishedPriceSqft', e.target.value)} />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">PLC per Sqft (₹)</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.plcPerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'plcPerSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Other Charges per Sqft (₹)</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.otherChargesPerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'otherChargesPerSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Custom Price per Sqft (₹)</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.customPricePerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'customPricePerSqft', e.target.value)} />
+                      </div>
+
+                      <div className="space-y-1 md:col-span-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Possession Date</label>
                         <input type="date" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                                value={config.possessionDate ? new Date(config.possessionDate).toISOString().substring(0,10) : ''} 

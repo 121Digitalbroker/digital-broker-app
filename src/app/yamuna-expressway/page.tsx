@@ -6,16 +6,11 @@ import { Home } from 'lucide-react';
 
 async function getYamunaProperties() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties`,
+    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties?showOnYamunaExpressway=true`,
     { cache: 'no-store' }
   );
   if (!res.ok) return [];
-  const all = await res.json();
-  // Only Greater Noida / Noida, no promoted cards
-  return all.filter(
-    (p: any) =>
-      ['Greater Noida', 'Noida'].includes(p.city) && !p.isPromoted
-  );
+  return res.json();
 }
 
 export default async function YamunaExpresswayPage() {

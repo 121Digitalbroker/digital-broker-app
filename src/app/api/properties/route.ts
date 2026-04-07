@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
-    
+
     const type = searchParams.get('type');
     const category = searchParams.get('category');
     const minPrice = searchParams.get('minPrice');
@@ -15,7 +15,9 @@ export async function GET(request: Request) {
     const minSqft = searchParams.get('minSqft');
     const maxSqft = searchParams.get('maxSqft');
     const q = searchParams.get('q');
-    
+    const promoted = searchParams.get('promoted');
+    const showOnYamunaExpressway = searchParams.get('showOnYamunaExpressway');
+
     let andConditions: any[] = [];
     
     if (q && q.trim() !== '') {
@@ -83,10 +85,20 @@ export async function GET(request: Request) {
        if (bedrooms === '2') typologyMap = '2BHK';
        if (bedrooms === '3') typologyMap = '3BHK';
        if (bedrooms === '4+') typologyMap = '4BHK';
-       
+
        if (typologyMap) {
          andConditions.push({ 'residentialConfigs.typology': typologyMap });
        }
+    }
+
+    // Promoted filter
+    if (promoted === 'true') {
+      andConditions.push({ isPromoted: true });
+    }
+
+    // Yamuna Expressway filter
+    if (showOnYamunaExpressway === 'true') {
+      andConditions.push({ showOnYamunaExpressway: true });
     }
 
     let query = {};

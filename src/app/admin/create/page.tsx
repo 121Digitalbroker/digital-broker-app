@@ -50,7 +50,8 @@ export default function CreateProperty() {
 
     // Internal Metadata/Settings
     isFeatured: false,
-    isPromoted: false
+    isPromoted: false,
+    showOnYamunaExpressway: false
   });
 
   const [saving, setSaving] = useState(false);
@@ -140,6 +141,12 @@ export default function CreateProperty() {
         ...c,
         unitSize: Number(c.unitSize) || 0,
         pricePerSqft: Number(c.pricePerSqft) || 0,
+        unfurnishedPriceSqft: Number(c.unfurnishedPriceSqft) || 0,
+        semiFurnishedPriceSqft: Number(c.semiFurnishedPriceSqft) || 0,
+        fullyFurnishedPriceSqft: Number(c.fullyFurnishedPriceSqft) || 0,
+        plcPerSqft: Number(c.plcPerSqft) || 0,
+        otherChargesPerSqft: Number(c.otherChargesPerSqft) || 0,
+        customPricePerSqft: Number(c.customPricePerSqft) || 0,
         possessionDate: c.possessionDate ? new Date(c.possessionDate) : undefined
       }));
 
@@ -189,7 +196,24 @@ export default function CreateProperty() {
       ...formData,
       residentialConfigs: [
         ...formData.residentialConfigs,
-        { typology: '2BHK', unitSize: 0, pricePerSqft: 0, priceRangeMin: 0, priceRangeMax: 0, plcCharges: 0, otherCharges: 0, possessionDate: '', ticketSize: 0, sitePlanUrl: '' }
+        { 
+          typology: '2BHK', 
+          unitSize: 0, 
+          pricePerSqft: 0, 
+          unfurnishedPriceSqft: 0,
+          semiFurnishedPriceSqft: 0,
+          fullyFurnishedPriceSqft: 0,
+          plcPerSqft: 0,
+          otherChargesPerSqft: 0,
+          customPricePerSqft: 0,
+          priceRangeMin: 0, 
+          priceRangeMax: 0, 
+          plcCharges: 0, 
+          otherCharges: 0, 
+          possessionDate: '', 
+          ticketSize: 0, 
+          sitePlanUrl: '' 
+        }
       ]
     });
   };
@@ -460,7 +484,39 @@ export default function CreateProperty() {
                         <input type="text" readOnly className="w-full bg-green-50 border border-green-200 rounded-xl p-3 font-black text-green-700 pointer-events-none"
                                value={`₹ ${config.ticketSize?.toLocaleString() || 0}`} />
                       </div>
-                      <div className="space-y-1 md:col-span-2">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Unfurnished Price/Sqft</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.unfurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'unfurnishedPriceSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Semi-Furnished Price/Sqft</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.semiFurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'semiFurnishedPriceSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Fully Furnished Price/Sqft</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.fullyFurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'fullyFurnishedPriceSqft', e.target.value)} />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">PLC per Sqft (₹)</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.plcPerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'plcPerSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Other Charges per Sqft (₹)</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.otherChargesPerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'otherChargesPerSqft', e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Custom Price per Sqft (₹)</label>
+                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.customPricePerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'customPricePerSqft', e.target.value)} />
+                      </div>
+
+                      <div className="space-y-1 md:col-span-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Possession Date</label>
                         <input type="date" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                                value={config.possessionDate ? new Date(config.possessionDate).toISOString().substring(0,10) : ''} 
@@ -677,6 +733,18 @@ export default function CreateProperty() {
                         <input type="checkbox" className="sr-only" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} />
                         <div className={`w-14 h-8 rounded-full transition-all ${formData.isFeatured ? 'bg-blue-500' : 'bg-gray-200'}`}></div>
                         <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isFeatured ? 'translate-x-6' : ''}`}></div>
+                      </div>
+                    </label>
+
+                    <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[#0a1628]">Show on Yamuna Expressway</span>
+                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Display on Yamuna Expressway page</span>
+                      </div>
+                      <div className="relative">
+                        <input type="checkbox" className="sr-only" checked={formData.showOnYamunaExpressway} onChange={(e) => setFormData({...formData, showOnYamunaExpressway: e.target.checked})} />
+                        <div className={`w-14 h-8 rounded-full transition-all ${formData.showOnYamunaExpressway ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.showOnYamunaExpressway ? 'translate-x-6' : ''}`}></div>
                       </div>
                     </label>
                   </div>

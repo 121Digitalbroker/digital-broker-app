@@ -7,7 +7,9 @@ import Link from 'next/link';
 export default function AdminDashboard() {
   const [properties, setProperties] = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState('properties'); // 'properties' | 'leads'
+  const [banners, setBanners] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('properties'); // 'properties' | 'leads' | 'banners'
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,12 +30,14 @@ export default function AdminDashboard() {
     try {
       const promises = [
         fetch('/api/properties').then(r => r.json()),
-        fetch('/api/leads').then(r => r.json())
+        fetch('/api/leads').then(r => r.json()),
+        fetch('/api/yamuna-banners').then(r => r.json())
       ];
       
       const results = await Promise.all(promises);
       setProperties(results[0]);
       setLeads(results[1]);
+      setBanners(results[2] || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -91,6 +95,105 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this banner?')) return;
+    try {
+      const res = await fetch(`/api/yamuna-banners/${id}`, { method: 'DELETE' });
+      if (res.ok) fetchAllData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBanner(true);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        // Now create a banner record
+        const title = prompt("Enter banner title/tagline:", "New Banner") || "New Banner";
+        const resBanner = await fetch("/api/yamuna-banners", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: data.url, title, order: banners.length })
+        });
+        if (resBanner.ok) {
+          fetchAllData();
+        } else {
+          alert("Failed to save banner record.");
+        }
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error!");
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
+
+  const handleEditBannerTitle = async (id: string, currentTitle: string) => {
+    const newTitle = prompt('Edit banner title/tagline:', currentTitle);
+    if (newTitle && newTitle !== currentTitle) {
+      try {
+        const res = await fetch(`/api/yamuna-banners/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: newTitle })
+        });
+        if (res.ok) fetchAllData();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const handleChangeBannerImage = async (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBanner(true);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        const resUpdate = await fetch(`/api/yamuna-banners/${id}`, {
+          method: "PATCH",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: data.url })
+        });
+        if (resUpdate.ok) {
+          fetchAllData();
+        } else {
+          alert("Failed to update banner image.");
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUploadingBanner(false);
     }
   };
 
@@ -152,6 +255,12 @@ export default function AdminDashboard() {
                className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === 'leads' ? 'bg-[#0a1628] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
              >
                Leads ({leads.length})
+             </button>
+             <button 
+               onClick={() => setActiveTab('banners')}
+               className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === 'banners' ? 'bg-[#0a1628] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
+             >
+               Banners ({banners.length})
              </button>
           </div>
         </div>
@@ -287,7 +396,7 @@ export default function AdminDashboard() {
               </table>
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'leads' ? (
           /* Leads Table */
           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-left">
             <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
@@ -326,7 +435,62 @@ export default function AdminDashboard() {
               </table>
             </div>
           </div>
-        )}
+        ) : activeTab === 'banners' ? (
+          /* Banners Table */
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-left">
+            <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-xl font-bold text-[#0a1628]">Yamuna Expressway Banners</h3>
+              <label className="bg-[#0a1628] hover:bg-[#1a2d4a] text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg cursor-pointer">
+                {isUploadingBanner ? (
+                  <div className="w-5 h-5 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
+                ) : (
+                  <Plus className="w-5 h-5" />
+                )}
+                {isUploadingBanner ? 'Uploading...' : 'Upload Banner'}
+                <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} disabled={isUploadingBanner} />
+              </label>
+            </div>
+            
+            <div className="overflow-x-auto p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {banners.map((b: any, index: number) => (
+                  <div key={b._id} className="border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all relative flex flex-col">
+                    <img src={b.image} alt={b.title} className="w-full h-48 object-cover border-b border-gray-100" />
+                    <div className="p-4 bg-white flex-1 flex flex-col justify-between">
+                      <div className="flex justify-between items-start gap-4">
+                         <p className="font-bold text-[#0a1628] leading-tight flex-1">{b.title}</p>
+                         <button onClick={() => handleEditBannerTitle(b._id, b.title)} className="text-gray-400 hover:text-blue-500 shrink-0">
+                           <Edit className="w-4 h-4" />
+                         </button>
+                      </div>
+                      <div className="mt-6 flex items-center justify-between border-t border-gray-50 pt-3">
+                         <p className="text-xs text-gray-400 font-medium">Order: {b.order}</p>
+                         <label className="text-xs font-bold text-orange-500 hover:text-orange-600 cursor-pointer flex items-center gap-1">
+                           Change Image
+                           <input type="file" className="hidden" accept="image/*" onChange={(e) => handleChangeBannerImage(e, b._id)} />
+                         </label>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => handleDeleteBanner(b._id)}
+                      className="absolute top-4 right-4 bg-white/90 backdrop-blur text-red-500 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-[#0a1628] px-3 py-1 rounded-xl text-xs font-bold shadow-sm">
+                      #{index + 1}
+                    </div>
+                  </div>
+                ))}
+                {banners.length === 0 && (
+                  <div className="col-span-full py-12 text-center border-2 border-dashed border-gray-100 rounded-2xl">
+                    <p className="text-gray-400 font-bold">No banners added yet.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );
