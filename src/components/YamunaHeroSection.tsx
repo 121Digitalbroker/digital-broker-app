@@ -53,9 +53,9 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Fetch dynamic banners
-    fetch('/api/yamuna-banners')
+    fetch('/api/yamuna-banners', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
