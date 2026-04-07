@@ -96,6 +96,38 @@ export default function CreateProperty() {
     }
   };
 
+  const handleConfigUpload = async (e: React.ChangeEvent<HTMLInputElement>, configType: 'residential' | 'commercial', index: number, fieldName: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingField(`${configType}-${index}-${fieldName}`);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (configType === 'residential') {
+          updateResidentialConfig(index, fieldName, data.url);
+        } else {
+          updateCommercialConfig(index, fieldName, data.url);
+        }
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error!");
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.developerName || !formData.projectName) {
@@ -157,7 +189,7 @@ export default function CreateProperty() {
       ...formData,
       residentialConfigs: [
         ...formData.residentialConfigs,
-        { typology: '2BHK', unitSize: 0, pricePerSqft: 0, priceRangeMin: 0, priceRangeMax: 0, plcCharges: 0, otherCharges: 0, possessionDate: '', ticketSize: 0 }
+        { typology: '2BHK', unitSize: 0, pricePerSqft: 0, priceRangeMin: 0, priceRangeMax: 0, plcCharges: 0, otherCharges: 0, possessionDate: '', ticketSize: 0, sitePlanUrl: '' }
       ]
     });
   };
@@ -427,6 +459,29 @@ export default function CreateProperty() {
                         <label className="text-[10px] font-black text-green-600 uppercase">Ticket Size (Auto)</label>
                         <input type="text" readOnly className="w-full bg-green-50 border border-green-200 rounded-xl p-3 font-black text-green-700 pointer-events-none"
                                value={`₹ ${config.ticketSize?.toLocaleString() || 0}`} />
+                      </div>
+                      <div className="space-y-1 md:col-span-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Possession Date</label>
+                        <input type="date" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                               value={config.possessionDate ? new Date(config.possessionDate).toISOString().substring(0,10) : ''} 
+                               onChange={(e) => updateResidentialConfig(index, 'possessionDate', e.target.value)} />
+                      </div>
+                      <div className="space-y-1 md:col-span-4 mt-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Configuration Site Plan (URL)</label>
+                        <div className="flex gap-2">
+                          <input type="text" className="flex-1 bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                                 placeholder="https://... (Image or PDF of layout plan)"
+                                 value={config.sitePlanUrl || ''} 
+                                 onChange={(e) => updateResidentialConfig(index, 'sitePlanUrl', e.target.value)} />
+                          <label className={`cursor-pointer px-4 py-3 rounded-xl flex items-center justify-center transition-all ${uploadingField === `residential-${index}-sitePlanUrl` ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-700 hover:bg-green-700 hover:text-white'}`}>
+                            {uploadingField === `residential-${index}-sitePlanUrl` ? (
+                               <div className="w-5 h-5 border-2 border-gray-300 border-t-green-500 animate-spin rounded-full"></div>
+                            ) : (
+                               <Upload className="w-5 h-5" />
+                            )}
+                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleConfigUpload(e, 'residential', index, 'sitePlanUrl')} />
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>

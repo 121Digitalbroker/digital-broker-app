@@ -1,16 +1,18 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Navbar from '@/components/Navbar';
 import PropertyCard from '@/components/PropertyCard';
 import MultiRangeSlider from '@/components/MultiRangeSlider';
 import { LayoutGrid, Map as MapIcon, List, Search } from 'lucide-react';
 
 const SearchPage = () => {
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [filter, setFilter] = useState({ 
     type: 'residential', 
-    category: 'Apartments',
+    category: 'All', // Changed from 'Apartments' to 'All'
+    q: '',
     minSqft: '12',
     maxSqft: '740',
     minPrice: '500000',
@@ -20,11 +22,32 @@ const SearchPage = () => {
     condition: 'All'
   });
 
+  // Initialize filters from URL on first load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setFilter({
+        type: params.get('type') || 'residential',
+        category: params.get('category') || 'All',
+        q: params.get('q') || '',
+        minSqft: params.get('minSqft') || '12',
+        maxSqft: params.get('maxSqft') || '740',
+        minPrice: params.get('minPrice') || '500000',
+        maxPrice: params.get('maxPrice') || '1000000000',
+        floors: params.get('floors') || 'All',
+        bedrooms: params.get('bedrooms') || 'All',
+        condition: params.get('condition') || 'All'
+      });
+      setIsInitialized(true);
+    }
+  }, []);
+
   const fetchProperties = async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({
+      const qParams = new URLSearchParams({
         type: filter.type,
+        q: filter.q,
         category: filter.category,
         minSqft: filter.minSqft,
         maxSqft: filter.maxSqft,
@@ -35,9 +58,14 @@ const SearchPage = () => {
         condition: filter.condition
       }).toString();
       
-      const res = await fetch(`/api/properties?${q}`);
+      const res = await fetch(`/api/properties?${qParams}`);
       const data = await res.json();
-      setProperties(data);
+      if (Array.isArray(data)) {
+        setProperties(data);
+      } else {
+        console.error("API returned non-array data:", data);
+        setProperties([]);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -45,9 +73,13 @@ const SearchPage = () => {
     }
   };
 
+  const stableFilter = useMemo(() => filter, [filter.type, filter.category, filter.q, filter.minSqft, filter.maxSqft, filter.minPrice, filter.maxPrice, filter.floors, filter.bedrooms, filter.condition]);
+
   useEffect(() => {
-    fetchProperties();
-  }, [filter]);
+    if (isInitialized) {
+      fetchProperties();
+    }
+  }, [stableFilter, isInitialized]);
 
   // Format price helper
   const formatRupees = (val: string | number) => {
@@ -62,19 +94,7 @@ const SearchPage = () => {
     <div className="min-h-screen bg-white font-sans text-gray-800 pb-20 overflow-x-hidden pt-28">
       <Navbar />
 
-      {/* Top Search / Header mock */}
-      <div className="container mx-auto px-6 md:px-12 mb-8 hidden md:flex items-center gap-6 text-sm text-gray-500 border-b border-gray-100 pb-4">
-        <div className="flex items-center gap-2"><div className="w-5 h-5 bg-orange-100 text-orange-500 rounded flex items-center justify-center font-bold">H</div></div>
-        <span className="font-medium">Properties list</span>
-        <span className="font-medium">Analytics</span>
-        <span className="text-orange-500 font-bold">What is Horizon?</span>
-        <span className="font-medium mr-auto">Tools&Calculators</span>
-        
-        <div className="bg-gray-50 rounded-lg px-4 py-2 flex items-center gap-3 w-64 border border-gray-100">
-          <Search className="w-4 h-4 text-gray-400" />
-          <input type="text" placeholder="Noida, India" className="bg-transparent border-none outline-none text-xs w-full font-medium" />
-        </div>
-      </div>
+      {/* Filters Section Header removed per request */}
 
       <main className="container mx-auto px-6 md:px-12">
         
@@ -82,30 +102,34 @@ const SearchPage = () => {
         <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 mb-8 mt-4 border-b border-gray-100 pb-6">
           
           <div className="flex items-center gap-8 w-full xl:w-auto overflow-x-auto scrollbar-hide">
-            {/* Residential / Commercial Toggle */}
-            <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100 flex-shrink-0">
-              <button 
-                onClick={() => setFilter({...filter, type: 'residential'})}
-                className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${filter.type === 'residential' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-              >Residential</button>
-              <button 
-                onClick={() => setFilter({...filter, type: 'commercial'})}
-                  className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${filter.type === 'commercial' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-              >Commercial</button>
+            {/* Residential / Commercial Toggle & Search Bar */}
+            <div className="flex flex-col sm:flex-row items-center gap-6 w-full">
+              <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100 flex-shrink-0">
+                <button 
+                  onClick={() => setFilter({...filter, type: 'residential'})}
+                  className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${filter.type === 'residential' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >Residential</button>
+                <button 
+                  onClick={() => setFilter({...filter, type: 'commercial'})}
+                    className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${filter.type === 'commercial' ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >Commercial</button>
+              </div>
+
+              {/* New Search Bar */}
+              <div className="flex-1 w-full max-w-md relative group">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <Search className="w-4 h-4 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+                </div>
+                <input 
+                  type="text" 
+                  value={filter.q}
+                  onChange={(e) => setFilter({...filter, q: e.target.value})}
+                  placeholder="Search by project or location..." 
+                  className="w-full bg-gray-50 border border-gray-100 rounded-full py-2.5 pl-11 pr-4 text-xs font-medium focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                />
+              </div>
             </div>
 
-            {/* Categories */}
-            <div className="flex items-center gap-6 font-semibold text-[13px] text-gray-400">
-              {['All', 'Apartments', 'Private homes', 'Multi-storey building', 'Single rooms', 'Units'].map(cat => (
-                  <button 
-                    key={cat} 
-                    onClick={() => setFilter({...filter, category: cat})}
-                    className={`whitespace-nowrap transition-colors ${filter.category === cat ? 'text-orange-500 font-bold bg-orange-50 px-3 py-1.5 rounded-full' : 'hover:text-gray-600'}`}
-                  >
-                    {cat}
-                  </button>
-              ))}
-            </div>
           </div>
 
           {/* View Modes */}

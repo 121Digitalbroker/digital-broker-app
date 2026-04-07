@@ -10,6 +10,7 @@ export interface IResidentialConfig {
   otherCharges?: number;
   possessionDate?: Date;
   ticketSize: number;
+  sitePlanUrl?: string;
 }
 
 export interface ICommercialConfig {
@@ -73,6 +74,7 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   otherCharges: { type: Number },
   possessionDate: { type: Date },
   ticketSize: { type: Number, required: true },
+  sitePlanUrl: { type: String },
 });
 
 const CommercialConfigSchema = new Schema<ICommercialConfig>({

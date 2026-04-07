@@ -19,12 +19,13 @@ export async function GET(request: Request) {
     let andConditions: any[] = [];
     
     if (q && q.trim() !== '') {
+      const escapedQ = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       andConditions.push({
         $or: [
-          { projectName: { $regex: q.trim(), $options: 'i' } },
-          { city: { $regex: q.trim(), $options: 'i' } },
-          { sector: { $regex: q.trim(), $options: 'i' } },
-          { developerName: { $regex: q.trim(), $options: 'i' } }
+          { projectName: { $regex: escapedQ, $options: 'i' } },
+          { city: { $regex: escapedQ, $options: 'i' } },
+          { sector: { $regex: escapedQ, $options: 'i' } },
+          { developerName: { $regex: escapedQ, $options: 'i' } }
         ]
       });
     }

@@ -14,14 +14,14 @@ export async function POST(request: Request) {
     // 2. Check Database for CMS Users
     await dbConnect();
     const user = await User.findOne({ username, password });
-    
+
     if (user) {
       return NextResponse.json({ success: true, role: user.role });
     }
 
     // 3. Fallback to old simple prototype login temporarily until fully migrated
-    if (username === 'admin' && password === 'admin123') {
-       return NextResponse.json({ success: true, role: 'cms_user' });
+    if (username === 'admin' && password === 'AdminG924') {
+      return NextResponse.json({ success: true, role: 'cms_user' });
     }
 
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });

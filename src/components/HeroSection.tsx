@@ -3,8 +3,20 @@ import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, MapPin, DollarSign, Home, Maximize2, Layers, TrendingUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import MultiRangeSlider from './MultiRangeSlider';
+import PrivateViewingModal from './PrivateViewingModal';
 
-const HeroSection = () => {
+interface Property {
+  _id: string;
+  projectName?: string;
+  title?: string;
+  location?: string;
+}
+
+interface HeroSectionProps {
+  properties?: Property[];
+}
+
+const HeroSection = ({ properties = [] }: HeroSectionProps) => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -15,6 +27,7 @@ const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Residential');
   const [commercialType, setCommercialType] = useState<string | null>(null);
+  const [showViewingModal, setShowViewingModal] = useState(false);
 
   const categories = [
     { id: 'Residential', icon: Home, label: 'Residential' },
@@ -57,7 +70,10 @@ const HeroSection = () => {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-600">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-3.5 rounded-full font-bold tracking-widest text-[11px] uppercase transition-all hover:scale-105 hover:shadow-[0_15px_40px_rgba(249,115,22,0.5)]">
+            <button 
+              onClick={() => setShowViewingModal(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-3.5 rounded-full font-bold tracking-widest text-[11px] uppercase transition-all hover:scale-105 hover:shadow-[0_15px_40px_rgba(249,115,22,0.5)]"
+            >
               Request Private Viewing
             </button>
             <button className="border border-white/40 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-[#0a1628] px-10 py-3.5 rounded-full font-bold tracking-widest text-[11px] uppercase transition-all">
@@ -77,10 +93,16 @@ const HeroSection = () => {
             ))}
           </div>
         </div> 
+
       </div>
 
       {/* ── OVERLAPPING SEARCH BAR ── */}
       <div className="relative z-20 w-full max-w-6xl mx-auto px-6 md:px-0 -mt-32">
+        <PrivateViewingModal 
+          isOpen={showViewingModal} 
+          onClose={() => setShowViewingModal(false)} 
+          properties={properties}
+        />
         {/* ── CATEGORY BAR ── */}
         <div className="mb-6 flex justify-center">
           <div className="bg-[#0a1628] border border-[#1a2d4a] rounded-full p-1.5 flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-x-auto">

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
-import { ArrowLeft, Save, X, Check, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Upload, X, Check, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -18,6 +18,7 @@ export default function EditProperty() {
   const [formData, setFormData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   useEffect(() => {
     const auth = localStorage.getItem('admin_auth');
@@ -98,6 +99,73 @@ export default function EditProperty() {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string, index?: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingField(index !== undefined ? `${fieldName}-${index}` : fieldName);
+    
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (index !== undefined) {
+          const newArray = [...(formData as any)[fieldName]];
+          newArray[index] = data.url;
+          setFormData({ ...formData, [fieldName]: newArray });
+        } else {
+          setFormData({ ...formData, [fieldName]: data.url });
+        }
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error!");
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
+  const handleConfigUpload = async (e: React.ChangeEvent<HTMLInputElement>, configType: 'residential' | 'commercial', index: number, fieldName: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingField(`${configType}-${index}-${fieldName}`);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (configType === 'residential') {
+          updateResidentialConfig(index, fieldName, data.url);
+        } else {
+          updateCommercialConfig(index, fieldName, data.url);
+        }
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error!");
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
   const handleImageUrlChange = (index: number, value: string) => {
     const newImages = [...formData.productImages];
     newImages[index] = value;
@@ -110,7 +178,7 @@ export default function EditProperty() {
       ...formData,
       residentialConfigs: [
         ...formData.residentialConfigs,
-        { typology: '2BHK', unitSize: 0, pricePerSqft: 0, priceRangeMin: 0, priceRangeMax: 0, plcCharges: 0, otherCharges: 0, possessionDate: '', ticketSize: 0 }
+        { typology: '2BHK', unitSize: 0, pricePerSqft: 0, priceRangeMin: 0, priceRangeMax: 0, plcCharges: 0, otherCharges: 0, possessionDate: '', ticketSize: 0, sitePlanUrl: '' }
       ]
     });
   };
@@ -425,11 +493,30 @@ export default function EditProperty() {
                       <div className="space-y-1 md:col-span-2">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Possession Date</label>
                         <input type="date" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                               value={config.possessionDate ? new Date(config.possessionDate).toISOString().substr(0,10) : ''} 
+                               value={config.possessionDate ? new Date(config.possessionDate).toISOString().substring(0,10) : ''} 
                                onChange={(e) => updateResidentialConfig(index, 'possessionDate', e.target.value)} />
                       </div>
 
+                      <div className="space-y-1 md:col-span-4 mt-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Configuration Site Plan (URL)</label>
+                        <div className="flex gap-2">
+                          <input type="text" className="flex-1 bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                                 placeholder="https://... (Image or PDF of layout plan)"
+                                 value={config.sitePlanUrl || ''} 
+                                 onChange={(e) => updateResidentialConfig(index, 'sitePlanUrl', e.target.value)} />
+                          <label className={`cursor-pointer px-4 py-3 rounded-xl flex items-center justify-center transition-all ${uploadingField === `residential-${index}-sitePlanUrl` ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-700 hover:bg-green-700 hover:text-white'}`}>
+                            {uploadingField === `residential-${index}-sitePlanUrl` ? (
+                               <div className="w-5 h-5 border-2 border-gray-300 border-t-green-500 animate-spin rounded-full"></div>
+                            ) : (
+                               <Upload className="w-5 h-5" />
+                            )}
+                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleConfigUpload(e, 'residential', index, 'sitePlanUrl')} />
+                          </label>
+                        </div>
+                      </div>
+
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -584,39 +671,79 @@ export default function EditProperty() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
                     <div className="space-y-2">
                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Brochure PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.brochureUrl || ''}
-                         onChange={(e) => setFormData({...formData, brochureUrl: e.target.value})}
-                       />
+                       <div className="flex gap-3">
+                         <input 
+                           type="text" 
+                           className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
+                           value={formData.brochureUrl || ''}
+                           onChange={(e) => setFormData({...formData, brochureUrl: e.target.value})}
+                         />
+                         <label className={`cursor-pointer px-5 py-5 rounded-2xl flex items-center justify-center transition-all ${uploadingField === 'brochureUrl' ? 'bg-gray-100 text-gray-400' : 'bg-cyan-100 text-cyan-700 hover:bg-cyan-700 hover:text-white'}`}>
+                            {uploadingField === 'brochureUrl' ? (
+                               <div className="w-5 h-5 border-2 border-gray-300 border-t-cyan-500 animate-spin rounded-full"></div>
+                            ) : (
+                               <Upload className="w-5 h-5" />
+                            )}
+                            <input type="file" className="hidden" accept=".pdf" onChange={(e) => handleFileUpload(e, 'brochureUrl')} />
+                         </label>
+                       </div>
                     </div>
                     <div className="space-y-2">
                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Price List PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.priceListUrl || ''}
-                         onChange={(e) => setFormData({...formData, priceListUrl: e.target.value})}
-                       />
+                       <div className="flex gap-3">
+                         <input 
+                           type="text" 
+                           className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
+                           value={formData.priceListUrl || ''}
+                           onChange={(e) => setFormData({...formData, priceListUrl: e.target.value})}
+                         />
+                         <label className={`cursor-pointer px-5 py-5 rounded-2xl flex items-center justify-center transition-all ${uploadingField === 'priceListUrl' ? 'bg-gray-100 text-gray-400' : 'bg-cyan-100 text-cyan-700 hover:bg-cyan-700 hover:text-white'}`}>
+                            {uploadingField === 'priceListUrl' ? (
+                               <div className="w-5 h-5 border-2 border-gray-300 border-t-cyan-500 animate-spin rounded-full"></div>
+                            ) : (
+                               <Upload className="w-5 h-5" />
+                            )}
+                            <input type="file" className="hidden" accept=".pdf" onChange={(e) => handleFileUpload(e, 'priceListUrl')} />
+                         </label>
+                       </div>
                     </div>
                     <div className="space-y-2">
                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Site Plan Image/PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.sitePlanUrl || ''}
-                         onChange={(e) => setFormData({...formData, sitePlanUrl: e.target.value})}
-                       />
+                       <div className="flex gap-3">
+                         <input 
+                           type="text" 
+                           className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
+                           value={formData.sitePlanUrl || ''}
+                           onChange={(e) => setFormData({...formData, sitePlanUrl: e.target.value})}
+                         />
+                         <label className={`cursor-pointer px-5 py-5 rounded-2xl flex items-center justify-center transition-all ${uploadingField === 'sitePlanUrl' ? 'bg-gray-100 text-gray-400' : 'bg-cyan-100 text-cyan-700 hover:bg-cyan-700 hover:text-white'}`}>
+                            {uploadingField === 'sitePlanUrl' ? (
+                               <div className="w-5 h-5 border-2 border-gray-300 border-t-cyan-500 animate-spin rounded-full"></div>
+                            ) : (
+                               <Upload className="w-5 h-5" />
+                            )}
+                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileUpload(e, 'sitePlanUrl')} />
+                         </label>
+                       </div>
                     </div>
                     <div className="space-y-2">
                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Layout Plan Image/PDF (URL)</label>
-                       <input 
-                         type="text" 
-                         className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
-                         value={formData.layoutPlanUrl || ''}
-                         onChange={(e) => setFormData({...formData, layoutPlanUrl: e.target.value})}
-                       />
+                       <div className="flex gap-3">
+                         <input 
+                           type="text" 
+                           className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
+                           value={formData.layoutPlanUrl || ''}
+                           onChange={(e) => setFormData({...formData, layoutPlanUrl: e.target.value})}
+                         />
+                         <label className={`cursor-pointer px-5 py-5 rounded-2xl flex items-center justify-center transition-all ${uploadingField === 'layoutPlanUrl' ? 'bg-gray-100 text-gray-400' : 'bg-cyan-100 text-cyan-700 hover:bg-cyan-700 hover:text-white'}`}>
+                            {uploadingField === 'layoutPlanUrl' ? (
+                               <div className="w-5 h-5 border-2 border-gray-300 border-t-cyan-500 animate-spin rounded-full"></div>
+                            ) : (
+                               <Upload className="w-5 h-5" />
+                            )}
+                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileUpload(e, 'layoutPlanUrl')} />
+                         </label>
+                       </div>
                     </div>
                 </div>
              </div>
