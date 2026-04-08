@@ -218,7 +218,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   {/* Developer Badge */}
                   <div className="flex items-center gap-3 mb-4">
                     {developerLogo && (
-                      <img src={developerLogo} alt={developerName} className="w-8 h-8 rounded-lg object-contain bg-gray-50 border border-gray-100" />
+                      <img src={developerLogo} alt={developerName} className="w-10 h-10 rounded-full object-contain bg-gray-50 border border-gray-100 p-0.5" />
                     )}
                     <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{developerName}</span>
                     <span className="bg-green-50 text-green-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Verified</span>

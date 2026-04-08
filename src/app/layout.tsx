@@ -7,6 +7,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "Digital Broker | Premium Real Estate",
   description: "Find exclusive homes and commercial properties with expert guidance.",
+  icons: {
+    icon: "/Logo1.svg",
+    apple: "/Logo1.svg",
+  },
 };
 
 export default function RootLayout({

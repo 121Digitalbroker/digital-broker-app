@@ -4,31 +4,45 @@ export interface IResidentialConfig {
   typology: '2BHK' | '3BHK' | '4BHK';
   unitSize: number;
   pricePerSqft: number;
-  // Furnishing-specific prices
-  unfurnishedPriceSqft?: number;
-  semiFurnishedPriceSqft?: number;
+  // Furnishing Type
+  furnishingType?: 'Unfurnished' | 'Semi Furnished' | 'Fully Furnished';
   fullyFurnishedPriceSqft?: number;
   // Per SqFt charges
   plcPerSqft?: number;
   otherChargesPerSqft?: number;
-  customPricePerSqft?: number;
   // Existing fields
   priceRangeMin?: number;
   priceRangeMax?: number;
   plcCharges?: number;
   otherCharges?: number;
-  possessionDate?: Date;
+  // Possession - Month/Year or RERA
+  possessionMonth?: string;
+  possessionYear?: string;
+  reraLink?: string;
   ticketSize: number;
   sitePlanUrl?: string;
+  // Room details
+  servantRooms?: 1 | 2 | 3 | 4;
+  toilets?: 1 | 2 | 3;
+  balconies?: 2 | 3 | 4;
+  // Additional features
+  carParking?: '1 Covered' | '2 Covered' | '1 Open' | '2 Open' | 'Included';
+  clubMembership?: 'Included' | 'Not Included' | 'Optional';
+  // Loanable option
+  loanable?: boolean;
 }
 
 export interface ICommercialConfig {
-  commercialType: 'Retail' | 'Studio' | 'Office' | 'Food Court' | 'Gaming Zone' | 'Industrial';
+  commercialType: 'Business Suite' | 'Gaming Zone' | 'Fine Dining' | 'Serviced Apartment' | 'Office Spaces';
   unitSize: number;
   pricePerSqft: number;
   leaseYears?: number;
   assuredReturnPct?: number;
   preLeased: boolean;
+  isLockable?: boolean;
+  mlgPrice?: number;
+  assuredReturnMonthly?: boolean;
+  loanable?: boolean;
   ticketSize: number;
 }
 
@@ -39,11 +53,11 @@ export interface IProperty extends Document {
 
   // Section 2 — Project
   projectName: string;
-  city: 'Noida' | 'Greater Noida' | 'Delhi' | 'Gurgaon';
+  city: 'Noida' | 'Greater Noida' | 'Noida Extension' | 'Yamuna Expressway';
   sector?: string;
   projectSize?: number;
   reraNumber?: string;
-  projectStatus?: 'New Launch' | 'Under Construction' | 'Ready To Move';
+  projectStatus?: 'Pre Launched' | 'New Launch' | 'Under Construction' | 'Ready To Move';
 
   // Section 3 — Type
   propertyType: 'residential' | 'commercial' | 'both';
@@ -59,7 +73,6 @@ export interface IProperty extends Document {
   brochureUrl?: string;
   priceListUrl?: string;
   sitePlanUrl?: string;
-  layoutPlanUrl?: string;
   googleMapsUrl?: string;
 
   // Additional Details
@@ -79,31 +92,45 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   typology: { type: String, enum: ['2BHK', '3BHK', '4BHK'], required: true },
   unitSize: { type: Number, required: true },
   pricePerSqft: { type: Number, required: true },
-  // Furnishing-specific prices
-  unfurnishedPriceSqft: { type: Number },
-  semiFurnishedPriceSqft: { type: Number },
+  // Furnishing Type
+  furnishingType: { type: String, enum: ['Unfurnished', 'Semi Furnished', 'Fully Furnished'] },
   fullyFurnishedPriceSqft: { type: Number },
   // Per SqFt charges
   plcPerSqft: { type: Number },
   otherChargesPerSqft: { type: Number },
-  customPricePerSqft: { type: Number },
   // Existing fields
   priceRangeMin: { type: Number },
   priceRangeMax: { type: Number },
   plcCharges: { type: Number },
   otherCharges: { type: Number },
-  possessionDate: { type: Date },
+  // Possession - Month/Year or RERA
+  possessionMonth: { type: String },
+  possessionYear: { type: String },
+  reraLink: { type: String },
   ticketSize: { type: Number, required: true },
   sitePlanUrl: { type: String },
+  // Room details
+  servantRooms: { type: Number, enum: [1, 2, 3, 4] },
+  toilets: { type: Number, enum: [1, 2, 3] },
+  balconies: { type: Number, enum: [2, 3, 4] },
+  // Additional features
+  carParking: { type: String, enum: ['1 Covered', '2 Covered', '1 Open', '2 Open', 'Included'] },
+  clubMembership: { type: String, enum: ['Included', 'Not Included', 'Optional'] },
+  // Loanable option
+  loanable: { type: Boolean, default: false },
 });
 
 const CommercialConfigSchema = new Schema<ICommercialConfig>({
-  commercialType: { type: String, enum: ['Retail', 'Studio', 'Office', 'Food Court', 'Gaming Zone', 'Industrial'], required: true },
+  commercialType: { type: String, enum: ['Business Suite', 'Gaming Zone', 'Fine Dining', 'Serviced Apartment', 'Office Spaces'], required: true },
   unitSize: { type: Number, required: true },
   pricePerSqft: { type: Number, required: true },
   leaseYears: { type: Number },
   assuredReturnPct: { type: Number },
   preLeased: { type: Boolean, default: false },
+  isLockable: { type: Boolean, default: true },
+  mlgPrice: { type: Number },
+  assuredReturnMonthly: { type: Boolean, default: false },
+  loanable: { type: Boolean, default: false },
   ticketSize: { type: Number, required: true },
 });
 
@@ -111,24 +138,23 @@ const PropertySchema = new Schema<IProperty>(
   {
     developerName: { type: String, required: true },
     developerLogo: { type: String },
-    
+
     projectName: { type: String, required: true },
-    city: { type: String, enum: ['Noida', 'Greater Noida', 'Delhi', 'Gurgaon'], required: true },
+    city: { type: String, enum: ['Noida', 'Greater Noida', 'Noida Extension', 'Yamuna Expressway'], required: true },
     sector: { type: String },
     projectSize: { type: Number },
     reraNumber: { type: String },
-    projectStatus: { type: String, enum: ['New Launch', 'Under Construction', 'Ready To Move'] },
+    projectStatus: { type: String, enum: ['Pre Launched', 'New Launch', 'Under Construction', 'Ready To Move'] },
 
     propertyType: { type: String, enum: ['residential', 'commercial', 'both'], required: true },
-    
+
     residentialConfigs: [ResidentialConfigSchema],
     commercialConfigs: [CommercialConfigSchema],
-    
+
     productImages: [{ type: String }],
     brochureUrl: { type: String },
     priceListUrl: { type: String },
     sitePlanUrl: { type: String },
-    layoutPlanUrl: { type: String },
     googleMapsUrl: { type: String },
 
     aboutProject: { type: String },
@@ -137,7 +163,6 @@ const PropertySchema = new Schema<IProperty>(
     isFeatured: { type: Boolean, default: false },
     isPromoted: { type: Boolean, default: false },
     showOnYamunaExpressway: { type: Boolean, default: false },
-    furnishingType: { type: String, enum: ['Semi Furnished', 'Fully Furnished', 'Unfurnished'] },
   },
   { timestamps: true }
 );
