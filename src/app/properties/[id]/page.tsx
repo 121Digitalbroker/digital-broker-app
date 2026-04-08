@@ -634,29 +634,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              {/* Agent Card */}
-              <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="relative">
-                    <img src={agentAvatar} className="w-14 h-14 rounded-2xl object-cover ring-4 ring-gray-50" alt={agentName} />
-                    <div className="absolute -bottom-1 -right-1 bg-green-500 w-3.5 h-3.5 rounded-full border-[3px] border-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-[#0a1628] text-sm">{agentName}</h4>
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                      <Star className="w-3 h-3 fill-orange-500 text-orange-500" />
-                      {agentRating} Rated Expert
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 leading-relaxed italic mb-4">
-                  &quot;Specializing in luxury portfolios and commercial high-yield investments for over 10 years.&quot;
-                </p>
-                {/* Contact support info instead of call button */}
-                <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest font-bold">
-                  Expert Consultation Reserved for You
-                </p>
-              </div>
+              {/* Agent Card removed as per user request */}
 
               {/* Why Choose Us */}
               <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
