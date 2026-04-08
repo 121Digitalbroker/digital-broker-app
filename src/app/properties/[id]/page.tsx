@@ -614,7 +614,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                     </button>
                     {/* WhatsApp Button */}
                     <a
-                      href={`https://wa.me/916375232264?text=Hi, I am interested in ${title} at ${locationStr}. Please share more details.`}
+                      href={`https://wa.me/919217976577?text=Hi, I am interested in ${title} at ${locationStr}. Please share more details.`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white py-4 rounded-full font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"

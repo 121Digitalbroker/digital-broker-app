@@ -6,7 +6,7 @@ const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="pt-32 pb-20 max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16 animate-fade-in-up">
           <h1 className="text-4xl lg:text-6xl font-black text-[#0a1628] uppercase tracking-tight mb-4">
@@ -20,23 +20,23 @@ const ContactPage = () => {
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
               <Phone className="w-8 h-8 text-orange-500 mb-4" />
               <h3 className="text-lg font-bold text-[#0a1628] mb-1">Direct Line</h3>
-              <p className="text-gray-500 mb-4">Available 24/7 for VIP clients.</p>
-              <p className="font-bold text-[#0a1628]">+1 (800) LUX-ESTATE</p>
+              <p className="text-gray-500 mb-4">Call or WhatsApp us anytime.</p>
+              <a href="https://wa.me/919217976577" target="_blank" className="font-bold text-[#0a1628] hover:text-orange-500 transition-colors">+91 9217976577</a>
             </div>
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
               <Mail className="w-8 h-8 text-orange-500 mb-4" />
               <h3 className="text-lg font-bold text-[#0a1628] mb-1">Private Desk</h3>
               <p className="text-gray-500 mb-4">For general and press inquiries.</p>
-              <p className="font-bold text-[#0a1628]">office@digitalbroker.com</p>
+              <a href="mailto:devashish@vantagerealtors.in" className="font-bold text-[#0a1628] hover:text-orange-500 transition-colors">devashish@vantagerealtors.in</a>
             </div>
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
               <MapPin className="w-8 h-8 text-orange-500 mb-4" />
-              <h3 className="text-lg font-bold text-[#0a1628] mb-1">Global HQ</h3>
-              <p className="text-gray-500 mb-4">By appointment only.</p>
-              <p className="font-bold text-[#0a1628]">100 Luxury Avenue, NY</p>
+              <h3 className="text-lg font-bold text-[#0a1628] mb-1">Our Office</h3>
+              <p className="text-gray-500 mb-4">Visit us by appointment.</p>
+              <p className="font-bold text-[#0a1628]">Noida, Uttar Pradesh, India</p>
             </div>
           </div>
-          
+
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-8 lg:p-12">
             <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

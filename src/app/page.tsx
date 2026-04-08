@@ -36,7 +36,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div className="animate-fade-in-up">
-              <p className="text-sm font-bold text-orange-500 tracking-widest uppercase mb-2">Prime Recommendations</p>
+              <p className="text-sm font-bold text-orange-500 tracking-widest uppercase mb-2">Featured Properties</p>
             </div>
             <a href="/search" className="text-orange-500 font-bold hover:text-orange-600 transition-colors flex items-center">
               View All Promoted <ArrowRight className="w-4 h-4 ml-1" />
