@@ -122,13 +122,20 @@ const PropertyCard = ({ property }: { property: any }) => {
           </div>
         </div>
         
-        {/* Location */}
-        {location && (
-          <div className="flex items-start text-xs font-semibold text-gray-400 mb-6">
-             <MapPin className="w-3.5 h-3.5 text-orange-400 mr-2 flex-shrink-0" /> 
-             <span className="line-clamp-1">{location}</span>
-          </div>
-        )}
+        {/* Location & Furnishing */}
+        <div className="flex flex-col gap-3 mb-6">
+          {location && (
+            <div className="flex items-start text-xs font-semibold text-gray-400">
+               <MapPin className="w-3.5 h-3.5 text-orange-400 mr-2 flex-shrink-0" /> 
+               <span className="line-clamp-1">{location}</span>
+            </div>
+          )}
+          {property.furnishingType && (
+            <div className="flex items-center text-[10px] font-bold text-blue-600 bg-blue-50 w-fit px-3 py-1 rounded-full border border-blue-100 uppercase tracking-widest">
+               {property.furnishingType}
+            </div>
+          )}
+        </div>
         
         {/* Footer */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">

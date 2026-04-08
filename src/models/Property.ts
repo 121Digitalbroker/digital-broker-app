@@ -70,6 +70,7 @@ export interface IProperty extends Document {
   isFeatured: boolean;
   isPromoted: boolean;
   showOnYamunaExpressway: boolean;
+  furnishingType: 'Semi Furnished' | 'Fully Furnished' | 'Unfurnished';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -136,6 +137,7 @@ const PropertySchema = new Schema<IProperty>(
     isFeatured: { type: Boolean, default: false },
     isPromoted: { type: Boolean, default: false },
     showOnYamunaExpressway: { type: Boolean, default: false },
+    furnishingType: { type: String, enum: ['Semi Furnished', 'Fully Furnished', 'Unfurnished'] },
   },
   { timestamps: true }
 );

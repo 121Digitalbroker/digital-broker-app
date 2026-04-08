@@ -74,24 +74,11 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
               onClick={() => setShowViewingModal(true)}
               className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-3.5 rounded-full font-bold tracking-widest text-[11px] uppercase transition-all hover:scale-105 hover:shadow-[0_15px_40px_rgba(249,115,22,0.5)]"
             >
-              Request Private Viewing
-            </button>
-            <button className="border border-white/40 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-[#0a1628] px-10 py-3.5 rounded-full font-bold tracking-widest text-[11px] uppercase transition-all">
-              Explore The Collection
+              Book Your Appointment
             </button>
           </div>
 
-          <div className="mt-8 flex items-center gap-10 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
-            {[['500+', 'Properties'], ['₹2K Cr+', 'Transactions'], ['0%', 'Brokerage']].map(([num, label], i) => (
-              <React.Fragment key={label}>
-                {i > 0 && <div className="w-px h-8 bg-white/20"></div>}
-                <div className="text-center">
-                  <p className="text-white font-black text-2xl">{num}</p>
-                  <p className="text-gray-400 text-[10px] tracking-widest uppercase mt-0.5">{label}</p>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
+
         </div> 
 
       </div>

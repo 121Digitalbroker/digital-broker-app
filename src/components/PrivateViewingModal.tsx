@@ -80,8 +80,8 @@ const PrivateViewingModal = ({ isOpen, onClose, properties = [] }: PrivateViewin
         {/* Header */}
         <div className="bg-[#0a1628] p-6 rounded-t-3xl flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white">Request Private Viewing</h2>
-            <p className="text-gray-400 text-sm mt-1">Schedule a one-to-one property tour</p>
+            <h2 className="text-xl font-bold text-white">Book Your Appointment</h2>
+            <p className="text-gray-400 text-sm mt-1">Schedule a consultation with our experts</p>
           </div>
           <button 
             onClick={onClose}
@@ -225,7 +225,7 @@ const PrivateViewingModal = ({ isOpen, onClose, properties = [] }: PrivateViewin
                 disabled={loading}
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_30px_rgba(249,115,22,0.3)]"
               >
-                {loading ? 'Submitting...' : 'Request Viewing'}
+                {loading ? 'Submitting...' : 'Confirm Appointment'}
               </button>
 
               <p className="text-xs text-gray-400 text-center">
