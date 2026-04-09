@@ -347,7 +347,7 @@ export default function CreateProperty() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">City</label>
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Location Name</label>
                 <select
                   className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-purple-500 transition-all font-bold text-[#0a1628]"
                   value={formData.city}
@@ -400,7 +400,7 @@ export default function CreateProperty() {
                   value={formData.projectStatus}
                   onChange={(e) => setFormData({ ...formData, projectStatus: e.target.value })}
                 >
-                  <option value="Pre Launched">Pre Launched</option>
+                  <option value="Pre Launch">Pre Launch</option>
                   <option value="New Launch">New Launch</option>
                   <option value="Under Construction">Under Construction</option>
                   <option value="Ready To Move">Ready To Move</option>

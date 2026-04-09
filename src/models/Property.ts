@@ -59,7 +59,7 @@ export interface IProperty extends Document {
   sector?: string;
   projectSize?: number;
   reraNumber?: string;
-  projectStatus?: 'Pre Launched' | 'New Launch' | 'Under Construction' | 'Ready To Move';
+  projectStatus?: 'Pre Launch' | 'New Launch' | 'Under Construction' | 'Ready To Move';
 
   // Section 3 — Type
   propertyType: 'residential' | 'commercial' | 'both';
@@ -149,7 +149,7 @@ const PropertySchema = new Schema<IProperty>(
     sector: { type: String },
     projectSize: { type: Number },
     reraNumber: { type: String },
-    projectStatus: { type: String, enum: ['Pre Launched', 'New Launch', 'Under Construction', 'Ready To Move'] },
+    projectStatus: { type: String, enum: ['Pre Launch', 'New Launch', 'Under Construction', 'Ready To Move'] },
 
     propertyType: { type: String, enum: ['residential', 'commercial', 'both'], required: true },
 
