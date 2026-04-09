@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { Shield, Target, Trophy, Building2 } from 'lucide-react';
 
 const AboutPage = () => {
@@ -60,6 +61,7 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 };

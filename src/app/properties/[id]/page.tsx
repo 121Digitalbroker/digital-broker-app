@@ -9,10 +9,12 @@ import {
   DollarSign, Layers, Home, Clock, FileText, Image as ImageIcon,
   Wifi, Car, Dumbbell, TreePine, ShieldCheck, Zap, Wind, Droplets,
   Users, Baby, Dog, Bike, Coffee, UtensilsCrossed, Gamepad2,
-  PlayCircle, TrendingUp, Calculator, Navigation, ExternalLink
+  PlayCircle, TrendingUp, Calculator, Navigation, ExternalLink,
+  Landmark
 } from 'lucide-react';
 import { Metadata } from 'next';
 import LeadForm from '@/components/LeadForm';
+import Footer from '@/components/Footer';
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop';
 
@@ -104,6 +106,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   const resTicket = resConfigs.length > 0 ? (Number(resConfigs[0].ticketSize) || 0) : 0;
   const comTicket = comConfigs.length > 0 ? (Number(comConfigs[0].ticketSize) || 0) : 0;
+
+  // Check if any config is loanable
+  const isLoanable = isResidential
+    ? resConfigs.some((c: any) => c.loanable === true)
+    : comConfigs.some((c: any) => c.loanable === true);
 
   let ticketDisplay: string;
   if (propType === 'commercial') {
@@ -372,7 +379,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                         <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-l-xl">Type</th>
                         <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Unit Size</th>
                         <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Price/sqft</th>
-                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-r-xl">Ticket Size</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Ticket Size</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-r-xl">Loanable</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -382,6 +390,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                           <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                           <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
                           <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 10000000).toFixed(1)}Cr</td>
+                          <td className="p-4">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${c.loanable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
+                              {c.loanable ? 'Yes' : 'No'}
+                            </span>
+                          </td>
                         </tr>
                       ))}
                       {comConfigs.map((c: any, i: number) => (
@@ -390,6 +403,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                           <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                           <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
                           <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 100000).toFixed(0)}L</td>
+                          <td className="p-4">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${c.loanable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
+                              {c.loanable ? 'Yes' : 'No'}
+                            </span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -660,16 +678,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      {/* ── FOOTER ── */}
-      <footer className="bg-white pt-16 pb-10 border-t border-gray-100">
-        <div className="container mx-auto px-4 md:px-8 lg:px-12 text-center">
-          <h2 className="text-2xl font-bold text-[#0a1628] mb-3">Digital Broker</h2>
-          <p className="text-gray-500 text-sm mb-8">Luxury Real Estate Solutions &amp; Commercial Investments</p>
-          <div className="text-xs text-gray-400 pt-6 border-t border-gray-50">
-            &copy; 2024 Digital Broker. RERA: {rera}
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <ChatWidget />
     </div>

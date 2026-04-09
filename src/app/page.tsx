@@ -151,9 +151,6 @@ export default async function HomePage() {
 
       <Footer />
       <ChatWidget />
-
-
-      <ChatWidget />
     </div>
   );
 }

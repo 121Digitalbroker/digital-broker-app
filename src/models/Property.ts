@@ -23,11 +23,13 @@ export interface IResidentialConfig {
   sitePlanUrl?: string;
   // Room details
   servantRooms?: 1 | 2 | 3 | 4;
-  toilets?: 1 | 2 | 3;
+  toilets?: 1 | 2 | 3 ;
   balconies?: 2 | 3 | 4;
   // Additional features
-  carParking?: '1 Covered' | '2 Covered' | '1 Open' | '2 Open' | 'Included';
+  carParking?: 'Included' | 'Not Included';
+  parkingPrice?: number;
   clubMembership?: 'Included' | 'Not Included' | 'Optional';
+  clubMembershipPrice?: number;
   // Loanable option
   loanable?: boolean;
 }
@@ -83,6 +85,7 @@ export interface IProperty extends Document {
   isFeatured: boolean;
   isPromoted: boolean;
   showOnYamunaExpressway: boolean;
+  isVisible: boolean;
   furnishingType: 'Semi Furnished' | 'Fully Furnished' | 'Unfurnished';
   createdAt: Date;
   updatedAt: Date;
@@ -114,8 +117,10 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   toilets: { type: Number, enum: [1, 2, 3] },
   balconies: { type: Number, enum: [2, 3, 4] },
   // Additional features
-  carParking: { type: String, enum: ['1 Covered', '2 Covered', '1 Open', '2 Open', 'Included'] },
+  carParking: { type: String, enum: ['Included', 'Not Included'] },
+  parkingPrice: { type: Number },
   clubMembership: { type: String, enum: ['Included', 'Not Included', 'Optional'] },
+  clubMembershipPrice: { type: Number },
   // Loanable option
   loanable: { type: Boolean, default: false },
 });
@@ -163,6 +168,7 @@ const PropertySchema = new Schema<IProperty>(
     isFeatured: { type: Boolean, default: false },
     isPromoted: { type: Boolean, default: false },
     showOnYamunaExpressway: { type: Boolean, default: false },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

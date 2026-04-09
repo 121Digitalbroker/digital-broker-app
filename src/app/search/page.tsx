@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import PropertyCard from '@/components/PropertyCard';
 import MultiRangeSlider from '@/components/MultiRangeSlider';
 import { LayoutGrid, Map as MapIcon, List, Search } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 const SearchPage = () => {
   const [properties, setProperties] = useState<any[]>([]);
@@ -232,6 +233,7 @@ const SearchPage = () => {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

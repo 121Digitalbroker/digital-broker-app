@@ -101,6 +101,12 @@ export async function GET(request: Request) {
       andConditions.push({ showOnYamunaExpressway: true });
     }
 
+    // Visibility filter (Default: only show visible properties)
+    const adminAccess = searchParams.get('adminAccess');
+    if (adminAccess !== 'true') {
+      andConditions.push({ isVisible: { $ne: false } });
+    }
+
     let query = {};
     if (andConditions.length > 0) {
       query = { $and: andConditions };

@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { Search, HelpCircle, FileText, Settings, ShieldCheck } from 'lucide-react';
 
 const SupportPage = () => {
@@ -61,6 +62,7 @@ const SupportPage = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

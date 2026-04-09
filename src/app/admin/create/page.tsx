@@ -50,7 +50,8 @@ export default function CreateProperty() {
     // Internal Metadata/Settings
     isFeatured: false,
     isPromoted: false,
-    showOnYamunaExpressway: false
+    showOnYamunaExpressway: false,
+    isVisible: true
   });
 
   const [saving, setSaving] = useState(false);
@@ -486,7 +487,7 @@ export default function CreateProperty() {
                     </div>
 
                     {/* ROW 2: Unit Features */}
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Servant Room / Study</label>
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
@@ -522,13 +523,18 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.carParking || ''} onChange={(e) => updateResidentialConfig(index, 'carParking', e.target.value)}>
                           <option value="">Select</option>
-                          <option value="1 Covered">1 Covered</option>
-                          <option value="2 Covered">2 Covered</option>
-                          <option value="1 Open">1 Open</option>
-                          <option value="2 Open">2 Open</option>
                           <option value="Included">Included</option>
+                          <option value="Not Included">Not Included</option>
                         </select>
                       </div>
+                      {config.carParking === 'Included' && (
+                        <div className="space-y-1 animate-fade-in">
+                          <label className="text-[10px] font-black text-green-600 uppercase">Parking Price (₹)</label>
+                          <input type="number" className="w-full bg-white border border-green-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                            placeholder="Enter parking price"
+                            value={config.parkingPrice || ''} onChange={(e) => updateResidentialConfig(index, 'parkingPrice', e.target.value)} />
+                        </div>
+                      )}
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Club Membership</label>
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
@@ -539,6 +545,14 @@ export default function CreateProperty() {
                           <option value="Optional">Optional</option>
                         </select>
                       </div>
+                      {config.clubMembership === 'Included' && (
+                        <div className="space-y-1 animate-fade-in">
+                          <label className="text-[10px] font-black text-green-600 uppercase">Membership Price (₹)</label>
+                          <input type="number" className="w-full bg-white border border-green-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                            placeholder="Enter membership price"
+                            value={config.clubMembershipPrice || ''} onChange={(e) => updateResidentialConfig(index, 'clubMembershipPrice', e.target.value)} />
+                        </div>
+                      )}
                     </div>
 
                     {/* ROW 3: Pricing */}
@@ -651,7 +665,7 @@ export default function CreateProperty() {
                       <button type="button" onClick={() => removeCommercialConfig(index)} className="absolute top-6 right-6 text-red-400 hover:text-red-300 transition-colors">
                         <Trash2 className="w-5 h-5" />
                       </button>
-                      
+
                       <div className="space-y-8">
                         {/* ROW 1: BASIC INFO */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -739,7 +753,7 @@ export default function CreateProperty() {
                                 <span className="text-sm font-bold text-white">Enable</span>
                               </label>
                             </div>
-                            
+
                             {config.assuredReturn && (
                               <div className="space-y-1 animate-fade-in">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Return rate (%)</label>
@@ -942,6 +956,18 @@ export default function CreateProperty() {
                       <input type="checkbox" className="sr-only" checked={formData.showOnYamunaExpressway} onChange={(e) => setFormData({ ...formData, showOnYamunaExpressway: e.target.checked })} />
                       <div className={`w-14 h-8 rounded-full transition-all ${formData.showOnYamunaExpressway ? 'bg-green-500' : 'bg-gray-200'}`}></div>
                       <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.showOnYamunaExpressway ? 'translate-x-6' : ''}`}></div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer border-t border-gray-50 pt-6 mt-2">
+                    <div className="flex flex-col text-left">
+                      <span className="font-bold text-[#0a1628]">Visible on Website</span>
+                      <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest text-left">Show/Hide from property listings</span>
+                    </div>
+                    <div className="relative">
+                      <input type="checkbox" className="sr-only" checked={formData.isVisible} onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })} />
+                      <div className={`w-14 h-8 rounded-full transition-all ${formData.isVisible ? 'bg-indigo-500' : 'bg-gray-200'}`}></div>
+                      <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isVisible ? 'translate-x-6' : ''}`}></div>
                     </div>
                   </label>
                 </div>

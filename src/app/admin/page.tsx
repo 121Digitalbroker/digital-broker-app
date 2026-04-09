@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
-import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink, Star, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink, Star, Image as ImageIcon, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -27,11 +27,11 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const promises = [
-        fetch('/api/properties').then(r => r.json()),
+        fetch('/api/properties?adminAccess=true').then(r => r.json()),
         fetch('/api/leads').then(r => r.json()),
 
       ];
-      
+
       const results = await Promise.all(promises);
       setProperties(results[0]);
       setLeads(results[1]);
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-      
+
       if (data.success) {
         localStorage.setItem('admin_auth', 'true');
         localStorage.setItem('admin_role', data.role);
@@ -96,6 +96,25 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleToggleVisibility = async (id: string, currentValue: boolean) => {
+    try {
+      const res = await fetch(`/api/properties/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isVisible: !currentValue })
+      });
+      if (res.ok) {
+        setProperties((prev: any[]) =>
+          prev.map((p: any) => p._id === id ? { ...p, isVisible: !currentValue } : p)
+        );
+      } else {
+        alert('Failed to update visibility');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 
 
 
@@ -109,16 +128,16 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-white mb-2 text-center">Admin Access</h1>
             <p className="text-blue-200 text-center mb-8 text-sm">Sign in to workspace</p>
             <form onSubmit={handleLogin} className="space-y-4">
-              <input 
-                type="text" 
-                placeholder="Username (e.g. superadmin)" 
+              <input
+                type="text"
+                placeholder="Username (e.g. superadmin)"
                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-blue-300 focus:outline-none focus:border-orange-500 transition-all font-medium"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <input 
-                type="password" 
-                placeholder="Password" 
+              <input
+                type="password"
+                placeholder="Password"
                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-blue-300 focus:outline-none focus:border-orange-500 transition-all font-medium"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -136,7 +155,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 text-[#0a1628] font-sans text-left">
       <Navbar />
-      
+
       <div className="container mx-auto px-6 md:px-12 pt-32 pb-24">
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
@@ -147,57 +166,57 @@ export default function AdminDashboard() {
             <p className="text-gray-500 mt-2 text-left">Control center for Digital Broker operations.</p>
           </div>
           <div className="flex gap-4">
-             <button 
-               onClick={() => setActiveTab('properties')}
-               className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === 'properties' ? 'bg-[#0a1628] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
-             >
-               Properties
-             </button>
-             <button 
-               onClick={() => setActiveTab('leads')}
-               className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === 'leads' ? 'bg-[#0a1628] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
-             >
-               Leads ({leads.length})
-             </button>
-             <Link 
-               href="/admin/banners"
-               className="px-8 py-3 rounded-2xl font-bold bg-white text-gray-400 hover:bg-orange-500 hover:text-white transition-all flex items-center gap-2"
-             >
-               <ImageIcon className="w-4 h-4" /> Banners
-             </Link>
+            <button
+              onClick={() => setActiveTab('properties')}
+              className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === 'properties' ? 'bg-[#0a1628] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
+            >
+              Properties
+            </button>
+            <button
+              onClick={() => setActiveTab('leads')}
+              className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === 'leads' ? 'bg-[#0a1628] text-white' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
+            >
+              Leads ({leads.length})
+            </button>
+            <Link
+              href="/admin/banners"
+              className="px-8 py-3 rounded-2xl font-bold bg-white text-gray-400 hover:bg-orange-500 hover:text-white transition-all flex items-center gap-2"
+            >
+              <ImageIcon className="w-4 h-4" /> Banners
+            </Link>
 
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-[#0a1628]">
-                <Database className="w-7 h-7" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-left">Assets</p>
-                <p className="text-3xl font-black text-left">{properties.length}</p>
-              </div>
-           </div>
-           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6 text-left">
-              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500">
-                <Users className="w-7 h-7" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-left">Total Leads</p>
-                <p className="text-3xl font-black text-left">{leads.length}</p>
-              </div>
-           </div>
-           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6 text-left">
-              <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-green-600">
-                <TrendingUp className="w-7 h-7 text-left" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-left">Active ROI</p>
-                <p className="text-3xl font-black text-left">8.4%</p>
-              </div>
-           </div>
+          <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6">
+            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-[#0a1628]">
+              <Database className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-left">Assets</p>
+              <p className="text-3xl font-black text-left">{properties.length}</p>
+            </div>
+          </div>
+          <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6 text-left">
+            <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500">
+              <Users className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-left">Total Leads</p>
+              <p className="text-3xl font-black text-left">{leads.length}</p>
+            </div>
+          </div>
+          <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6 text-left">
+            <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-green-600">
+              <TrendingUp className="w-7 h-7 text-left" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-left">Active ROI</p>
+              <p className="text-3xl font-black text-left">8.4%</p>
+            </div>
+          </div>
         </div>
 
         {activeTab === 'properties' ? (
@@ -205,14 +224,14 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-left">
             <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-xl font-bold text-[#0a1628]">Property Listings</h3>
-              <Link 
-                href="/admin/create" 
+              <Link
+                href="/admin/create"
                 className="bg-[#0a1628] hover:bg-[#1a2d4a] text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg"
               >
                 <Plus className="w-5 h-5" /> Add Property
               </Link>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -222,6 +241,7 @@ export default function AdminDashboard() {
                     <th className="px-8 py-5">Type</th>
                     <th className="px-8 py-5">Status</th>
                     <th className="px-8 py-5 text-center">⭐ Promote</th>
+                    <th className="px-8 py-5 text-center">👁️ Visible</th>
                     <th className="px-8 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -238,10 +258,10 @@ export default function AdminDashboard() {
                         </div>
                       </td>
                       <td className="px-8 py-6 font-bold">
-                        {p.propertyType === 'commercial' 
-                          ? (p.commercialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.commercialConfigs[0].ticketSize/100000)}L+` : p.price)
+                        {p.propertyType === 'commercial'
+                          ? (p.commercialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.commercialConfigs[0].ticketSize / 100000)}L+` : p.price)
                           : (p.propertyType === 'residential' || p.propertyType === 'both')
-                            ? (p.residentialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.residentialConfigs[0].ticketSize/10000000)}Cr+` : p.price)
+                            ? (p.residentialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.residentialConfigs[0].ticketSize / 10000000)}Cr+` : p.price)
                             : p.price
                         }
                       </td>
@@ -269,14 +289,28 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => handleTogglePromotion(p._id, !!p.isPromoted, 'isPromoted')}
                           title={p.isPromoted ? 'Remove from Promoted' : 'Add to Promoted'}
-                          className={`w-10 h-10 rounded-2xl flex items-center justify-center mx-auto transition-all ${
-                            p.isPromoted 
-                              ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' 
+                          className={`w-10 h-10 rounded-2xl flex items-center justify-center mx-auto transition-all ${p.isPromoted
+                              ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
                               : 'bg-gray-100 text-gray-400 hover:bg-orange-50 hover:text-orange-400'
-                          }`}
+                            }`}
                         >
                           <Star className={`w-5 h-5 ${p.isPromoted ? 'fill-white' : ''}`} />
                         </button>
+                      </td>
+                      {/* Visibility Toggle */}
+                      <td className="px-8 py-6 text-center">
+                        <div className="flex justify-center">
+                          <button
+                            onClick={() => handleToggleVisibility(p._id, p.isVisible !== false)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${p.isVisible !== false ? 'bg-indigo-500' : 'bg-gray-200'
+                              }`}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${p.isVisible !== false ? 'translate-x-6' : 'translate-x-1'
+                                }`}
+                            />
+                          </button>
+                        </div>
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex justify-end gap-3 text-left">
@@ -286,7 +320,7 @@ export default function AdminDashboard() {
                           <Link href={`/admin/edit/${p._id}`} className="p-2.5 rounded-xl hover:bg-white border border-transparent hover:border-gray-100 text-gray-400 hover:text-orange-500">
                             <Edit className="w-5 h-5" />
                           </Link>
-                          <button 
+                          <button
                             onClick={() => handleDeleteProperty(p._id)}
                             className="p-2.5 rounded-xl hover:bg-white border border-transparent hover:border-gray-100 text-gray-400 hover:text-red-500"
                           >
@@ -306,7 +340,7 @@ export default function AdminDashboard() {
             <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-xl font-bold text-[#0a1628]">Customer Inquiries</h3>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>

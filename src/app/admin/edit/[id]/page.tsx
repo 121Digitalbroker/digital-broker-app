@@ -37,6 +37,13 @@ export default function EditProperty() {
           productImages: data.productImages?.length ? data.productImages : [''],
           residentialConfigs: data.residentialConfigs || [],
           commercialConfigs: data.commercialConfigs || [],
+          amenities: data.amenities || [],
+          isFeatured: data.isFeatured || false,
+          isPromoted: data.isPromoted || false,
+          showOnYamunaExpressway: data.showOnYamunaExpressway || false,
+          isVisible: data.isVisible !== false, // Default to true if not present
+          aboutProject: data.aboutProject || '',
+          googleMapsUrl: data.googleMapsUrl || '',
         });
       } else {
         alert('Property not found');
@@ -234,13 +241,13 @@ export default function EditProperty() {
       ...formData,
       commercialConfigs: [
         ...formData.commercialConfigs,
-        { 
-          commercialType: 'Office Spaces', 
-          unitSize: 0, 
-          pricePerSqft: 0, 
+        {
+          commercialType: 'Office Spaces',
+          unitSize: 0,
+          pricePerSqft: 0,
           isLockable: true,
           mlgRatePerSqft: 0,
-          preLeased: false, 
+          preLeased: false,
           ticketSize: 0,
           assuredReturn: false,
           assuredReturnPct: 0,
@@ -253,14 +260,14 @@ export default function EditProperty() {
   const updateCommercialConfig = (index: number, field: string, value: any) => {
     const configs = [...formData.commercialConfigs];
     configs[index] = { ...configs[index], [field]: value };
-    
+
     // Auto-calculate ticket size
     if (field === 'unitSize' || field === 'pricePerSqft') {
       const sqft = field === 'unitSize' ? Number(value) : Number(configs[index].unitSize || 0);
       const price = field === 'pricePerSqft' ? Number(value) : Number(configs[index].pricePerSqft || 0);
       configs[index].ticketSize = sqft * price;
     }
-    
+
     setFormData({ ...formData, commercialConfigs: configs });
   };
 
@@ -664,7 +671,7 @@ export default function EditProperty() {
                       <button type="button" onClick={() => removeCommercialConfig(index)} className="absolute top-6 right-6 text-red-400 hover:text-red-300 transition-colors">
                         <Trash2 className="w-5 h-5" />
                       </button>
-                      
+
                       <div className="space-y-8">
                         {/* ROW 1: BASIC INFO */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -752,7 +759,7 @@ export default function EditProperty() {
                                 <span className="text-sm font-bold text-white">Enable</span>
                               </label>
                             </div>
-                            
+
                             {config.assuredReturn && (
                               <div className="space-y-1 animate-fade-in">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Return rate (%)</label>
@@ -932,6 +939,111 @@ export default function EditProperty() {
                 </div>
               </div>
             </div>
+          </div>
+          {/* SECTION 7: Description & Maps */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
+              <h3 className="text-xl font-black tracking-tight uppercase">7. Description & Location</h3>
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">About the Project</label>
+                <textarea rows={5} placeholder="Describe the project..." className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.aboutProject} onChange={(e) => setFormData({ ...formData, aboutProject: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Google Maps URL</label>
+                <input type="text" placeholder="URL" className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.googleMapsUrl} onChange={(e) => setFormData({ ...formData, googleMapsUrl: e.target.value })} />
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 8: Amenities & Promotion */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm border-t-8 border-t-orange-500">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
+              <h3 className="text-xl font-black tracking-tight uppercase">8. Promotion & Amenities</h3>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div>
+                <h4 className="text-sm font-black text-[#0a1628] uppercase tracking-widest mb-6">Key Amenities</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  {['Swimming Pool', 'Gymnasium', 'Clubhouse', 'Childrens Play Area', 'Covered Parking', '24/7 Security', 'Power Backup', 'Landscaped Gardens'].map((amenity) => (
+                    <label key={amenity} className="flex items-center gap-3 cursor-pointer group">
+                      <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500" checked={formData.amenities.includes(amenity)} onChange={(e) => {
+                        const newAmenities = e.target.checked ? [...formData.amenities, amenity] : formData.amenities.filter((a: any) => a !== amenity);
+                        setFormData({ ...formData, amenities: newAmenities });
+                      }} />
+                      <span className="text-sm font-bold text-gray-600 group-hover:text-[#0a1628]">{amenity}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-3xl p-8 space-y-8">
+                <div className="space-y-6">
+                  <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer">
+                    <div className="flex flex-col text-left">
+                      <span className="font-bold text-[#0a1628]">Promoted Selection</span>
+                      <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest text-left">Show in top homepage</span>
+                    </div>
+                    <div className="relative">
+                      <input type="checkbox" className="sr-only" checked={formData.isPromoted} onChange={(e) => setFormData({ ...formData, isPromoted: e.target.checked })} />
+                      <div className={`w-14 h-8 rounded-full transition-all ${formData.isPromoted ? 'bg-orange-500' : 'bg-gray-200'}`}></div>
+                      <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isPromoted ? 'translate-x-6' : ''}`}></div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer">
+                    <div className="flex flex-col text-left">
+                      <span className="font-bold text-[#0a1628]">Featured Project</span>
+                      <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest text-left">Mark as premium</span>
+                    </div>
+                    <div className="relative">
+                      <input type="checkbox" className="sr-only" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} />
+                      <div className={`w-14 h-8 rounded-full transition-all ${formData.isFeatured ? 'bg-blue-500' : 'bg-gray-200'}`}></div>
+                      <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isFeatured ? 'translate-x-6' : ''}`}></div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer">
+                    <div className="flex flex-col text-left">
+                      <span className="font-bold text-[#0a1628]">Show on Yamuna Expressway</span>
+                      <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest text-left">Display on Yamuna Expressway page</span>
+                    </div>
+                    <div className="relative">
+                      <input type="checkbox" className="sr-only" checked={formData.showOnYamunaExpressway} onChange={(e) => setFormData({ ...formData, showOnYamunaExpressway: e.target.checked })} />
+                      <div className={`w-14 h-8 rounded-full transition-all ${formData.showOnYamunaExpressway ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                      <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.showOnYamunaExpressway ? 'translate-x-6' : ''}`}></div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm cursor-pointer border-t border-gray-50 pt-6 mt-2">
+                    <div className="flex flex-col text-left">
+                      <span className="font-bold text-[#0a1628]">Visible on Website</span>
+                      <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest text-left">Show/Hide from property listings</span>
+                    </div>
+                    <div className="relative">
+                      <input type="checkbox" className="sr-only" checked={formData.isVisible} onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })} />
+                      <div className={`w-14 h-8 rounded-full transition-all ${formData.isVisible ? 'bg-indigo-500' : 'bg-gray-200'}`}></div>
+                      <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${formData.isVisible ? 'translate-x-6' : ''}`}></div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SAVE BUTTON - At End */}
+          <div className="flex justify-center pt-8 pb-4">
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white px-12 py-5 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-xl shadow-orange-500/20 active:scale-95 text-lg"
+            >
+              {saving ? 'Saving...' : <><Save className="w-6 h-6" /> Save Changes</>}
+            </button>
           </div>
 
         </form>

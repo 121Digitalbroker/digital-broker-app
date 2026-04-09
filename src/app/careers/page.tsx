@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ArrowRight, Briefcase, Star, Users } from 'lucide-react';
 
 const CareersPage = () => {
@@ -57,6 +58,7 @@ const CareersPage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
