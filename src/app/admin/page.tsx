@@ -290,8 +290,8 @@ export default function AdminDashboard() {
                           onClick={() => handleTogglePromotion(p._id, !!p.isPromoted, 'isPromoted')}
                           title={p.isPromoted ? 'Remove from Promoted' : 'Add to Promoted'}
                           className={`w-10 h-10 rounded-2xl flex items-center justify-center mx-auto transition-all ${p.isPromoted
-                              ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
-                              : 'bg-gray-100 text-gray-400 hover:bg-orange-50 hover:text-orange-400'
+                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
+                            : 'bg-gray-100 text-gray-400 hover:bg-orange-50 hover:text-orange-400'
                             }`}
                         >
                           <Star className={`w-5 h-5 ${p.isPromoted ? 'fill-white' : ''}`} />
