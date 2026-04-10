@@ -43,15 +43,15 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
   return (
     <section className="relative w-full flex flex-col">
       {/* Hero Banner Area */}
-      <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-20 px-6 md:px-12">
+      <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-32 px-6 md:px-12">
         {/* Background */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=2670&auto=format&fit=crop"
-            alt="Luxury Real Estate Building"
+            src="/banner%20design%20costume%202nd.jpg"
+            alt="Hero Banner"
             className="w-full h-full object-cover animate-ken-burns"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/30 to-black/80"></div>
+          {/* Gradient overlay removed per user request */}
         </div>
 
         {/* Content */}
@@ -84,7 +84,7 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
       </div>
 
       {/* ── OVERLAPPING SEARCH BAR ── */}
-      <div className="relative z-20 w-full max-w-4xl mx-auto px-6 md:px-0 -mt-48">
+      <div className="relative z-20 w-full max-w-4xl mx-auto px-6 md:px-0 -mt-28">
         <PrivateViewingModal
           isOpen={showViewingModal}
           onClose={() => setShowViewingModal(false)}
@@ -110,7 +110,7 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
         </div>
 
         {/* ── NEW HORIZONTAL FLOATING BAR ── */}
-        <div className="bg-white shadow-[0_25px_60px_rgba(0,0,0,0.35)] rounded-[25px] md:rounded-full p-1 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 border border-gray-100">
+        <div className="bg-white shadow-[0_30px_80px_rgba(0,0,0,0.25)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 border border-white/20">
 
           {/* Location Input */}
           <div className="w-full md:flex-1 flex items-center px-5 py-2.5 cursor-text group">
@@ -135,10 +135,10 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
             onMouseEnter={() => setOpenDropdown('type')}
             onMouseLeave={() => setOpenDropdown(null)}
           >
-            <span className="text-[9px] font-black text-[#0a1628] uppercase tracking-widest block mb-0.5">Property Type</span>
-            <div className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 whitespace-nowrap">
+            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Property Type</span>
+            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 whitespace-nowrap group-hover:text-orange-500 transition-colors">
               {activeCategory === 'Commercial'
-                ? (commercialType ? commercialType : 'All Commercial')
+                ? (commercialType ? commercialType : 'All Types')
                 : (bedrooms ? bedrooms : 'All Types')}
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'type' ? 'rotate-180 text-orange-500' : ''}`} />
             </div>
@@ -205,8 +205,8 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
             onMouseEnter={() => setOpenDropdown('budget')}
             onMouseLeave={() => setOpenDropdown(null)}
           >
-            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-widest block mb-0.5">Budget</span>
-            <div className="flex items-center gap-1.5 text-sm font-medium text-gray-500 whitespace-nowrap">
+            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Budget</span>
+            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 whitespace-nowrap group-hover:text-orange-500 transition-colors">
               ₹{priceRange.min} - {priceRange.max}Cr <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'budget' ? 'rotate-180 text-orange-500' : ''}`} />
             </div>
 
@@ -265,10 +265,10 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
                 }
                 router.push(`/search?${params.toString()}`);
               }}
-              className="w-full md:w-auto px-8 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-[0_10px_30px_rgba(249,115,22,0.5)] active:scale-95 gap-3"
+              className="w-full md:w-auto px-10 h-[52px] bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-[0_15px_35px_rgba(249,115,22,0.45)] active:scale-95 gap-3"
             >
-              <Search className="w-5 h-5 stroke-[2.5px]" />
-              <span className="font-bold tracking-widest text-[11px] uppercase">Search</span>
+              <Search className="w-4 h-4 stroke-[3px]" />
+              <span className="font-black tracking-[0.15em] text-[11px] uppercase">Search</span>
             </button>
           </div>
 
