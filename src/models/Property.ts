@@ -120,7 +120,6 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   possessionYear: { type: String },
   reraLink: { type: String },
   ticketSize: { type: Number, required: true },
-  layoutImages: [{ type: String }],
   sitePlanUrl: { type: String },
   // Room details
   servantRooms: { type: Number, enum: [1, 2, 3, 4] },
@@ -147,6 +146,7 @@ const CommercialConfigSchema = new Schema<ICommercialConfig>({
   assuredReturnMonthly: { type: Boolean, default: false },
   loanable: { type: Boolean, default: false },
   ticketSize: { type: Number, required: true },
+  layoutImages: [{ type: String }],
 });
 
 const PropertySchema = new Schema<IProperty>(
