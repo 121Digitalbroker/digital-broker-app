@@ -47,7 +47,6 @@ export interface ICommercialConfig {
   mlgPrice?: number;
   assuredReturnMonthly?: boolean;
   loanable?: boolean;
-  loanable?: boolean;
   ticketSize: number;
   layoutImages?: string[];
 }
