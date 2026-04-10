@@ -22,6 +22,7 @@ export interface IResidentialConfig {
   reraLink?: string;
   ticketSize: number;
   sitePlanUrl?: string;
+  layoutImages?: string[];
   // Room details
   servantRooms?: 1 | 2 | 3 | 4;
   toilets?: 1 | 2 | 3 ;
@@ -46,7 +47,9 @@ export interface ICommercialConfig {
   mlgPrice?: number;
   assuredReturnMonthly?: boolean;
   loanable?: boolean;
+  loanable?: boolean;
   ticketSize: number;
+  layoutImages?: string[];
 }
 
 export interface IProperty extends Document {
@@ -106,6 +109,7 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
     name: { type: String },
     price: { type: Number }
   }],
+  layoutImages: [{ type: String }],
   otherChargesPerSqft: { type: Number },
   // Existing fields
   priceRangeMin: { type: Number },
@@ -117,6 +121,7 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   possessionYear: { type: String },
   reraLink: { type: String },
   ticketSize: { type: Number, required: true },
+  layoutImages: [{ type: String }],
   sitePlanUrl: { type: String },
   // Room details
   servantRooms: { type: Number, enum: [1, 2, 3, 4] },

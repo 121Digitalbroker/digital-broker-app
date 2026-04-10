@@ -8,8 +8,8 @@ import { useRouter, useParams } from 'next/navigation';
 const citySectors: Record<string, string[]> = {
   'Noida': ['Sector 1', 'Sector 15', 'Sector 16', 'Sector 43', 'Sector 44', 'Sector 50', 'Sector 62', 'Sector 78', 'Sector 104', 'Sector 108', 'Sector 128', 'Sector 132', 'Sector 142', 'Sector 143', 'Sector 150', 'Sector 152', 'Sector 168'],
   'Greater Noida': ['Alpha I', 'Alpha II', 'Beta I', 'Beta II', 'Gamma I', 'Gamma II', 'Delta I', 'Omega I', 'Knowledge Park I', 'Knowledge Park II', 'Knowledge Park V', 'Tech Zone IV', 'Zeta I'],
-  'Delhi': ['Dwarka', 'Rohini', 'Saket', 'Vasant Kunj', 'Janakpuri', 'Lajpat Nagar', 'Pitampura', 'Greater Kailash', 'Okhla', 'Connaught Place'],
-  'Gurgaon': ['Sector 24', 'Sector 25', 'Sector 42', 'Sector 43', 'Sector 45', 'Sector 50', 'Sector 54', 'Sector 55', 'Sector 56', 'Sector 59', 'Sector 62', 'Sector 65', 'Sector 66']
+  'Noida Extension': ['Tech Zone IV', 'Gaur City', 'Sector 16C', 'Sector 16D', 'Sector 10', 'Sector 12', 'Sector 1'],
+  'Yamuna Expressway': ['Sector 22 A', 'Sector 22 D', 'Sector 22 C', 'Sector 18', 'Sector 20', 'Sector 19 A']
 };
 
 export default function EditProperty() {
@@ -153,11 +153,11 @@ export default function EditProperty() {
     }
   };
 
-  const handleConfigUpload = async (e: React.ChangeEvent<HTMLInputElement>, configType: 'residential' | 'commercial', index: number, fieldName: string) => {
+  const handleConfigUpload = async (e: React.ChangeEvent<HTMLInputElement>, configType: 'residential' | 'commercial', index: number, fieldName: string, arrayIndex?: number) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploadingField(`${configType}-${index}-${fieldName}`);
+    setUploadingField(`${configType}-${index}-${fieldName}${arrayIndex !== undefined ? `-${arrayIndex}` : ''}`);
     const uploadData = new FormData();
     uploadData.append("file", file);
 
@@ -170,7 +170,14 @@ export default function EditProperty() {
       const data = await res.json();
       if (data.success) {
         if (configType === 'residential') {
-          updateResidentialConfig(index, fieldName, data.url);
+          if (arrayIndex !== undefined && fieldName === 'layoutImages') {
+            const currentLayouts = formData.residentialConfigs[index].layoutImages || [];
+            const newLayouts = [...currentLayouts];
+            newLayouts[arrayIndex] = data.url;
+            updateResidentialConfig(index, 'layoutImages', newLayouts);
+          } else {
+            updateResidentialConfig(index, fieldName, data.url);
+          }
         } else {
           updateCommercialConfig(index, fieldName, data.url);
         }
@@ -385,8 +392,8 @@ export default function EditProperty() {
                 >
                   <option value="Noida">Noida</option>
                   <option value="Greater Noida">Greater Noida</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Gurgaon">Gurgaon</option>
+                  <option value="Noida Extension">Noida Extension</option>
+                  <option value="Yamuna Expressway">Yamuna Expressway</option>
                 </select>
               </div>
               <div className="space-y-2">
@@ -639,6 +646,63 @@ export default function EditProperty() {
                             <input type="file" className="hidden" accept="image/*,.pdf" onChange={(e) => handleConfigUpload(e, 'residential', index, 'sitePlanUrl')} />
                           </label>
                         </div>
+                      </div>
+
+                      {/* Layout/Floor Plan Images */}
+                      <div className="space-y-2 md:col-span-4 mt-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-gray-400 uppercase">Layout/Floor Plan Images</label>
+                          <button type="button" onClick={() => {
+                            const newLayouts = [...(config.layoutImages || [])];
+                            newLayouts.push('');
+                            updateResidentialConfig(index, 'layoutImages', newLayouts);
+                          }} className="text-[10px] font-bold text-green-600 hover:text-green-800 flex items-center gap-1">
+                            <Plus className="w-3 h-3" /> Add Image
+                          </button>
+                        </div>
+                        {(!config.layoutImages || config.layoutImages.length === 0) ? (
+                          <p className="text-xs text-gray-400 italic">No layout images added yet.</p>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {config.layoutImages.map((url: string, imgIdx: number) => (
+                              <div key={imgIdx} className="flex gap-2 items-center">
+                                <input type="text" placeholder="Image URL" value={url} onChange={(e) => {
+                                  const newLayouts = [...config.layoutImages];
+                                  newLayouts[imgIdx] = e.target.value;
+                                  updateResidentialConfig(index, 'layoutImages', newLayouts);
+                                }} className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-green-500" />
+                                <label className={`cursor-pointer px-3 py-3 rounded-xl flex items-center justify-center transition-all ${uploadingField === `residential-${index}-layoutImages-${imgIdx}` ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-700 hover:bg-green-700 hover:text-white'}`}>
+                                  {uploadingField === `residential-${index}-layoutImages-${imgIdx}` ? (
+                                    <div className="w-4 h-4 border-2 border-gray-300 border-t-green-500 animate-spin rounded-full"></div>
+                                  ) : (
+                                    <Upload className="w-4 h-4" />
+                                  )}
+                                  <input type="file" className="hidden" accept="image/*" onChange={(e) => handleConfigUpload(e, 'residential', index, 'layoutImages', imgIdx)} />
+                                </label>
+                                <button type="button" onClick={() => {
+                                  const newLayouts = config.layoutImages.filter((_: any, i: number) => i !== imgIdx);
+                                  updateResidentialConfig(index, 'layoutImages', newLayouts);
+                                }} className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                                {url && (
+                                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                    <img src={url} alt="" className="w-full h-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* LOANABLE - At End */}
+                      <div className="space-y-1 md:col-span-4 mt-4 pt-4 border-t border-gray-200">
+                        <label className="text-[10px] font-black text-green-600 uppercase">Loanable</label>
+                        <label className="flex items-center gap-3 bg-white border border-gray-200 w-fit p-3 px-5 rounded-xl cursor-pointer hover:bg-green-50 transition-all">
+                          <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-green-500 focus:ring-green-500" checked={config.loanable} onChange={(e) => updateResidentialConfig(index, 'loanable', e.target.checked)} />
+                          <span className="text-sm font-bold text-gray-700">Yes, This property is loanable</span>
+                        </label>
                       </div>
 
                     </div>

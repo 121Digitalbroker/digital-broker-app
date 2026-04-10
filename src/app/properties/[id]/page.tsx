@@ -15,6 +15,7 @@ import {
 import { Metadata } from 'next';
 import LeadForm from '@/components/LeadForm';
 import Footer from '@/components/Footer';
+import InteractivePriceBreakup from '@/components/InteractivePriceBreakup';
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop';
 
@@ -383,56 +384,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* ─── Price Breakup Table ─── */}
-            {(resConfigs.length > 0 || comConfigs.length > 0) && (
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
-                  <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
-                  Price Breakup
-                </h2>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gray-50 rounded-xl">
-                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-l-xl">Type</th>
-                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Unit Size</th>
-                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Price/sqft</th>
-                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Ticket Size</th>
-                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-r-xl">Loanable</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {resConfigs.map((c: any, i: number) => (
-                        <tr key={`res-${i}`} className="border-b border-gray-50 hover:bg-orange-50/30 transition-colors">
-                          <td className="p-4 font-bold text-[#0a1628]">{c.typology}</td>
-                          <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
-                          <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
-                          <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 10000000).toFixed(1)}Cr</td>
-                          <td className="p-4">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${c.loanable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
-                              {c.loanable ? 'Yes' : 'No'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                      {comConfigs.map((c: any, i: number) => (
-                        <tr key={`com-${i}`} className="border-b border-gray-50 hover:bg-orange-50/30 transition-colors">
-                          <td className="p-4 font-bold text-[#0a1628]">{c.commercialType}</td>
-                          <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
-                          <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
-                          <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 100000).toFixed(0)}L</td>
-                          <td className="p-4">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${c.loanable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
-                              {c.loanable ? 'Yes' : 'No'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            <InteractivePriceBreakup resConfigs={resConfigs} comConfigs={comConfigs} />
 
             {/* ─── Amenities ─── */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
