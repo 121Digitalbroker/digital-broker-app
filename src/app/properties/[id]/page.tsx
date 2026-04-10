@@ -71,8 +71,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   // ── Extract data ──
   const productImgs: string[] = Array.isArray(p.productImages) ? p.productImages.map(String) : [];
+  const moreImgs: string[] = Array.isArray(p.morePhotos) ? p.morePhotos.map(String) : [];
   const oldImgs: string[] = Array.isArray(p.images) ? p.images.map(String) : [];
-  const allImgs = productImgs.length > 0 ? productImgs : oldImgs;
+  const allImgs = [...(productImgs.length > 0 ? productImgs : oldImgs), ...moreImgs];
   const heroImage = allImgs.length > 0 ? allImgs[0] : FALLBACK_IMG;
 
   const title = String(p.projectName || p.title || 'Property');
@@ -96,7 +97,14 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     : 'Ready to Move';
 
   const resTypologies = resConfigs.length > 0
-    ? resConfigs.map((c: any) => String(c.typology || '')).filter(Boolean).join(', ')
+    ? resConfigs.map((c: any) => {
+        const typology = String(c.typology || '');
+        const servantRooms = Number(c.servantRooms) || 0;
+        if (typology && servantRooms >= 1) {
+          return `${typology} + ${servantRooms === 1 ? 'S' : servantRooms + 'S'}`;
+        }
+        return typology;
+      }).filter(Boolean).join(', ')
     : `${p.bedrooms || '--'} BHK`;
   const resUnitSize = resConfigs.length > 0 ? String(resConfigs[0].unitSize || '--') : String(p.sqft || '--');
   const comTypes = comConfigs.length > 0
@@ -104,21 +112,30 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
     : String(p.category || '--');
   const comReturn = comConfigs.length > 0 ? String(comConfigs[0].assuredReturnPct || '--') : '--';
 
-  const resTicket = resConfigs.length > 0 ? (Number(resConfigs[0].ticketSize) || 0) : 0;
-  const comTicket = comConfigs.length > 0 ? (Number(comConfigs[0].ticketSize) || 0) : 0;
+  const resValid = resConfigs.map((c: any) => Number(c.ticketSize) || 0).filter(t => t > 0);
+  const resTicket = resValid.length > 0 ? Math.min(...resValid) : 0;
+  
+  const comValid = comConfigs.map((c: any) => Number(c.ticketSize) || 0).filter(t => t > 0);
+  const comTicket = comValid.length > 0 ? Math.min(...comValid) : 0;
 
   // Check if any config is loanable
   const isLoanable = isResidential
     ? resConfigs.some((c: any) => c.loanable === true)
     : comConfigs.some((c: any) => c.loanable === true);
 
-  let ticketDisplay: string;
-  if (propType === 'commercial') {
-    ticketDisplay = comTicket > 0 ? `₹ ${Math.round(comTicket / 100000).toLocaleString()}L+` : (p.price || 'On Request');
-  } else if (isResidential) {
-    ticketDisplay = resTicket > 0 ? `₹ ${(resTicket / 10000000).toFixed(1)}Cr+` : (p.price || 'On Request');
-  } else {
-    ticketDisplay = p.price || 'On Request';
+  let ticketDisplay: string = p.price || 'On Request';
+  if (propType === 'commercial' && comValid.length > 0) {
+    const min = Math.min(...comValid);
+    const max = Math.max(...comValid);
+    const formatL = (val: number) => `₹ ${(val / 100000).toFixed(1)}L`;
+    const formatCr = (val: number) => `₹ ${(val / 10000000).toFixed(2)}Cr`;
+    const format = (val: number) => val >= 10000000 ? formatCr(val) : formatL(val);
+    ticketDisplay = min === max ? `${format(min)}+` : `${format(min)} - ${format(max).replace('₹ ', '')}`;
+  } else if (isResidential && resValid.length > 0) {
+    const min = Math.min(...resValid);
+    const max = Math.max(...resValid);
+    const formatCr = (val: number) => `₹ ${(val / 10000000).toFixed(2)}Cr`;
+    ticketDisplay = min === max ? `${formatCr(min)}+` : `${formatCr(min)} - ${formatCr(max).replace('₹ ', '')}`;
   }
 
   const pricePerSqft = resConfigs.length > 0 ? resConfigs[0].pricePerSqft : comConfigs.length > 0 ? comConfigs[0].pricePerSqft : null;
@@ -132,6 +149,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const priceListUrl = p.priceListUrl || null;
   const sitePlanUrl = p.sitePlanUrl || null;
   const layoutPlanUrl = p.layoutPlanUrl || null;
+  const googleMapsUrl = p.googleMapsUrl || null;
 
   // Get similar properties
   let similarProperties: any[] = [];
@@ -490,10 +508,23 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
                 Location &amp; Connectivity
               </h2>
-              {/* Map Placeholder */}
+              {/* Map */}
               <div className="w-full h-[300px] rounded-2xl bg-gray-100 overflow-hidden relative mb-6">
                 <iframe
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(locationStr)}&output=embed`}
+                  src={(() => {
+                    const url = googleMapsUrl || '';
+                    if (url.includes('<iframe')) return url.match(/src="([^"]+)"/)?.[1] || url;
+                    if (url.includes('/maps/embed') || url.includes('output=embed')) return url;
+                    if (url.includes('/maps/place/')) {
+                      const place = url.split('/maps/place/')[1]?.split('/')[0];
+                      if (place) return `https://www.google.com/maps?q=${place}&output=embed`;
+                    }
+                    if (url.includes('/maps/search/')) {
+                      const search = url.split('/maps/search/')[1]?.split('/')[0];
+                      if (search) return `https://www.google.com/maps?q=${search}&output=embed`;
+                    }
+                    return url ? (url + (url.includes('?') ? '&' : '?') + 'output=embed') : `https://www.google.com/maps?q=${encodeURIComponent(locationStr)}&output=embed`;
+                  })()}
                   className="w-full h-full border-0"
                   loading="lazy"
                   allowFullScreen

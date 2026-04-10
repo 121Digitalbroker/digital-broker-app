@@ -9,6 +9,7 @@ export interface IResidentialConfig {
   fullyFurnishedPriceSqft?: number;
   // Per SqFt charges
   plcPerSqft?: number;
+  plcElements?: { name: string; price: number }[];
   otherChargesPerSqft?: number;
   // Existing fields
   priceRangeMin?: number;
@@ -72,6 +73,7 @@ export interface IProperty extends Document {
 
   // Section 6 — Documents
   productImages?: string[];
+  morePhotos?: string[];
   brochureUrl?: string;
   priceListUrl?: string;
   sitePlanUrl?: string;
@@ -100,6 +102,10 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   fullyFurnishedPriceSqft: { type: Number },
   // Per SqFt charges
   plcPerSqft: { type: Number },
+  plcElements: [{
+    name: { type: String },
+    price: { type: Number }
+  }],
   otherChargesPerSqft: { type: Number },
   // Existing fields
   priceRangeMin: { type: Number },
@@ -157,6 +163,7 @@ const PropertySchema = new Schema<IProperty>(
     commercialConfigs: [CommercialConfigSchema],
 
     productImages: [{ type: String }],
+    morePhotos: [{ type: String }],
     brochureUrl: { type: String },
     priceListUrl: { type: String },
     sitePlanUrl: { type: String },

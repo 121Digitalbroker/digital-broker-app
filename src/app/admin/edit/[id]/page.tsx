@@ -35,6 +35,7 @@ export default function EditProperty() {
         setFormData({
           ...data,
           productImages: data.productImages?.length ? data.productImages : [''],
+          morePhotos: data.morePhotos?.length ? data.morePhotos : [],
           residentialConfigs: data.residentialConfigs || [],
           commercialConfigs: data.commercialConfigs || [],
           amenities: data.amenities || [],
@@ -71,6 +72,7 @@ export default function EditProperty() {
         ticketSize: (Number(c.unitSize) || 0) * (Number(c.pricePerSqft) || 0),
         fullyFurnishedPriceSqft: Number(c.fullyFurnishedPriceSqft) || 0,
         plcPerSqft: Number(c.plcPerSqft) || 0,
+        plcElements: (c.plcElements || []).map((p: any) => ({ name: p.name, price: Number(p.price) || 0 })),
         otherChargesPerSqft: Number(c.otherChargesPerSqft) || 0,
         servantRooms: Number(c.servantRooms) || 0,
         toilets: Number(c.toilets) || 0,
@@ -90,6 +92,7 @@ export default function EditProperty() {
         ...formData,
         projectSize: formData.projectSize ? Number(formData.projectSize) : undefined,
         productImages: formData.productImages.filter((img: string) => img.trim() !== ''),
+        morePhotos: (formData.morePhotos || []).filter((img: string) => img.trim() !== ''),
         residentialConfigs: cleanedResidential,
         commercialConfigs: cleanedCommercial
       };
@@ -201,6 +204,7 @@ export default function EditProperty() {
           furnishingType: 'Unfurnished',
           fullyFurnishedPriceSqft: 0,
           plcPerSqft: 0,
+          plcElements: [],
           otherChargesPerSqft: 0,
           possessionMonth: '',
           possessionYear: '',
@@ -208,7 +212,7 @@ export default function EditProperty() {
           servantRooms: 0,
           toilets: 0,
           balconies: 0,
-          carParking: '1 Covered',
+          carParking: 'Included',
           clubMembership: 'Included',
           ticketSize: 0,
           sitePlanUrl: ''
@@ -532,17 +536,14 @@ export default function EditProperty() {
                           <option value="Fully Furnished">Fully Furnished</option>
                         </select>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Fully Furnished Price/Sqft</label>
-                        <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                          value={config.fullyFurnishedPriceSqft || ''} onChange={(e) => updateResidentialConfig(index, 'fullyFurnishedPriceSqft', e.target.value)} />
-                      </div>
+
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">PLC per Sqft (₹)</label>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">PLC per Sqft (₹)</label>
                         <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.plcPerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'plcPerSqft', e.target.value)} />
                       </div>
+
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Other Charges per Sqft (₹)</label>
                         <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
@@ -607,11 +608,8 @@ export default function EditProperty() {
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Car Parking</label>
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                          value={config.carParking || ''} onChange={(e) => updateResidentialConfig(index, 'carParking', e.target.value)}>
-                          <option value="1 Covered">1 Covered</option>
-                          <option value="2 Covered">2 Covered</option>
-                          <option value="1 Open">1 Open</option>
-                          <option value="2 Open">2 Open</option>
+                          value={config.carParking || 'Included'} onChange={(e) => updateResidentialConfig(index, 'carParking', e.target.value)}>
+                          <option value="Included">Included</option>
                           <option value="Not Included">Not Included</option>
                         </select>
                       </div>
@@ -861,6 +859,53 @@ export default function EditProperty() {
                 </div>
               </div>
 
+              {/* More Photos Section */}
+              <div className="pt-6 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="font-bold text-[#0a1628]">More Photos</h4>
+                    <p className="text-xs text-gray-400 mt-0.5">Upload additional property photos for the gallery</p>
+                  </div>
+                  <button type="button" onClick={() => setFormData({ ...formData, morePhotos: [...(formData.morePhotos || []), ''] })} className="text-cyan-600 font-bold flex items-center gap-2 hover:text-cyan-700 text-sm">
+                    <Plus className="w-4 h-4" /> Add Photo
+                  </button>
+                </div>
+                {(!formData.morePhotos || formData.morePhotos.length === 0) ? (
+                  <p className="text-sm text-gray-400 italic">No additional photos added yet.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {formData.morePhotos.map((url: string, idx: number) => (
+                      <div key={idx} className="flex gap-3 items-center">
+                        <input type="text" placeholder="Image URL" value={url} onChange={(e) => {
+                          const newPhotos = [...formData.morePhotos];
+                          newPhotos[idx] = e.target.value;
+                          setFormData({ ...formData, morePhotos: newPhotos });
+                        }} className="flex-1 bg-gray-50 border-none rounded-xl p-3 font-medium text-sm" />
+                        <label className={`cursor-pointer px-4 py-3 rounded-xl flex items-center justify-center transition-all ${uploadingField === `morePhotos-${idx}` ? 'bg-gray-200 text-gray-400' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-600 hover:text-white'}`}>
+                          {uploadingField === `morePhotos-${idx}` ? (
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-cyan-500 animate-spin rounded-full"></div>
+                          ) : (
+                            <Upload className="w-4 h-4" />
+                          )}
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'morePhotos', idx)} />
+                        </label>
+                        <button type="button" onClick={() => {
+                          const newPhotos = formData.morePhotos.filter((_: any, i: number) => i !== idx);
+                          setFormData({ ...formData, morePhotos: newPhotos });
+                        }} className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        {url && (
+                          <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
                 <div className="space-y-2">
                   <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Brochure PDF (URL)</label>
@@ -941,29 +986,63 @@ export default function EditProperty() {
               </div>
             </div>
           </div>
-          {/* SECTION 7: Description & Maps */}
+          {/* SECTION 7: Description */}
           <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
-              <h3 className="text-xl font-black tracking-tight uppercase">7. Description & Location</h3>
+              <h3 className="text-xl font-black tracking-tight uppercase">7. Project Description</h3>
             </div>
             <div className="space-y-6">
               <div className="space-y-2">
                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">About the Project</label>
                 <textarea rows={5} placeholder="Describe the project..." className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.aboutProject} onChange={(e) => setFormData({ ...formData, aboutProject: e.target.value })} />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Google Maps URL</label>
-                <input type="text" placeholder="URL" className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.googleMapsUrl} onChange={(e) => setFormData({ ...formData, googleMapsUrl: e.target.value })} />
-              </div>
             </div>
           </div>
 
-          {/* SECTION 8: Amenities & Promotion */}
+          {/* SECTION 8: Google Maps Integration */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm border-t-8 border-t-indigo-500">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
+              <h3 className="text-xl font-black tracking-tight uppercase">8. Google Maps Location</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Google Maps URL (Embed Code or Link)</label>
+                <input type="text" placeholder="Paste Google Maps URL or Embed script here..." className="w-full bg-gray-50 border-none rounded-2xl p-5" value={formData.googleMapsUrl || ''} onChange={(e) => setFormData({ ...formData, googleMapsUrl: e.target.value })} />
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest px-1">Paste the "Embed a map" SRC URL or the entire iframe tag from Google Maps.</p>
+              </div>
+              {formData.googleMapsUrl && (
+                <div className="w-full h-[300px] rounded-2xl overflow-hidden border-4 border-indigo-50 shadow-inner">
+                  <iframe
+                    src={(() => {
+                      const url = formData.googleMapsUrl || '';
+                      if (url.includes('<iframe')) return url.match(/src="([^"]+)"/)?.[1] || url;
+                      if (url.includes('/maps/embed') || url.includes('output=embed')) return url;
+                      if (url.includes('/maps/place/')) {
+                        const place = url.split('/maps/place/')[1]?.split('/')[0];
+                        if (place) return `https://www.google.com/maps?q=${place}&output=embed`;
+                      }
+                      if (url.includes('/maps/search/')) {
+                        const search = url.split('/maps/search/')[1]?.split('/')[0];
+                        if (search) return `https://www.google.com/maps?q=${search}&output=embed`;
+                      }
+                      return url + (url.includes('?') ? '&' : '?') + 'output=embed';
+                    })()}
+                    className="w-full h-full border-0 bg-gray-50"
+                    title="Google Maps Preview"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* SECTION 9: Amenities & Promotion */}
           <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm border-t-8 border-t-orange-500">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
-              <h3 className="text-xl font-black tracking-tight uppercase">8. Promotion & Amenities</h3>
+              <h3 className="text-xl font-black tracking-tight uppercase">9. Promotion & Amenities</h3>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
