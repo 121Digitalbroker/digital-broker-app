@@ -84,7 +84,7 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
       </div>
 
       {/* ── OVERLAPPING SEARCH BAR ── */}
-      <div className="relative z-20 w-full max-w-4xl mx-auto px-6 md:px-0 -mt-28">
+      <div className="relative z-20 w-full max-w-6xl mx-auto px-6 md:px-0 -mt-28">
         <PrivateViewingModal
           isOpen={showViewingModal}
           onClose={() => setShowViewingModal(false)}
