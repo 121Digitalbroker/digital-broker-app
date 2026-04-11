@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, ChevronDown, ChevronUp, MapPin, DollarSign, Home, Maximize2, Layers, TrendingUp } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, ChevronUp, MapPin, DollarSign, Home, Maximize2, Layers, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import MultiRangeSlider from './MultiRangeSlider';
 
@@ -76,7 +76,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
   return (
     <section className="relative w-full flex flex-col">
       {/* Hero Banner Area */}
-      <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-20 px-6 md:px-12 bg-black">
+      <div className="relative w-full min-h-[85vh] flex flex-col items-center justify-center overflow-hidden pt-20 pb-20 px-6 md:px-12 bg-black">
         {/* Background Images Crossfade */}
         {heroSlides.map((slide, index) => (
           <div
@@ -138,63 +138,62 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
         </div>
       </div>
 
-      {/* ── OVERLAPPING SEARCH BAR (Exact Copy from HeroSection) ── */}
-      <div className="relative z-20 w-full max-w-6xl mx-auto px-6 md:px-0 -mt-32">
+      {/* ── OVERLAPPING SEARCH BAR ── */}
+      <div className="relative z-20 w-full max-w-5xl mx-auto px-4 md:px-0 -mt-16">
         {/* ── CATEGORY BAR ── */}
-        <div className="mb-6 flex justify-center">
-          <div className="bg-[#0a1628] border border-[#1a2d4a] rounded-full p-1.5 flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-x-auto">
+        <div className="mb-4 flex justify-center w-full animate-fade-in-up">
+          <div className="bg-[#0a1628]/80 backdrop-blur-md border border-white/10 rounded-full p-1 flex items-center shadow-lg overflow-x-auto text-[11px] font-black uppercase tracking-widest">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2.5 px-6 md:px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeCategory === cat.id
-                  ? 'bg-orange-500 text-white shadow-[0_10px_25px_rgba(249,115,22,0.4)]'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                className={`flex items-center gap-2 px-6 md:px-8 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap ${activeCategory === cat.id
+                  ? 'bg-orange-500 text-white shadow-[0_4px_15px_rgba(249,115,22,0.4)]'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
               >
-                <cat.icon className={`w-4 h-4 ${activeCategory === cat.id ? 'text-white' : 'text-gray-400'}`} />
                 <span>{cat.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* ── NEW HORIZONTAL FLOATING BAR ── */}
-        <div className="bg-white shadow-[0_25px_60px_rgba(0,0,0,0.35)] rounded-[30px] md:rounded-full p-2 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500">
-
+        {/* ── SEARCH BAR ── */}
+        <div className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 mb-16 animate-fade-in-up animation-delay-200">
+          
           {/* Location Input */}
           <div className="w-full md:flex-1 flex items-center px-6 py-3 cursor-text group">
-            <Search className={`w-5 h-5 mr-3 transition-colors ${searchQuery ? 'text-orange-500' : 'text-gray-400'}`} />
+            <Search className={`w-4 h-4 mr-3 transition-colors ${searchQuery ? 'text-orange-500' : 'text-gray-400'}`} />
             <div className="flex-1 w-full text-left">
               <span className="text-[10px] font-black text-[#0a1628] mb-0.5 uppercase tracking-widest group-focus-within:text-orange-500 transition-colors block">Where</span>
               <input
                 type="text"
                 placeholder="Address, City or Zip"
-                className="w-full outline-none text-[#0a1628] bg-transparent placeholder-gray-300 text-sm font-medium"
+                className="w-full outline-none text-[#0a1628] bg-transparent placeholder-gray-400 text-sm font-medium"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="hidden md:block w-px h-10 bg-gray-100"></div>
+          <div className="hidden md:block w-px h-12 bg-gray-200/60"></div>
 
           {/* Type Dropdown */}
           <div
-            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none"
+            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t md:border-t-0 border-gray-50 flex-1 md:flex-none"
             onMouseEnter={() => setOpenDropdown('type')}
             onMouseLeave={() => setOpenDropdown(null)}
           >
-            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-widest block mb-0.5">Property Type</span>
-            <div className="flex items-center gap-1.5 text-sm font-medium text-gray-500 whitespace-nowrap">
+            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Property Type</span>
+            <div className="flex items-center justify-between md:justify-start gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap group-hover:text-orange-500 transition-colors">
               {activeCategory === 'Commercial'
-                ? (commercialType ? commercialType : 'All Commercial')
+                ? (commercialType ? commercialType : 'All Types')
                 : (bedrooms ? bedrooms : 'All Types')}
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'type' ? 'rotate-180 text-orange-500' : ''}`} />
+              <ArrowUpRight className={`w-4 h-4 transition-transform ${openDropdown === 'type' ? 'text-orange-500 translate-x-0.5 -translate-y-0.5' : 'text-gray-400'}`} />
             </div>
 
             {openDropdown === 'type' && (
-              <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
+              <div className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
                 <div className="bg-white rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-6">
                   {activeCategory === 'Residential' ? (
                     <div className="space-y-4">
@@ -228,7 +227,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-[orange-600] mb-2 block">Commercial Property Types</span>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-orange-600 mb-2 block">Commercial Categories</span>
                       <div className="flex flex-wrap gap-2">
                         {['Any', 'Office Space', 'Shop/Showroom', 'Commercial Land', 'Coworking Space', 'Warehouse', 'Industrial'].map((option) => (
                           <button
@@ -247,21 +246,21 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
             )}
           </div>
 
-          <div className="hidden md:block w-px h-10 bg-gray-100"></div>
+          <div className="hidden md:block w-px h-12 bg-gray-200/60"></div>
 
           {/* Budget Dropdown */}
           <div
-            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none"
+            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t md:border-t-0 border-gray-50 flex-1 md:flex-none"
             onMouseEnter={() => setOpenDropdown('budget')}
             onMouseLeave={() => setOpenDropdown(null)}
           >
-            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-widest block mb-0.5">Budget</span>
-            <div className="flex items-center gap-1.5 text-sm font-medium text-gray-500 whitespace-nowrap">
-              ₹{priceRange.min} - {priceRange.max}Cr <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'budget' ? 'rotate-180 text-orange-500' : ''}`} />
+            <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Budget</span>
+            <div className="flex items-center justify-between md:justify-start gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap group-hover:text-orange-500 transition-colors">
+              ₹{priceRange.min} - {priceRange.max}Cr <ArrowUpRight className={`w-4 h-4 transition-transform ${openDropdown === 'budget' ? 'text-orange-500 translate-x-0.5 -translate-y-0.5' : 'text-gray-400'}`} />
             </div>
 
             {openDropdown === 'budget' && (
-              <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
+              <div className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
                 <div className="bg-white rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-6">
                   <div className="flex items-center justify-between mb-6">
                     <span className="text-[11px] font-black uppercase tracking-widest text-[#0a1628]">Price Range</span>
@@ -315,13 +314,12 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
                 }
                 router.push(`/search?${params.toString()}`);
               }}
-              className="w-full md:w-auto px-8 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-[0_10px_30px_rgba(249,115,22,0.5)] active:scale-95 gap-3"
+              className="w-full md:w-auto px-10 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-[0_10px_30px_rgba(249,115,22,0.4)] active:scale-95 gap-3 font-black uppercase text-[11px] tracking-widest"
             >
               <Search className="w-5 h-5 stroke-[2.5px]" />
-              <span className="font-bold tracking-widest text-[11px] uppercase">Search</span>
+              Search
             </button>
           </div>
-
         </div>
       </div>
     </section>
