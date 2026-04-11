@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, ChevronDown, ChevronUp, MapPin, DollarSign, Home, Maximize2, Layers, TrendingUp } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, ArrowUpRight, MapPin, DollarSign, Home, Maximize2, TrendingUp, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import MultiRangeSlider from './MultiRangeSlider';
 import PrivateViewingModal from './PrivateViewingModal';
@@ -41,110 +41,80 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
   if (!mounted) return null;
 
   return (
-    <section className="relative w-full flex flex-col">
-      {/* Hero Banner Area */}
-      <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-32 px-6 md:px-12">
-        {/* Background */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/banner%20design%20costume%202nd.jpg"
-            alt="Hero Banner"
-            className="w-full h-full object-cover animate-ken-burns"
-          />
-          {/* Gradient overlay removed per user request */}
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center my-auto">
-          <h1 className="animate-fade-in-up animation-delay-200 mb-4" style={{ lineHeight: '0.88' }}>
-            <span className="block text-white uppercase" style={{ fontSize: 'clamp(2.5rem, 8vw, 7rem)', fontWeight: 900, letterSpacing: '-0.02em' }}>
-              Find Your
-            </span>
-            <span className="block text-orange-500 uppercase" style={{ fontSize: 'clamp(2.5rem, 8vw, 7rem)', fontWeight: 900, letterSpacing: '-0.02em' }}>
-              Dream Home
-            </span>
-          </h1>
-
-          <p className="mt-6 text-gray-300 max-w-xl mx-auto text-base font-light tracking-wide leading-relaxed animate-fade-in-up animation-delay-400">
-            Exclusive portfolio of ultra-luxury residences, penthouses & commercial investments for the discerning elite.
-          </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-600">
-            <button
-              onClick={() => setShowViewingModal(true)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-3.5 rounded-full font-bold tracking-widest text-[11px] uppercase transition-all hover:scale-105 hover:shadow-[0_15px_40px_rgba(249,115,22,0.5)]"
-            >
-              Book Your Appointment
-            </button>
-          </div>
-
-
-        </div>
-
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-start pt-30 pb-24 px-6 md:px-12 overflow-hidden bg-[#050b14]">
+      {/* Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[#0a1628]/60 mix-blend-multiply z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent z-10" />
+        <img
+          src="/banner%20design%20costume%202nd.jpg"
+          alt="Hero Banner"
+          className="w-full h-full object-cover animate-ken-burns"
+        />
       </div>
 
-      {/* ── OVERLAPPING SEARCH BAR ── */}
-      <div className="relative z-20 w-full max-w-6xl mx-auto px-6 md:px-0 -mt-28">
-        <PrivateViewingModal
-          isOpen={showViewingModal}
-          onClose={() => setShowViewingModal(false)}
-          properties={properties}
-        />
+      <PrivateViewingModal
+        isOpen={showViewingModal}
+        onClose={() => setShowViewingModal(false)}
+        properties={properties}
+      />
+
+      {/* Main Content Wrapper */}
+      <div className="relative z-20 w-full max-w-5xl mx-auto flex flex-col items-center -mt-8">
+
         {/* ── CATEGORY BAR ── */}
-        <div className="mb-4 flex justify-center">
-          <div className="bg-[#0a1628] border border-[#1a2d4a] rounded-full p-1 flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-x-auto">
+        <div className="mb-4 flex justify-center w-full animate-fade-in-up">
+          <div className="bg-[#0a1628]/80 backdrop-blur-md border border-white/10 rounded-full p-1 flex items-center shadow-lg overflow-x-auto">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2 px-4 md:px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeCategory === cat.id
-                  ? 'bg-orange-500 text-white shadow-[0_10px_25px_rgba(249,115,22,0.4)]'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                className={`flex items-center gap-2 px-6 md:px-8 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeCategory === cat.id
+                  ? 'bg-orange-500 text-white shadow-[0_4px_15px_rgba(249,115,22,0.4)]'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
               >
-                <cat.icon className={`w-4 h-4 ${activeCategory === cat.id ? 'text-white' : 'text-gray-400'}`} />
                 <span>{cat.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* ── NEW HORIZONTAL FLOATING BAR ── */}
-        <div className="bg-white shadow-[0_30px_80px_rgba(0,0,0,0.25)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 border border-white/20">
-
+        {/* ── SEARCH BAR ── */}
+        <div className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 mb-16 animate-fade-in-up animation-delay-200">
           {/* Location Input */}
-          <div className="w-full md:flex-1 flex items-center px-5 py-2.5 cursor-text group">
-            <Search className={`w-4 h-4 mr-2.5 transition-colors ${searchQuery ? 'text-orange-500' : 'text-gray-400'}`} />
+          <div className="w-full md:flex-1 flex items-center px-6 py-3 cursor-text group">
+            <Search className={`w-4 h-4 mr-3 transition-colors ${searchQuery ? 'text-orange-500' : 'text-gray-400'}`} />
             <div className="flex-1 w-full text-left">
-              <span className="text-[9px] font-black text-[#0a1628] mb-0.5 uppercase tracking-widest group-focus-within:text-orange-500 transition-colors block">Where</span>
+              <span className="text-[10px] font-black text-[#0a1628] mb-0.5 uppercase tracking-widest group-focus-within:text-orange-500 transition-colors block">Where</span>
               <input
                 type="text"
                 placeholder="Address, City or Zip"
-                className="w-full outline-none text-[#0a1628] bg-transparent placeholder-gray-300 text-[13px] font-medium"
+                className="w-full outline-none text-[#0a1628] bg-transparent placeholder-gray-400 text-sm font-medium"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="hidden md:block w-px h-10 bg-gray-100"></div>
+          <div className="hidden md:block w-px h-12 bg-gray-200/60"></div>
 
           {/* Type Dropdown */}
           <div
-            className="w-full md:w-auto relative px-5 py-2.5 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t md:border-t-0 border-gray-50"
+            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t md:border-t-0 border-gray-50 flex-1 md:flex-none"
             onMouseEnter={() => setOpenDropdown('type')}
             onMouseLeave={() => setOpenDropdown(null)}
           >
             <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Property Type</span>
-            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 whitespace-nowrap group-hover:text-orange-500 transition-colors">
+            <div className="flex items-center justify-between md:justify-start gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap group-hover:text-orange-500 transition-colors">
               {activeCategory === 'Commercial'
                 ? (commercialType ? commercialType : 'All Types')
                 : (bedrooms ? bedrooms : 'All Types')}
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'type' ? 'rotate-180 text-orange-500' : ''}`} />
+              <ArrowUpRight className={`w-4 h-4 transition-transform ${openDropdown === 'type' ? 'text-orange-500 translate-x-0.5 -translate-y-0.5' : 'text-gray-400'}`} />
             </div>
 
             {openDropdown === 'type' && (
-              <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
+              <div className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
                 <div className="bg-white rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-6">
                   {activeCategory === 'Residential' ? (
                     <div className="space-y-4">
@@ -197,21 +167,21 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
             )}
           </div>
 
-          <div className="hidden md:block w-px h-10 bg-gray-100"></div>
+          <div className="hidden md:block w-px h-12 bg-gray-200/60"></div>
 
           {/* Budget Dropdown */}
           <div
-            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none"
+            className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none flex-1 md:flex-none"
             onMouseEnter={() => setOpenDropdown('budget')}
             onMouseLeave={() => setOpenDropdown(null)}
           >
             <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Budget</span>
-            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 whitespace-nowrap group-hover:text-orange-500 transition-colors">
-              ₹{priceRange.min} - {priceRange.max}Cr <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === 'budget' ? 'rotate-180 text-orange-500' : ''}`} />
+            <div className="flex items-center justify-between md:justify-start gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap group-hover:text-orange-500 transition-colors">
+              ₹{priceRange.min} - {priceRange.max}Cr <ArrowUpRight className={`w-4 h-4 transition-transform ${openDropdown === 'budget' ? 'text-orange-500 translate-x-0.5 -translate-y-0.5' : 'text-gray-400'}`} />
             </div>
 
             {openDropdown === 'budget' && (
-              <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
+              <div className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
                 <div className="bg-white rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-6">
                   <div className="flex items-center justify-between mb-6">
                     <span className="text-[11px] font-black uppercase tracking-widest text-[#0a1628]">Price Range</span>
@@ -247,7 +217,7 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
           </div>
 
           {/* Search Button */}
-          <div className="w-full md:w-auto p-1 mt-2 md:mt-0 ml-auto">
+          <div className="w-full md:w-auto p-1.5 mt-2 md:mt-0 md:ml-2">
             <button
               onClick={() => {
                 const params = new URLSearchParams();
@@ -265,14 +235,38 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
                 }
                 router.push(`/search?${params.toString()}`);
               }}
-              className="w-full md:w-auto px-10 h-[52px] bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-[0_15px_35px_rgba(249,115,22,0.45)] active:scale-95 gap-3"
+              className="w-full md:w-auto px-10 h-[56px] bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-[0_10px_20px_rgba(249,115,22,0.3)] active:scale-95 gap-3"
             >
               <Search className="w-4 h-4 stroke-[3px]" />
-              <span className="font-black tracking-[0.15em] text-[11px] uppercase">Search</span>
+              <span className="font-black tracking-[0.1em] text-[12px] uppercase">Search</span>
             </button>
           </div>
 
         </div>
+
+        {/* ── HERO TEXT CONTENT ── */}
+        <h1 className="animate-fade-in-up animation-delay-400 mb-6 text-center w-full" style={{ lineHeight: '0.9' }}>
+          <span className="block text-white uppercase drop-shadow-lg" style={{ fontSize: 'clamp(3rem, 10vw, 8.5rem)', fontWeight: 900, letterSpacing: '-0.03em' }}>
+            Find Your
+          </span>
+          <span className="block text-orange-500 uppercase drop-shadow-lg" style={{ fontSize: 'clamp(3rem, 10vw, 8.5rem)', fontWeight: 900, letterSpacing: '-0.03em' }}>
+            Dream Home
+          </span>
+        </h1>
+
+        <p className="mt-4 text-gray-200 max-w-2xl mx-auto text-base md:text-lg font-medium tracking-wide leading-relaxed animate-fade-in-up animation-delay-600 text-center drop-shadow-md">
+          Exclusive portfolio of urban, industrial, philanthropies &amp; commercial investment for the discerned taste
+        </p>
+
+        <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-800">
+          <button
+            onClick={() => setShowViewingModal(true)}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-full font-black tracking-widest text-xs uppercase transition-all hover:scale-105 shadow-[0_15px_40px_rgba(249,115,22,0.4)]"
+          >
+            Book Your Appointment
+          </button>
+        </div>
+
       </div>
     </section>
   );

@@ -17,6 +17,9 @@ import LeadForm from '@/components/LeadForm';
 import Footer from '@/components/Footer';
 import InteractivePriceBreakup from '@/components/InteractivePriceBreakup';
 import DocumentsSection from '@/components/DocumentsSection';
+import ImagePopupGallery from '@/components/ImagePopupGallery';
+import EmiCalculator from '@/components/EmiCalculator';
+import MobilePropertyView from '@/components/MobilePropertyView';
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop';
 
@@ -178,8 +181,25 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="min-h-screen bg-[#f5f6fa] font-sans text-gray-900 overflow-x-hidden">
-      <Navbar />
-      <div className="pt-12 max-w-[2000px] mx-auto px-4 md:px-8 lg:px-12 pb-20">
+      <div className="hidden lg:block">
+        <Navbar />
+      </div>
+
+      <MobilePropertyView 
+        p={p} 
+        ticketDisplay={ticketDisplay} 
+        allImgs={allImgs} 
+        resConfigs={resConfigs} 
+        comConfigs={comConfigs} 
+        developerName={developerName} 
+        title={title} 
+        city={city} 
+        sector={sector} 
+        amenities={amenities} 
+        similarProperties={similarProperties} 
+      />
+
+      <div className="hidden lg:block pt-12 max-w-[2000px] mx-auto px-4 md:px-8 lg:px-12 pb-20">
 
         {/* ── BREADCRUMB ── */}
         <nav className="flex items-center gap-2 text-sm text-gray-400 py-2 overflow-x-auto whitespace-nowrap mb-8">
@@ -212,7 +232,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                     <span className="font-medium text-base">{locationStr}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-3 md:justify-end">
                   <span className="bg-[#f0f4f8] text-[#3b82f6] px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider">{status}</span>
                   <span className="bg-[#fdf4e4] text-[#f97316] px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider">{propType}</span>
@@ -223,34 +243,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            {/* ── Image Gallery ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 h-[450px] relative group cursor-pointer overflow-hidden rounded-[2.5rem]">
-                <img src={heroImage} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                <div className="absolute top-6 left-6 bg-orange-500 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">{status}</div>
-                <div className="absolute bottom-6 left-6 flex gap-2">
-                  <button className="bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-3 rounded-2xl transition-all border border-white/20">
-                    <Heart className="w-5 h-5" />
-                  </button>
-                  <button className="bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-3 rounded-2xl transition-all border border-white/20">
-                    <Share2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              <div className="hidden lg:flex flex-col gap-6 h-[450px]">
-                {[1, 2].map((i) => (
-                  <div key={i} className="flex-1 relative group cursor-pointer overflow-hidden rounded-[2.5rem]">
-                    <img src={allImgs[i] || FALLBACK_IMG} alt={`${title} ${i + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    {i === 2 && allImgs.length > 3 && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="text-white font-black text-xl">+{allImgs.length - 3}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* ── Image Gallery (Client Component with Lightbox) ── */}
+            <ImagePopupGallery images={allImgs} title={title} status={status} />
+
 
             {/* ── Quick Stats ── */}
             <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
@@ -430,38 +425,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
 
             {isResidential && !isCommercial && (
-              <div className="bg-white rounded-[2.5rem] p-1 shadow-sm border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-br from-[#0a1628] to-[#142240] p-10 text-white">
-                  <h2 className="text-3xl font-black mb-8 flex items-center gap-4">
-                    <div className="w-2 h-10 bg-orange-500 rounded-full" />
-                    Financing Options
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-                    <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                      <p className="text-blue-300 text-[10px] font-black uppercase tracking-widest mb-2">Loan Amount</p>
-                      <p className="text-2xl font-black">{ticketDisplay}</p>
-                    </div>
-                    <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                      <p className="text-blue-300 text-[10px] font-black uppercase tracking-widest mb-2">Interest Rate</p>
-                      <p className="text-2xl font-black">8.5% p.a.</p>
-                    </div>
-                    <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                      <p className="text-blue-300 text-[10px] font-black uppercase tracking-widest mb-2">Tenure</p>
-                      <p className="text-2xl font-black">20 Years</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 bg-orange-500 rounded-3xl shadow-xl shadow-orange-500/20">
-                    <div>
-                      <p className="text-orange-100 text-[10px] font-black uppercase tracking-widest mb-1">Estimated Monthly EMI</p>
-                      <p className="text-4xl font-black text-white">
-                        ₹{resTicket > 0 ? Math.round((resTicket * 0.8 * (0.085 / 12) * Math.pow(1 + 0.085 / 12, 240)) / (Math.pow(1 + 0.085 / 12, 240) - 1)).toLocaleString() : '--'}
-                      </p>
-                    </div>
-                    <Calculator className="w-16 h-16 text-white/20" />
-                  </div>
-                </div>
-              </div>
+              <EmiCalculator initialAmount={resTicket} ticketDisplay={ticketDisplay} />
             )}
+
 
             {similarProperties.length > 0 && (
               <div className="pt-10">
@@ -510,9 +476,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 </div>
 
                 <div className="space-y-4 pt-4">
-                  <a href={brochureUrl || '#'} target="_blank" rel="noopener noreferrer" className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3">
-                    <Download className="w-4 h-4" /> Digital Brochure
-                  </a>
+
                   <a href={`https://wa.me/919217976577?text=Hi, I'm interested in ${title}`} target="_blank" rel="noopener noreferrer" className="w-full bg-[#1db954] hover:bg-[#19a34a] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-500/20">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
                     WhatsApp Consultant

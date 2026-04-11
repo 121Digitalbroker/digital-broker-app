@@ -46,7 +46,7 @@ export default function DocumentsSection({
 
   return (
     <>
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
         <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
           <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
           Documents & Plans
@@ -55,20 +55,20 @@ export default function DocumentsSection({
           {documents.map((doc, i) => (
             <div
               key={i}
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all bg-gray-50/50 hover:bg-white cursor-pointer"
+              className="group flex items-center justify-between gap-3 md:gap-4 p-4 md:p-5 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all bg-gray-50/50 hover:bg-white cursor-pointer"
               onClick={() => handleDownloadClick(doc.label, doc.url)}
             >
-              <div className={`w-12 h-12 rounded-xl ${doc.bgClass} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                <doc.icon className={`w-6 h-6 ${doc.textClass}`} />
+              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl ${doc.bgClass} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                <doc.icon className={`w-5 h-5 md:w-6 md:h-6 ${doc.textClass}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-[#0a1628] group-hover:text-orange-500 transition-colors truncate">
+                <h4 className="font-bold text-[#0a1628] group-hover:text-orange-500 transition-colors text-sm md:text-base leading-tight">
                   {doc.label}
                 </h4>
                 <p className="text-xs text-gray-400">PDF Available</p>
               </div>
-              <button className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide ${doc.btnClass} text-white transition-all flex items-center gap-2`}>
-                <Download className="w-4 h-4" />
+              <button className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-wide ${doc.btnClass} text-white transition-all flex items-center gap-1.5 shrink-0`}>
+                <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 Download
               </button>
             </div>
