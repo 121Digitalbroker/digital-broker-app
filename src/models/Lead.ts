@@ -5,9 +5,10 @@ export interface ILead extends Document {
   email?: string;
   phone: string;
   message?: string;
-  source: 'chat' | 'enquiry' | string;
+  source: 'chat' | 'enquiry' | 'document_download' | string;
   propertyId?: string;
   propertyTitle?: string;
+  documentType?: string;
   createdAt: Date;
 }
 
@@ -20,6 +21,7 @@ const LeadSchema = new Schema<ILead>(
     source: { type: String, default: 'chat' },
     propertyId: { type: String },
     propertyTitle: { type: String },
+    documentType: { type: String },
   },
   { timestamps: true }
 );

@@ -16,6 +16,7 @@ import { Metadata } from 'next';
 import LeadForm from '@/components/LeadForm';
 import Footer from '@/components/Footer';
 import InteractivePriceBreakup from '@/components/InteractivePriceBreakup';
+import DocumentsSection from '@/components/DocumentsSection';
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop';
 
@@ -411,48 +412,14 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* ─── Documents / Downloads ─── */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-bold text-[#0a1628] mb-6 flex items-center gap-3">
-                <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
-                Documents &amp; Plans
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { label: 'Brochure', url: brochureUrl, icon: FileText, color: 'orange' },
-                  { label: 'Price List', url: priceListUrl, icon: DollarSign, color: 'green' },
-                  { label: 'Site Plan', url: sitePlanUrl, icon: Navigation, color: 'blue' },
-                  { label: 'Layout Plan', url: layoutPlanUrl, icon: Layers, color: 'purple' },
-                ].map((doc, i) => (
-                  <div
-                    key={i}
-                    className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${doc.url
-                      ? 'bg-white border-gray-100 hover:border-orange-200 cursor-pointer'
-                      : 'bg-gray-50 border-gray-100 opacity-60'
-                      }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-${doc.color}-50`}>
-                        <doc.icon className={`w-5 h-5 text-${doc.color}-500`} />
-                      </div>
-                      <div>
-                        <p className="font-bold text-[#0a1628] text-sm">{doc.label}</p>
-                        <p className="text-[10px] text-gray-400 uppercase tracking-wider">{doc.url ? 'PDF Available' : 'Coming Soon'}</p>
-                      </div>
-                    </div>
-                    {doc.url ? (
-                      <a href={doc.url} target="_blank" rel="noopener noreferrer"
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Download
-                      </a>
-                    ) : (
-                      <span className="text-gray-300 text-xs font-bold">N/A</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <DocumentsSection
+              propertyId={id}
+              propertyTitle={title}
+              brochureUrl={brochureUrl}
+              priceListUrl={priceListUrl}
+              sitePlanUrl={sitePlanUrl}
+              layoutPlanUrl={layoutPlanUrl}
+            />
 
             {/* ─── Location Map ─── */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
