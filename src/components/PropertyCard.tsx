@@ -72,10 +72,10 @@ const PropertyCard = ({ property }: { property: any }) => {
       </Link>
 
       <div className="px-2 flex flex-col flex-1 pb-2">
-        {/* Developer Info */}
+        {/* Developer Info - Prominent */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{developerName}</span>
+          <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Developer</span>
+          <span className="text-xs font-black text-[#0a1628] uppercase tracking-wide">{developerName}</span>
         </div>
 
         {/* Title */}
