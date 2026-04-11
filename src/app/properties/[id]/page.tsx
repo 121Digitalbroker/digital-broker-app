@@ -94,9 +94,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   const isResidential = propType === 'residential' || propType === 'both';
   const isCommercial = propType === 'commercial';
-  const possession = (resConfigs.length > 0 && resConfigs[0].possessionDate)
-    ? new Date(resConfigs[0].possessionDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })
-    : 'Ready to Move';
+  const possession = (resConfigs.length > 0 && resConfigs[0].possessionYear)
+    ? `${resConfigs[0].possessionMonth || ''} ${resConfigs[0].possessionYear}`.trim()
+    : (comConfigs.length > 0 && comConfigs[0].possessionYear)
+    ? `${comConfigs[0].possessionMonth || ''} ${comConfigs[0].possessionYear}`.trim()
+    : p.projectStatus || 'Ready to Move';
 
   const resTypologies = resConfigs.length > 0
     ? resConfigs.map((c: any) => {
