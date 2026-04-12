@@ -47,7 +47,7 @@ const Footer = () => {
               <div className="space-y-2">
                 <p className="text-sm text-gray-400">
                   <span className="text-orange-500 font-bold block mb-1">Email Us</span>
-                  devashish@vantagerealtors.in
+                  sales@digitalbroker.in
                 </p>
                 <div className="pt-2">
                   <span className="text-orange-500 font-bold block mb-1 uppercase tracking-tighter">Call / WhatsApp Us</span>

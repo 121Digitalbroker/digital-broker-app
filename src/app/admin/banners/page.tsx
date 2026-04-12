@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+import AdminNavbar from '@/components/AdminNavbar';
 import { ArrowLeft, Plus, Trash2, Upload, Save, X, ImageIcon, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -132,7 +132,7 @@ export default function AdminBanners() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-[#0a1628] font-sans pb-24 text-left">
-      <Navbar />
+      <AdminNavbar />
       
       <div className="container mx-auto px-6 md:px-12 pt-16">
         <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 font-bold hover:text-orange-500 mb-8 transition-colors group">

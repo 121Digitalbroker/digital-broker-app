@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+import AdminNavbar from '@/components/AdminNavbar';
 import { ArrowLeft, Save, Upload, X, Check, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -45,6 +45,7 @@ export default function EditProperty() {
           isVisible: data.isVisible !== false, // Default to true if not present
           aboutProject: data.aboutProject || '',
           googleMapsUrl: data.googleMapsUrl || '',
+          nearbyLocations: data.nearbyLocations || [],
         });
       } else {
         alert('Property not found');
@@ -302,7 +303,7 @@ export default function EditProperty() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-[#0a1628] font-sans pb-24">
-      <Navbar />
+      <AdminNavbar />
 
       <div className="container mx-auto px-6 md:px-12 pt-32">
         <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 font-bold hover:text-orange-500 mb-8 transition-colors group">
@@ -451,6 +452,19 @@ export default function EditProperty() {
                   <option value="Unfurnished">Unfurnished</option>
                   <option value="Semi Furnished">Semi Furnished</option>
                   <option value="Fully Furnished">Fully Furnished</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Loanable Option</label>
+                <select
+                  className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-purple-500 transition-all font-bold text-[#0a1628]"
+                  value={formData.loanable || 'NO'}
+                  onChange={(e) => setFormData({ ...formData, loanable: e.target.value })}
+                >
+                  <option value="NO">No</option>
+                  <option value="YES">Yes</option>
+                  <option value="PARTIAL">Partial</option>
+                  <option value="SELECTIVE BANKS ONLY">Selective Banks Only</option>
                 </select>
               </div>
             </div>
@@ -890,33 +904,45 @@ export default function EditProperty() {
               {/* Images */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-bold text-[#0a1628]">Product Images</h4>
+                  <div>
+                    <h4 className="font-bold text-[#0a1628]">Product Images</h4>
+                    <p className="text-xs text-gray-400 mt-0.5">Add image URLs or upload files directly</p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, productImages: [...formData.productImages, ''] })}
                     className="text-cyan-600 font-bold flex items-center gap-2 hover:text-cyan-700 text-sm"
                   >
-                    <Plus className="w-4 h-4" /> Add Image URL
+                    <Plus className="w-4 h-4" /> Add Image
                   </button>
                 </div>
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {formData.productImages.map((url: string, idx: number) => (
-                    <div key={idx} className="flex gap-4 items-center">
+                    <div key={idx} className="flex gap-3 items-center">
                       <input
                         type="text"
-                        placeholder="https://..."
-                        className="w-full bg-gray-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-[#0a1628]"
+                        placeholder="https://... or upload below"
+                        className="flex-1 bg-gray-50 border-none rounded-xl p-3 focus:ring-2 focus:ring-cyan-500 transition-all font-medium text-sm text-[#0a1628]"
                         value={url || ''}
                         onChange={(e) => handleImageUrlChange(idx, e.target.value)}
                       />
+                      <label className={`cursor-pointer px-4 py-3 rounded-xl flex items-center justify-center transition-all ${uploadingField === `productImages-${idx}` ? 'bg-gray-200 text-gray-400' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-600 hover:text-white'}`}>
+                        {uploadingField === `productImages-${idx}` ? (
+                          <div className="w-4 h-4 border-2 border-gray-300 border-t-cyan-500 animate-spin rounded-full"></div>
+                        ) : (
+                          <Upload className="w-4 h-4" />
+                        )}
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'productImages', idx)} />
+                      </label>
                       {formData.productImages.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, productImages: formData.productImages.filter((_: any, i: number) => i !== idx) })}
-                          className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors shrink-0"
-                        >
-                          <X className="w-5 h-5" />
+                        <button type="button" onClick={() => setFormData({ ...formData, productImages: formData.productImages.filter((_: any, i: number) => i !== idx) })} className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                          <Trash2 className="w-4 h-4" />
                         </button>
+                      )}
+                      {url && (
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                        </div>
                       )}
                     </div>
                   ))}
@@ -1100,6 +1126,68 @@ export default function EditProperty() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* SECTION 8.5: Nearby Locations (Strategic Location) */}
+          <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm border-t-8 border-t-emerald-500">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2 h-8 bg-emerald-500 rounded-full"></div>
+              <h3 className="text-xl font-black tracking-tight uppercase">8.5. Nearby Locations</h3>
+            </div>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">Add nearby landmarks to show in the Strategic Location section on the property page.</p>
+            
+            <div className="space-y-3 mb-6">
+              {(formData.nearbyLocations || []).map((loc: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-3 bg-gray-50 rounded-2xl p-4">
+                  <div className="flex-1 grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="e.g. Metro Station"
+                      className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium"
+                      value={loc.name}
+                      onChange={(e) => {
+                        const updated = [...formData.nearbyLocations];
+                        updated[idx] = { ...updated[idx], name: e.target.value };
+                        setFormData({ ...formData, nearbyLocations: updated });
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="e.g. 500m, 2 km"
+                      className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium"
+                      value={loc.distance}
+                      onChange={(e) => {
+                        const updated = [...formData.nearbyLocations];
+                        updated[idx] = { ...updated[idx], distance: e.target.value };
+                        setFormData({ ...formData, nearbyLocations: updated });
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = formData.nearbyLocations.filter((_: any, i: number) => i !== idx);
+                      setFormData({ ...formData, nearbyLocations: updated });
+                    }}
+                    className="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl flex items-center justify-center transition-colors shrink-0"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  nearbyLocations: [...(formData.nearbyLocations || []), { name: '', distance: '' }]
+                });
+              }}
+              className="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-2xl p-4 font-black text-xs uppercase tracking-widest transition-colors border border-emerald-200 border-dashed"
+            >
+              + Add Nearby Location
+            </button>
           </div>
 
           {/* SECTION 9: Amenities & Promotion */}

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+import AdminNavbar from '@/components/AdminNavbar';
 import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
@@ -148,7 +148,7 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-[#0a1628] font-sans text-left">
-      <Navbar />
+      <AdminNavbar />
       
       <div className="container mx-auto px-6 md:px-12 pt-32 pb-24">
         {/* Dashboard Header */}

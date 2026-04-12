@@ -91,6 +91,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const status = String(p.projectStatus || p.badge || 'New Launch');
   const rera = String(p.reraNumber || 'RERA Registration Pending');
   const projectSize = p.projectSize ? `${p.projectSize} Acres` : p.sqft ? `${p.sqft} sqft` : '--';
+  const loanable = String(p.loanable || 'NO');
+  const nearbyLocations: { name: string; distance: string }[] = Array.isArray(p.nearbyLocations) ? p.nearbyLocations : [];
 
   const resConfigs: any[] = Array.isArray(p.residentialConfigs) ? p.residentialConfigs : [];
   const comConfigs: any[] = Array.isArray(p.commercialConfigs) ? p.commercialConfigs : [];
@@ -185,18 +187,18 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
         <Navbar />
       </div>
 
-      <MobilePropertyView 
-        p={p} 
-        ticketDisplay={ticketDisplay} 
-        allImgs={allImgs} 
-        resConfigs={resConfigs} 
-        comConfigs={comConfigs} 
-        developerName={developerName} 
-        title={title} 
-        city={city} 
-        sector={sector} 
-        amenities={amenities} 
-        similarProperties={similarProperties} 
+      <MobilePropertyView
+        p={p}
+        ticketDisplay={ticketDisplay}
+        allImgs={allImgs}
+        resConfigs={resConfigs}
+        comConfigs={comConfigs}
+        developerName={developerName}
+        title={title}
+        city={city}
+        sector={sector}
+        amenities={amenities}
+        similarProperties={similarProperties}
       />
 
       <div className="hidden lg:block pt-12 max-w-[2000px] mx-auto px-4 md:px-8 lg:px-12 pb-20">
@@ -351,6 +353,19 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                     <p className="text-sm font-bold text-[#0a1628]">{status}</p>
                   </div>
                 </div>
+                {loanable && loanable !== 'NO' && (
+                  <div className="flex items-center gap-4 bg-gradient-to-r from-green-50 to-emerald-100/50 p-4 rounded-2xl border border-green-100">
+                    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Loanable</p>
+                      <p className="text-sm font-black text-green-700">{loanable}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -402,26 +417,21 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   className="w-full h-full border-0" loading="lazy" allowFullScreen title="Map"
                 />
               </div>
+              {nearbyLocations.length > 0 && (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { name: 'Metro Station', dist: '500m', icon: Navigation },
-                  { name: 'Hospital', dist: '1.2 km', icon: ShieldCheck },
-                  { name: 'Schools', dist: '800m', icon: Users },
-                  { name: 'Shopping Mall', dist: '1.5 km', icon: Building },
-                  { name: 'Airport', dist: '25 km', icon: Wind },
-                  { name: 'Highway', dist: '2 km', icon: ArrowRight },
-                ].map((l, i) => (
+                {nearbyLocations.map((l, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                      <l.icon className="w-5 h-5 text-orange-500" />
+                      <MapPin className="w-5 h-5 text-orange-500" />
                     </div>
                     <div>
                       <p className="text-sm font-black text-[#0a1628]">{l.name}</p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">{l.dist}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">{l.distance}</p>
                     </div>
                   </div>
                 ))}
               </div>
+              )}
             </div>
 
             {isResidential && !isCommercial && (

@@ -72,7 +72,6 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Unit Size</th>
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Price/sqft</th>
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Ticket Size</th>
-              <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Loanable</th>
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-r-xl">Layouts</th>
             </tr>
           </thead>
@@ -85,7 +84,7 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
 
               return (
                 <React.Fragment key={id}>
-                  <tr 
+                  <tr
                     onClick={() => hasLayouts && toggleRow(id, layoutsToRender)}
                     className={`border-b border-gray-50 transition-colors ${hasLayouts ? 'cursor-pointer hover:bg-orange-50/30' : ''}`}
                   >
@@ -95,11 +94,6 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                     <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
                     <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 10000000).toFixed(1)}Cr</td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${c.loanable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
-                        {c.loanable ? 'Yes' : 'No'}
-                      </span>
-                    </td>
                     <td className="p-4">
                       {hasLayouts ? (
                         <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
@@ -111,10 +105,10 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                       )}
                     </td>
                   </tr>
-                  
+
                   {isExpanded && hasLayouts && (
                     <tr className="bg-orange-50/30">
-                      <td colSpan={6} className="p-6 border-b border-gray-100">
+                      <td colSpan={5} className="p-6 border-b border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {layoutsToRender.map((img: string, idx: number) => (
                             <div key={idx} className="relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 cursor-pointer" onClick={() => openOverlay(img, layoutsToRender)}>
@@ -145,7 +139,7 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
 
               return (
                 <React.Fragment key={id}>
-                  <tr 
+                  <tr
                     onClick={() => hasLayouts && toggleRow(id, layoutsToRender)}
                     className={`border-b border-gray-50 transition-colors ${hasLayouts ? 'cursor-pointer hover:bg-orange-50/30' : ''}`}
                   >
@@ -155,11 +149,6 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                     <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
                     <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 100000).toFixed(0)}L</td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${c.loanable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
-                        {c.loanable ? 'Yes' : 'No'}
-                      </span>
-                    </td>
                     <td className="p-4">
                       {hasLayouts ? (
                         <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
@@ -174,7 +163,7 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
 
                   {isExpanded && hasLayouts && (
                     <tr className="bg-orange-50/30">
-                      <td colSpan={6} className="p-6 border-b border-gray-100">
+                      <td colSpan={5} className="p-6 border-b border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {layoutsToRender.map((img: string, idx: number) => (
                             <div key={idx} className="relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 cursor-pointer" onClick={() => openOverlay(img, layoutsToRender)}>

@@ -32,8 +32,6 @@ export interface IResidentialConfig {
   parkingPrice?: number;
   clubMembership?: 'Included' | 'Not Included' | 'Optional';
   clubMembershipPrice?: number;
-  // Loanable option
-  loanable?: boolean;
 }
 
 export interface ICommercialConfig {
@@ -46,9 +44,13 @@ export interface ICommercialConfig {
   isLockable?: boolean;
   mlgPrice?: number;
   assuredReturnMonthly?: boolean;
-  loanable?: boolean;
   ticketSize: number;
   layoutImages?: string[];
+}
+
+export interface INearbyLocation {
+  name: string;
+  distance: string;
 }
 
 export interface IProperty extends Document {
@@ -63,6 +65,12 @@ export interface IProperty extends Document {
   projectSize?: number;
   reraNumber?: string;
   projectStatus?: 'Pre Launch' | 'New Launch' | 'Under Construction' | 'Ready To Move';
+
+  // Loanable option - Project level
+  loanable?: 'YES' | 'NO' | 'PARTIAL' | 'SELECTIVE BANKS ONLY';
+
+  // Nearby Locations (Strategic Location)
+  nearbyLocations?: INearbyLocation[];
 
   // Section 3 — Type
   propertyType: 'residential' | 'commercial' | 'both';
@@ -130,8 +138,6 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   parkingPrice: { type: Number },
   clubMembership: { type: String, enum: ['Included', 'Not Included', 'Optional'] },
   clubMembershipPrice: { type: Number },
-  // Loanable option
-  loanable: { type: Boolean, default: false },
 });
 
 const CommercialConfigSchema = new Schema<ICommercialConfig>({
@@ -144,7 +150,6 @@ const CommercialConfigSchema = new Schema<ICommercialConfig>({
   isLockable: { type: Boolean, default: true },
   mlgPrice: { type: Number },
   assuredReturnMonthly: { type: Boolean, default: false },
-  loanable: { type: Boolean, default: false },
   ticketSize: { type: Number, required: true },
   layoutImages: [{ type: String }],
 });
@@ -160,6 +165,15 @@ const PropertySchema = new Schema<IProperty>(
     projectSize: { type: Number },
     reraNumber: { type: String },
     projectStatus: { type: String, enum: ['Pre Launch', 'New Launch', 'Under Construction', 'Ready To Move'] },
+
+    // Loanable option - Project level
+    loanable: { type: String, enum: ['YES', 'NO', 'PARTIAL', 'SELECTIVE BANKS ONLY'], default: 'NO' },
+
+    // Nearby Locations (Strategic Location)
+    nearbyLocations: [{
+      name: { type: String, required: true },
+      distance: { type: String, required: true },
+    }],
 
     propertyType: { type: String, enum: ['residential', 'commercial', 'both'], required: true },
 

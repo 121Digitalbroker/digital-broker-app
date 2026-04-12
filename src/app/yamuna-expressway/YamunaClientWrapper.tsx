@@ -5,11 +5,25 @@ import YamunaFeaturedProperties from '@/components/YamunaFeaturedProperties';
 
 export default function YamunaClientWrapper({ properties }: { properties: any[] }) {
   const [activeCategory, setActiveCategory] = useState('Residential');
+  const [searchFilters, setSearchFilters] = useState<any>(null);
+
+  const handleSearch = (filters: any) => {
+    setSearchFilters(filters);
+    document.getElementById('yamuna-listings')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
-      <YamunaHeroSection activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
-      <YamunaFeaturedProperties properties={properties} activeCategory={activeCategory} />
+      <YamunaHeroSection 
+        activeCategory={activeCategory} 
+        setActiveCategory={setActiveCategory} 
+        onSearch={handleSearch}
+      />
+      <YamunaFeaturedProperties 
+        properties={properties} 
+        activeCategory={activeCategory} 
+        searchFilters={searchFilters}
+      />
     </>
   );
 }

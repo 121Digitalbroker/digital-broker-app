@@ -44,11 +44,11 @@ export default function MobilePropertyView({
   const projectSize = p.projectSize ? `${p.projectSize} Acres` : p.sqft ? `${p.sqft} sqft` : '--';
 
   const isResidential = propType === 'residential' || propType === 'both';
-  
+
   const resTypologies = resConfigs.length > 0
     ? resConfigs.map((c: any) => c.typology || '').filter(Boolean).join(', ')
     : `${p.bedrooms || '--'} BHK`;
-    
+
   const resUnitSize = resConfigs.length > 0 ? String(resConfigs[0].unitSize || '--') : String(p.sqft || '--');
   const comTypes = comConfigs.length > 0
     ? comConfigs.map((c: any) => String(c.commercialType || '')).filter(Boolean).join(', ')
@@ -79,12 +79,12 @@ export default function MobilePropertyView({
       {/* ── HERO IMAGE SECTION ── */}
       <div className="relative w-full h-[45vh] overflow-hidden rounded-b-[2rem] shadow-sm">
         <div className="flex transition-transform duration-300 h-full w-full" style={{ transform: `translateX(-${activeImage * 100}%)` }}>
-           {allImgs.map((img: string, i: number) => (
-             <img key={i} src={img} className="w-full h-full object-cover shrink-0" alt={`${title} ${i}`} />
-           ))}
+          {allImgs.map((img: string, i: number) => (
+            <img key={i} src={img} className="w-full h-full object-cover shrink-0" alt={`${title} ${i}`} />
+          ))}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/90 via-[#0a1628]/20 to-transparent" />
-        
+
         {/* Pagination Dots */}
         {allImgs.length > 1 && (
           <div className="absolute top-24 right-4 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-white text-[10px] font-black tracking-widest">
@@ -107,7 +107,7 @@ export default function MobilePropertyView({
       </div>
 
       <div className="px-5 -mt-4 relative z-10 space-y-6">
-        
+
         {/* ── PRICE + CONFIGURATION ROW ── */}
         <div className="bg-white rounded-3xl p-5 shadow-lg shadow-[#0a1628]/5 border border-gray-100 flex items-center justify-between">
           <div>
@@ -195,7 +195,7 @@ export default function MobilePropertyView({
             <p className={`text-sm text-gray-500 leading-relaxed transition-all duration-300 ${!isReadMore ? 'line-clamp-4' : ''}`}>
               {p.aboutProject || `Setting new benchmarks in luxury living, ${title} offers an unparalleled lifestyle in the heart of ${city || 'India'}. Designed by award-winning architects, this ${status.toLowerCase()} development combines contemporary aesthetics with world-class amenities.`}
             </p>
-            <button 
+            <button
               onClick={() => setIsReadMore(!isReadMore)}
               className="mt-2 text-blue-600 text-xs font-black uppercase tracking-widest flex items-center gap-1"
             >
@@ -239,12 +239,12 @@ export default function MobilePropertyView({
 
         {/* ── PRICE BREAKUP ── */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-hidden break-inside-avoid">
-           <InteractivePriceBreakup resConfigs={resConfigs} comConfigs={comConfigs} />
+          <InteractivePriceBreakup resConfigs={resConfigs} comConfigs={comConfigs} />
         </div>
 
         {/* ── DOCUMENTS & APPROVALS ── */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-hidden">
-           <DocumentsSection propertyId={p._id} propertyTitle={title} brochureUrl={p.brochureUrl} priceListUrl={p.priceListUrl} sitePlanUrl={p.sitePlanUrl} layoutPlanUrl={p.layoutPlanUrl} />
+          <DocumentsSection propertyId={p._id} propertyTitle={title} brochureUrl={p.brochureUrl} priceListUrl={p.priceListUrl} sitePlanUrl={p.sitePlanUrl} layoutPlanUrl={p.layoutPlanUrl} />
         </div>
 
         {/* ── LOCATION ADVANTAGES ── */}
@@ -254,21 +254,14 @@ export default function MobilePropertyView({
             Location & Connectivity
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { name: 'Metro Station', dist: '500m' },
-              { name: 'Hospital', dist: '1.2 km' },
-              { name: 'Schools', dist: '800m' },
-              { name: 'Shopping Mall', dist: '1.5 km' },
-              { name: 'Airport', dist: '25 km' },
-              { name: 'Highway', dist: '2 km' },
-            ].map((l, i) => (
+            {(p.nearbyLocations && p.nearbyLocations.length > 0 ? p.nearbyLocations : []).map((l: any, i: number) => (
               <div key={i} className="flex gap-3 items-start border-b border-gray-50 pb-3 last:border-0">
                 <div className="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center shrink-0 mt-0.5 border border-orange-100">
                   <MapPin className="w-3 h-3 text-orange-500" />
                 </div>
                 <div>
                   <p className="text-[11px] font-black leading-tight mb-0.5 truncate max-w-[100px]">{l.name}</p>
-                  <p className="text-[9px] font-bold text-gray-400">{l.dist}</p>
+                  <p className="text-[9px] font-bold text-gray-400">{l.distance}</p>
                 </div>
               </div>
             ))}
@@ -292,7 +285,7 @@ export default function MobilePropertyView({
             View All Projects
           </button>
         </div>
-        
+
       </div>
 
       {/* ── STICKY BOTTOM CTA BAR ── */}

@@ -3,13 +3,72 @@ import React, { useState } from 'react';
 import PropertyCard from '@/components/PropertyCard';
 import { Home, Link } from 'lucide-react';
 
-export default function YamunaFeaturedProperties({ properties, activeCategory = 'Residential' }: { properties: any[], activeCategory?: string }) {
+export default function YamunaFeaturedProperties({ properties, activeCategory = 'Residential', searchFilters }: { properties: any[], activeCategory?: string, searchFilters?: any }) {
 
   // Filter based on selected category + 'both'
   const filterCat = activeCategory.toLowerCase();
-  const filteredProperties = properties.filter((p: any) => 
+  let filteredProperties = properties.filter((p: any) => 
     p.propertyType === filterCat || p.propertyType === 'both'
   );
+
+  if (searchFilters) {
+    if (searchFilters.q) {
+      const q = searchFilters.q.toLowerCase();
+      filteredProperties = filteredProperties.filter((p: any) => 
+        p.title?.toLowerCase().includes(q) || 
+        p.location?.address?.toLowerCase().includes(q) ||
+        p.location?.city?.toLowerCase().includes(q) ||
+        p.developer?.toLowerCase().includes(q)
+      );
+    }
+    
+    if (searchFilters.minPrice !== undefined) {
+      filteredProperties = filteredProperties.filter((p: any) => {
+        let lowestPrice = Infinity;
+        if (p.residentialConfigs?.length) {
+          lowestPrice = Math.min(...p.residentialConfigs.map((c: any) => c.ticketSize || Infinity));
+        }
+        if (p.commercialConfigs?.length) {
+          lowestPrice = Math.min(lowestPrice, ...p.commercialConfigs.map((c: any) => c.ticketSize || Infinity));
+        }
+        const price = p.minTicketSize || p.ticketSize || lowestPrice;
+        return price !== Infinity ? price >= searchFilters.minPrice : true;
+      });
+    }
+
+    if (searchFilters.maxPrice !== undefined) {
+      filteredProperties = filteredProperties.filter((p: any) => {
+        let lowestPrice = Infinity;
+        if (p.residentialConfigs?.length) {
+          lowestPrice = Math.min(...p.residentialConfigs.map((c: any) => c.ticketSize || Infinity));
+        }
+        if (p.commercialConfigs?.length) {
+          lowestPrice = Math.min(lowestPrice, ...p.commercialConfigs.map((c: any) => c.ticketSize || Infinity));
+        }
+        const price = p.minTicketSize || p.ticketSize || lowestPrice;
+        return price !== Infinity ? price <= searchFilters.maxPrice : true;
+      });
+    }
+
+    if (searchFilters.bedrooms) {
+      filteredProperties = filteredProperties.filter((p: any) => {
+        if (!p.residentialConfigs) return false;
+        return p.residentialConfigs.some((c: any) => 
+          c.typology?.toLowerCase().includes(searchFilters.bedrooms.toLowerCase()) || 
+          String(c.bedrooms) === searchFilters.bedrooms
+        );
+      });
+    }
+
+    if (searchFilters.commercialType) {
+      filteredProperties = filteredProperties.filter((p: any) => {
+        if (!p.commercialConfigs) return false;
+        return p.commercialConfigs.some((c: any) => 
+          c.commercialType?.toLowerCase() === searchFilters.commercialType.toLowerCase()
+        );
+      });
+    }
+  }
 
   return (
     <section id="yamuna-listings" className="py-24 bg-gray-50">
