@@ -168,18 +168,18 @@ export default function MobilePropertyView({
                 <p className="text-sm font-black text-[#0a1628] leading-tight">{possession}</p>
               </div>
             </div>
-            <div className="flex gap-3 items-start">
+            <div className="flex gap-3 items-start overflow-hidden">
               <ShieldCheck className="w-5 h-5 text-gray-400 shrink-0" />
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">RERA ID</p>
-                <p className="text-sm font-black text-blue-600 leading-tight line-clamp-1">{rera}</p>
+                <p className="text-sm font-black text-blue-600 leading-tight truncate">{rera}</p>
               </div>
             </div>
-            <div className="flex gap-3 items-start">
+            <div className="flex gap-3 items-start overflow-hidden">
               <Building className="w-5 h-5 text-gray-400 shrink-0" />
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Builder</p>
-                <p className="text-sm font-black text-[#0a1628] leading-tight line-clamp-1">{developerName}</p>
+                <p className="text-sm font-black text-[#0a1628] leading-tight truncate">{developerName}</p>
               </div>
             </div>
           </div>
@@ -285,6 +285,33 @@ export default function MobilePropertyView({
             View All Projects
           </button>
         </div>
+
+        {/* ── SIMILAR PROJECTS ── */}
+        {similarProperties && similarProperties.length > 0 && (
+          <div className="space-y-5 pb-4">
+            <h3 className="text-xl font-black text-[#0a1628] flex items-center gap-2">
+              <div className="w-1.5 h-6 bg-orange-500 rounded-full" />
+              Similar Projects
+            </h3>
+            <div className="flex flex-col gap-4">
+              {similarProperties.map((sp: any) => (
+                <a key={sp._id} href={`/properties/${sp._id}`} className="bg-white rounded-3xl flex overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-all">
+                  <div className="w-32 h-32 shrink-0">
+                    <img src={sp.productImages?.[0] || sp.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop'} alt={sp.projectName} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-4 flex flex-col justify-center min-w-0 flex-1">
+                    <p className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 truncate">{sp.developerName}</p>
+                    <h4 className="text-sm font-black text-[#0a1628] leading-tight mb-1 truncate">{sp.projectName || sp.title}</h4>
+                    <div className="flex items-center gap-1 text-[10px] text-gray-400 mb-2 truncate">
+                      <MapPin className="w-3 h-3 text-orange-400" /> {sp.sector}, {sp.city}
+                    </div>
+                    <p className="text-xs font-black text-orange-600">₹{(sp.residentialConfigs?.[0]?.ticketSize / 10000000).toFixed(1)}Cr+</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
 
