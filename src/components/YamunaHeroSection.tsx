@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, MapPin, DollarSign, Home, Maximize2, Layers, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import MultiRangeSlider from './MultiRangeSlider';
 
 const slides = [
@@ -76,7 +77,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
   return (
     <section className="relative w-full flex flex-col">
       {/* Hero Banner Area */}
-      <div className="relative w-full min-h-[80vh] flex flex-col items-center justify-start overflow-hidden pt-2 pb-20 px-6 md:px-12 bg-black">
+      <div className="relative w-full min-h-[80vh] flex flex-col items-center justify-start overflow-hidden pt-2 pb-20 px-6 md:px-12 bg-[#0a1628]">
         {/* Background Images Crossfade */}
         {heroSlides.map((slide, index) => (
           <div
@@ -84,10 +85,14 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
             className="absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out"
             style={{ opacity: currentSlide === index ? 1 : 0 }}
           >
-            <img
+            <Image
               src={slide.image}
               alt={slide.title}
+              fill
               className={`w-full h-full object-cover ${currentSlide === index ? 'animate-ken-burns' : ''}`}
+              priority={index === 0}
+              sizes="100vw"
+              quality={85}
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/30 to-black/80"></div>
           </div>
