@@ -525,7 +525,7 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.toilets || ''} onChange={(e) => updateResidentialConfig(index, 'toilets', e.target.value)}>
                           <option value="">Select</option>
-                          {[1, 2, 3].map(n => (
+                          {[1, 2, 3, 4, 5].map(n => (
                             <option key={n} value={n}>{n}</option>
                           ))}
                         </select>

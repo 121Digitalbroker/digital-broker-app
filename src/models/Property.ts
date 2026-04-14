@@ -25,7 +25,7 @@ export interface IResidentialConfig {
   layoutImages?: string[];
   // Room details
   servantRooms?: 1 | 2 | 3 | 4;
-  toilets?: 1 | 2 | 3 ;
+  toilets?: 1 | 2 | 3 | 4 | 5;
   balconies?: 2 | 3 | 4;
   // Additional features
   carParking?: 'Included' | 'Not Included';
@@ -131,7 +131,7 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   sitePlanUrl: { type: String },
   // Room details
   servantRooms: { type: Number, enum: [1, 2, 3, 4] },
-  toilets: { type: Number, enum: [1, 2, 3] },
+  toilets: { type: Number, enum: [1, 2, 3, 4, 5] },
   balconies: { type: Number, enum: [2, 3, 4] },
   // Additional features
   carParking: { type: String, enum: ['Included', 'Not Included'] },
