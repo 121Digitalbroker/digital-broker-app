@@ -525,7 +525,7 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.toilets || ''} onChange={(e) => updateResidentialConfig(index, 'toilets', e.target.value)}>
                           <option value="">Select</option>
-                          {[1, 2, 3, 4, 5].map(n => (
+                          {[1, 2, 3, 4, 5, 6].map(n => (
                             <option key={n} value={n}>{n}</option>
                           ))}
                         </select>
@@ -535,9 +535,28 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.balconies || ''} onChange={(e) => updateResidentialConfig(index, 'balconies', e.target.value)}>
                           <option value="">Select</option>
-                          {[2, 3, 4].map(n => (
+                          {[1, 2, 3, 4, 5, 6].map(n => (
                             <option key={n} value={n}>{n}</option>
                           ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Terraces</label>
+                        <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                          value={config.terraces || ''} onChange={(e) => updateResidentialConfig(index, 'terraces', e.target.value)}>
+                          <option value="">Select</option>
+                          {[1, 2, 3, 4].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Store Room</label>
+                        <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
+                          value={config.storeRoom || ''} onChange={(e) => updateResidentialConfig(index, 'storeRoom', e.target.value)}>
+                          <option value="">Select</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
                         </select>
                       </div>
                       <div className="space-y-1">
@@ -1041,7 +1060,7 @@ export default function CreateProperty() {
                     />
                     <input
                       type="text"
-                      placeholder="e.g. 500m, 2 km"
+                      placeholder="e.g. 5 min, 10 min"
                       className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium"
                       value={loc.distance}
                       onChange={(e) => {
