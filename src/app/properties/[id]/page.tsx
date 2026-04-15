@@ -478,7 +478,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 <div className="mb-8">
                   <p className="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-2 opacity-80">Investment Starts At</p>
                   <div className="text-4xl font-black mb-1">{ticketDisplay}</div>
-                  {pricePerSqft && <p className="text-gray-400 text-xs font-bold">₹{pricePerSqft.toLocaleString()} per sqft</p>}
                 </div>
 
                 <div className="mb-6">

@@ -70,8 +70,6 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
             <tr className="bg-gray-50 rounded-xl">
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-l-xl">Type</th>
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Unit Size</th>
-              <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Price/sqft</th>
-              <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Ticket Size</th>
               <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase tracking-wider rounded-r-xl">Layouts</th>
             </tr>
           </thead>
@@ -92,8 +90,6 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                       {c.typology} {hasLayouts && (isExpanded ? <ChevronUp className="w-4 h-4 text-orange-500" /> : <ChevronDown className="w-4 h-4 text-gray-400" />)}
                     </td>
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
-                    <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
-                    <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 10000000).toFixed(1)}Cr</td>
                     <td className="p-4">
                       {hasLayouts ? (
                         <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
@@ -108,7 +104,7 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
 
                   {isExpanded && hasLayouts && (
                     <tr className="bg-orange-50/30">
-                      <td colSpan={5} className="p-6 border-b border-gray-100">
+                      <td colSpan={3} className="p-6 border-b border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {layoutsToRender.map((img: string, idx: number) => (
                             <div key={idx} className="relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 cursor-pointer" onClick={() => openOverlay(img, layoutsToRender)}>
@@ -147,8 +143,6 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                       {c.commercialType} {hasLayouts && (isExpanded ? <ChevronUp className="w-4 h-4 text-orange-500" /> : <ChevronDown className="w-4 h-4 text-gray-400" />)}
                     </td>
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
-                    <td className="p-4 text-gray-600">₹{(c.pricePerSqft || 0).toLocaleString()}</td>
-                    <td className="p-4 font-bold text-orange-500">₹{((c.ticketSize || 0) / 100000).toFixed(0)}L</td>
                     <td className="p-4">
                       {hasLayouts ? (
                         <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
@@ -163,7 +157,7 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
 
                   {isExpanded && hasLayouts && (
                     <tr className="bg-orange-50/30">
-                      <td colSpan={5} className="p-6 border-b border-gray-100">
+                      <td colSpan={3} className="p-6 border-b border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {layoutsToRender.map((img: string, idx: number) => (
                             <div key={idx} className="relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 cursor-pointer" onClick={() => openOverlay(img, layoutsToRender)}>
