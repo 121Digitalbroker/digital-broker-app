@@ -87,7 +87,15 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                     className={`border-b border-gray-50 transition-colors ${hasLayouts ? 'cursor-pointer hover:bg-orange-50/30' : ''}`}
                   >
                     <td className="p-4 font-bold text-[#0a1628] flex items-center gap-2">
-                      {c.typology} {hasLayouts && (isExpanded ? <ChevronUp className="w-4 h-4 text-orange-500" /> : <ChevronDown className="w-4 h-4 text-gray-400" />)}
+                      {(() => {
+                        const typology = String(c.typology || '');
+                        const servantRooms = Number(c.servantRooms) || 0;
+                        if (typology && servantRooms >= 1) {
+                          return `${typology} + ${servantRooms === 1 ? 'S' : servantRooms + 'S'}`;
+                        }
+                        return typology;
+                      })()} 
+                      {hasLayouts && (isExpanded ? <ChevronUp className="w-4 h-4 text-orange-500" /> : <ChevronDown className="w-4 h-4 text-gray-400" />)}
                     </td>
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                     <td className="p-4">

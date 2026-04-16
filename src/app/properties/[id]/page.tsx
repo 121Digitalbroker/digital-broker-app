@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: `${raw.projectName || raw.title || 'Property'} in ${raw.city || raw.location || ''} | Digital Broker`,
     description: `Explore ${raw.projectName || raw.title || 'Property'}, a premium ${raw.propertyType || raw.type || ''} property in ${raw.city || raw.location || ''}.`,
+    keywords: raw.keywords || '',
     openGraph: {
       title: String(raw.projectName || raw.title || 'Property'),
       description: `Premium property in ${raw.city || raw.location || 'India'}`,
@@ -100,9 +101,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
   const isResidential = propType === 'residential' || propType === 'both';
   const isCommercial = propType === 'commercial';
   const possession = (resConfigs.length > 0 && resConfigs[0].possessionYear)
-    ? `${resConfigs[0].possessionMonth || ''} ${resConfigs[0].possessionYear}`.trim()
+    ? `${resConfigs[0].possessionYear}`.trim()
     : (comConfigs.length > 0 && comConfigs[0].possessionYear)
-      ? `${comConfigs[0].possessionMonth || ''} ${comConfigs[0].possessionYear}`.trim()
+      ? `${comConfigs[0].possessionYear}`.trim()
       : p.projectStatus || 'Ready to Move';
 
   const resTypologies = resConfigs.length > 0

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, ArrowUpRight, MapPin, DollarSign, Home, Maximize2, TrendingUp, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import MultiRangeSlider from './MultiRangeSlider';
@@ -18,6 +18,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ properties = [] }: HeroSectionProps) => {
   const router = useRouter();
+  const searchBarRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState({ min: 1, max: 100 });
@@ -36,6 +37,16 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   if (!mounted) return null;
@@ -81,7 +92,7 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
         </div>
 
         {/* ── SEARCH BAR ── */}
-        <div className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 mb-16 animate-fade-in-up animation-delay-200">
+        <div ref={searchBarRef} className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative z-30 transition-all duration-500 mb-16 animate-fade-in-up animation-delay-200">
           {/* Location Input */}
           <div className="w-full md:flex-1 flex items-center px-6 py-3 cursor-text group">
             <Search className={`w-4 h-4 mr-3 transition-colors ${searchQuery ? 'text-orange-500' : 'text-gray-400'}`} />
@@ -102,8 +113,10 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
           {/* Type Dropdown */}
           <div
             className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t md:border-t-0 border-gray-50 flex-1 md:flex-none"
-            onMouseEnter={() => setOpenDropdown('type')}
-            onMouseLeave={() => setOpenDropdown(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdown(openDropdown === 'type' ? null : 'type');
+            }}
           >
             <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Property Type</span>
             <div className="flex items-center justify-between md:justify-start gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap group-hover:text-orange-500 transition-colors">
@@ -114,7 +127,10 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
             </div>
 
             {openDropdown === 'type' && (
-              <div className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
+              <div
+                className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="bg-white rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-6">
                   {activeCategory === 'Residential' ? (
                     <div className="space-y-4">
@@ -162,6 +178,15 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
                       </div>
                     </div>
                   )}
+
+                  <div className="mt-6 pt-4 border-t border-gray-50 flex justify-end">
+                    <button
+                      onClick={() => setOpenDropdown(null)}
+                      className="text-[10px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-600 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -172,8 +197,10 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
           {/* Budget Dropdown */}
           <div
             className="w-full md:w-auto relative px-6 py-3 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none flex-1 md:flex-none"
-            onMouseEnter={() => setOpenDropdown('budget')}
-            onMouseLeave={() => setOpenDropdown(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdown(openDropdown === 'budget' ? null : 'budget');
+            }}
           >
             <span className="text-[10px] font-black text-[#0a1628] uppercase tracking-[0.1em] block mb-0.5">Budget</span>
             <div className="flex items-center justify-between md:justify-start gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap group-hover:text-orange-500 transition-colors">
@@ -181,7 +208,10 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
             </div>
 
             {openDropdown === 'budget' && (
-              <div className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10">
+              <div
+                className="absolute top-[120%] left-0 md:left-1/2 md:-translate-x-1/2 pt-2 w-[340px] z-50 cursor-default animate-fade-in-up pb-10"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="bg-white rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-6">
                   <div className="flex items-center justify-between mb-6">
                     <span className="text-[11px] font-black uppercase tracking-widest text-[#0a1628]">Price Range</span>
@@ -210,6 +240,15 @@ const HeroSection = ({ properties = [] }: HeroSectionProps) => {
                       initialMin={areaRange.min}
                       initialMax={areaRange.max}
                     />
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-gray-50 flex justify-end">
+                    <button
+                      onClick={() => setOpenDropdown(null)}
+                      className="text-[10px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-600 transition-colors"
+                    >
+                      Close
+                    </button>
                   </div>
                 </div>
               </div>

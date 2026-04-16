@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
-import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink, Star, Image as ImageIcon, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink, Star, Image as ImageIcon, Eye, EyeOff, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {

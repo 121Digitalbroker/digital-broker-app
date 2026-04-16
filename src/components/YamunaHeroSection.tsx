@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, MapPin, DollarSign, Home, Maximize2, Layers, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -34,6 +34,7 @@ const slides = [
 
 const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory = (c: string) => { }, onSearch }: { activeCategory?: string, setActiveCategory?: (c: string) => void, onSearch?: (filters: any) => void }) => {
   const router = useRouter();
+  const searchBarRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState(slides);
@@ -71,6 +72,16 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
     }, 5000);
     return () => clearInterval(timer);
   }, [heroSlides.length]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (!mounted) return null;
 
@@ -121,7 +132,7 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
             </div>
 
             {/* Floating Search Bar - Compact Width & Height */}
-            <div className="bg-white shadow-[0_15px_35px_rgba(0,0,0,0.12)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative transition-all duration-500 min-h-[60px]">
+            <div ref={searchBarRef} className="bg-white shadow-[0_15px_35px_rgba(0,0,0,0.12)] rounded-[25px] md:rounded-full p-1.5 flex flex-col md:flex-row items-center w-full relative transition-all duration-500 min-h-[60px]">
               
               {/* Location Input */}
               <div className="w-full md:flex-1 flex items-center px-5 py-3 md:py-2 cursor-text group text-left">
@@ -143,8 +154,10 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
               {/* Type Dropdown */}
               <div
                 className="w-full md:w-auto relative px-5 py-3 md:py-2 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t border-gray-50 md:border-none text-left"
-                onMouseEnter={() => setOpenDropdown('type')}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenDropdown(openDropdown === 'type' ? null : 'type');
+                }}
               >
                 <span className="text-[8px] font-black text-[#0a1628]/30 uppercase tracking-widest block mb-0 whitespace-nowrap">Property Type</span>
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#0a1628] whitespace-nowrap">
@@ -155,7 +168,10 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
                 </div>
 
                 {openDropdown === 'type' && (
-                  <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 animate-fade-in-up">
+                  <div 
+                    className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 animate-fade-in-up"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 p-6 text-left">
                       {activeCategory === 'Residential' ? (
                         <div className="space-y-4">
@@ -205,6 +221,15 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
                           </div>
                         </div>
                       )}
+
+                      <div className="mt-6 pt-4 border-t border-gray-50 flex justify-end">
+                        <button 
+                          onClick={() => setOpenDropdown(null)}
+                          className="text-[10px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-600 transition-colors"
+                        >
+                          Close
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -215,8 +240,10 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
               {/* Budget Dropdown */}
               <div
                 className="w-full md:w-auto relative px-5 py-3 md:py-2 cursor-pointer group hover:bg-gray-50 md:hover:bg-transparent rounded-2xl md:rounded-none border-t border-gray-50 md:border-none text-left"
-                onMouseEnter={() => setOpenDropdown('budget')}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenDropdown(openDropdown === 'budget' ? null : 'budget');
+                }}
               >
                 <span className="text-[9px] font-black text-[#0a1628]/40 uppercase tracking-widest block mb-0.5">Budget</span>
                 <div className="flex items-center gap-2 text-sm font-bold text-[#0a1628] whitespace-nowrap">
@@ -225,7 +252,10 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
                 </div>
 
                 {openDropdown === 'budget' && (
-                  <div className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 animate-fade-in-up">
+                  <div 
+                    className="absolute top-full left-0 md:left-1/2 md:-translate-x-1/2 pt-4 w-[340px] z-50 animate-fade-in-up"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 p-6 text-left">
                       <div className="flex items-center justify-between mb-6">
                         <span className="text-[11px] font-black uppercase tracking-widest text-gray-400">Price Range</span>
@@ -239,6 +269,15 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
                           initialMin={priceRange.min}
                           initialMax={priceRange.max}
                         />
+                      </div>
+
+                      <div className="mt-6 pt-4 border-t border-gray-50 flex justify-end">
+                        <button 
+                          onClick={() => setOpenDropdown(null)}
+                          className="text-[10px] font-black uppercase tracking-widest text-orange-500 hover:text-orange-600 transition-colors"
+                        >
+                          Close
+                        </button>
                       </div>
                     </div>
                   </div>

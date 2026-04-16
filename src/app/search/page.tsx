@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Navbar from '@/components/Navbar';
 import PropertyCard from '@/components/PropertyCard';
+import PropertyCardSkeleton from '@/components/PropertyCardSkeleton';
 import MultiRangeSlider from '@/components/MultiRangeSlider';
 import { LayoutGrid, Map as MapIcon, List, Search } from 'lucide-react';
 import Footer from '@/components/Footer';
@@ -225,7 +226,7 @@ const SearchPage = () => {
         {/* Property Grid Array */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {loading ? (
-             Array(8).fill(0).map((_, i) => <div key={i} className="bg-gray-50 rounded-2xl h-[300px] animate-pulse"></div>)
+             Array(8).fill(0).map((_, i) => <PropertyCardSkeleton key={i} />)
           ) : properties.length === 0 ? (
              <div className="col-span-12 text-center text-gray-500 py-12">No properties found matching your criteria.</div>
           ) : (

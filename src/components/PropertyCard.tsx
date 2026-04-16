@@ -40,11 +40,6 @@ const PropertyCard = ({ property }: { property: any }) => {
   const isResidential = type === 'residential' || type === 'both';
   const isCommercial = type === 'commercial';
 
-  // For Residential: Get Possession Date
-  const possession = (property.residentialConfigs && property.residentialConfigs.length > 0 && property.residentialConfigs[0].possessionDate)
-    ? new Date(property.residentialConfigs[0].possessionDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })
-    : 'Ready';
-
   // For Commercial: Get Assured Return
   const roi = (property.commercialConfigs && property.commercialConfigs.length > 0 && property.commercialConfigs[0].assuredReturnPct)
     ? property.commercialConfigs[0].assuredReturnPct
@@ -73,14 +68,18 @@ const PropertyCard = ({ property }: { property: any }) => {
 
       <div className="px-2 flex flex-col flex-1 pb-2">
         {/* Developer Info - Prominent */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Developer</span>
-          <span className="text-xs font-black text-[#0a1628] uppercase tracking-wide">{developerName}</span>
+        <div className="flex items-center gap-3 mb-2">
+          {property.developerLogo ? (
+            <img src={property.developerLogo} alt={developerName} className="h-8 max-w-[80px] object-contain" />
+          ) : (
+            <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Developer</span>
+          )}
+          <span className="text-lg font-black text-[#0a1628] uppercase tracking-tight leading-tight line-clamp-1">{developerName}</span>
         </div>
 
         {/* Title */}
         <Link href={`/properties/${property._id}`}>
-          <h3 className="font-extrabold text-[18px] text-[#0a1628] mb-3 group-hover:text-orange-500 transition-colors line-clamp-1 leading-tight">
+          <h3 className="font-semibold text-sm text-gray-500 mb-3 group-hover:text-orange-500 transition-colors line-clamp-1 leading-tight">
             {projectName}
           </h3>
         </Link>
@@ -114,15 +113,15 @@ const PropertyCard = ({ property }: { property: any }) => {
               <>
                 <div className="flex items-center gap-2 mb-1">
                   <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Possession</span>
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Status</span>
                 </div>
-                <div className="text-[13px] font-black text-[#0a1628]">{possession}</div>
+                <div className="text-[13px] font-black text-[#0a1628] truncate">{property.projectStatus || 'Under Construction'}</div>
               </>
             )}
           </div>
         </div>
 
-        {/* Location & Furnishing */}
+        {/* Location & Furnishing & Towers */}
         <div className="flex flex-col gap-3 mb-6">
           {location && (
             <div className="flex items-start text-xs font-semibold text-gray-400">
@@ -130,11 +129,18 @@ const PropertyCard = ({ property }: { property: any }) => {
               <span className="line-clamp-1">{location}</span>
             </div>
           )}
-          {property.furnishingType && (
-            <div className="flex items-center text-[10px] font-bold text-blue-600 bg-blue-50 w-fit px-3 py-1 rounded-full border border-blue-100 uppercase tracking-widest">
-              {property.furnishingType}
-            </div>
-          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            {property.furnishingType && (
+              <div className="flex items-center text-[10px] font-bold text-blue-600 bg-blue-50 w-fit px-3 py-1 rounded-full border border-blue-100 uppercase tracking-widest">
+                {property.furnishingType}
+              </div>
+            )}
+            {property.totalTowers && (
+              <div className="flex items-center text-[10px] font-bold text-orange-600 bg-orange-50 w-fit px-3 py-1 rounded-full border border-orange-100 uppercase tracking-widest">
+                {property.totalTowers} {property.totalTowers === 1 ? 'Tower' : 'Towers'}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}

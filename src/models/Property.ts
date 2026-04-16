@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IResidentialConfig {
-  typology: '2BHK' | '3BHK' | '4BHK';
+  typology: '2BHK' | '3BHK' | '4BHK' | '5BHK';
   unitSize: number;
   pricePerSqft: number;
   // Furnishing Type
@@ -16,17 +16,16 @@ export interface IResidentialConfig {
   priceRangeMax?: number;
   plcCharges?: number;
   otherCharges?: number;
-  // Possession - Month/Year or RERA
-  possessionMonth?: string;
+  // Possession - Year or RERA
   possessionYear?: string;
   reraLink?: string;
   ticketSize: number;
   sitePlanUrl?: string;
   layoutImages?: string[];
   // Room details
-  servantRooms?: 1 | 2 | 3 | 4;
-  toilets?: 1 | 2 | 3 | 4 | 5;
-  balconies?: 2 | 3 | 4;
+  servantRooms?: 1 | 2 | 3 | 4 | 5 | 6;
+  toilets?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  balconies?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   // Additional features
   carParking?: 'Included' | 'Not Included';
   parkingPrice?: number;
@@ -57,6 +56,7 @@ export interface IProperty extends Document {
   // Section 1 — Developer
   developerName: string;
   developerLogo?: string;
+  keywords?: string; // SEO Keywords
 
   // Section 2 — Project
   projectName: string;
@@ -65,6 +65,7 @@ export interface IProperty extends Document {
   projectSize?: number;
   reraNumber?: string;
   projectStatus?: 'Pre Launch' | 'New Launch' | 'Under Construction' | 'Ready To Move';
+  totalTowers?: number;
 
   // Loanable option - Project level
   loanable?: 'YES' | 'NO' | 'PARTIAL' | 'SELECTIVE BANKS ONLY';
@@ -104,7 +105,7 @@ export interface IProperty extends Document {
 }
 
 const ResidentialConfigSchema = new Schema<IResidentialConfig>({
-  typology: { type: String, enum: ['2BHK', '3BHK', '4BHK'], required: true },
+  typology: { type: String, enum: ['2BHK', '3BHK', '4BHK', '5BHK'], required: true },
   unitSize: { type: Number, required: true },
   pricePerSqft: { type: Number, required: true },
   // Furnishing Type
@@ -123,16 +124,15 @@ const ResidentialConfigSchema = new Schema<IResidentialConfig>({
   priceRangeMax: { type: Number },
   plcCharges: { type: Number },
   otherCharges: { type: Number },
-  // Possession - Month/Year or RERA
-  possessionMonth: { type: String },
+  // Possession - Year or RERA
   possessionYear: { type: String },
   reraLink: { type: String },
   ticketSize: { type: Number, required: true },
   sitePlanUrl: { type: String },
   // Room details
-  servantRooms: { type: Number, enum: [1, 2, 3, 4] },
-  toilets: { type: Number, enum: [1, 2, 3, 4, 5] },
-  balconies: { type: Number, enum: [2, 3, 4] },
+  servantRooms: { type: Number, enum: [1, 2, 3, 4, 5, 6] },
+  toilets: { type: Number, enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+  balconies: { type: Number, enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
   // Additional features
   carParking: { type: String, enum: ['Included', 'Not Included'] },
   parkingPrice: { type: Number },
@@ -158,6 +158,7 @@ const PropertySchema = new Schema<IProperty>(
   {
     developerName: { type: String, required: true },
     developerLogo: { type: String },
+    keywords: { type: String },
 
     projectName: { type: String, required: true },
     city: { type: String, enum: ['Noida', 'Greater Noida', 'Noida Extension', 'Yamuna Expressway'], required: true },
@@ -165,6 +166,7 @@ const PropertySchema = new Schema<IProperty>(
     projectSize: { type: Number },
     reraNumber: { type: String },
     projectStatus: { type: String, enum: ['Pre Launch', 'New Launch', 'Under Construction', 'Ready To Move'] },
+    totalTowers: { type: Number, enum: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
 
     // Loanable option - Project level
     loanable: { type: String, enum: ['YES', 'NO', 'PARTIAL', 'SELECTIVE BANKS ONLY'], default: 'NO' },

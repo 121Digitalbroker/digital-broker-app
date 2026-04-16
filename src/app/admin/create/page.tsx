@@ -18,6 +18,7 @@ export default function CreateProperty() {
     // Section 1 — Developer Information
     developerName: '',
     developerLogo: '',
+    keywords: '',
 
     // Section 2 — Project Information
     projectName: '',
@@ -26,6 +27,7 @@ export default function CreateProperty() {
     projectSize: '',
     reraNumber: '',
     projectStatus: 'New Launch',
+    totalTowers: 1,
 
     // Section 3 — Property Type Selector
     propertyType: 'residential', // 'residential', 'commercial', 'both'
@@ -416,6 +418,18 @@ export default function CreateProperty() {
                 </select>
               </div>
               <div className="space-y-2">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Total Towers</label>
+                <select
+                  className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-purple-500 transition-all font-bold text-[#0a1628]"
+                  value={formData.totalTowers}
+                  onChange={(e) => setFormData({ ...formData, totalTowers: parseInt(e.target.value) })}
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Loanable Option</label>
                 <select
                   className="w-full bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-purple-500 transition-all font-bold text-[#0a1628]"
@@ -493,6 +507,7 @@ export default function CreateProperty() {
                           <option value="2BHK">2BHK</option>
                           <option value="3BHK">3BHK</option>
                           <option value="4BHK">4BHK</option>
+                          <option value="5BHK">5BHK</option>
                         </select>
                       </div>
                       <div className="space-y-1">
@@ -515,7 +530,7 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.servantRooms || ''} onChange={(e) => updateResidentialConfig(index, 'servantRooms', e.target.value)}>
                           <option value="">Select</option>
-                          {[1, 2, 3, 4].map(n => (
+                          {[1, 2, 3, 4, 5, 6].map(n => (
                             <option key={n} value={n}>{n}</option>
                           ))}
                         </select>
@@ -525,7 +540,7 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.toilets || ''} onChange={(e) => updateResidentialConfig(index, 'toilets', e.target.value)}>
                           <option value="">Select</option>
-                          {[1, 2, 3, 4, 5, 6].map(n => (
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                             <option key={n} value={n}>{n}</option>
                           ))}
                         </select>
@@ -535,7 +550,7 @@ export default function CreateProperty() {
                         <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.balconies || ''} onChange={(e) => updateResidentialConfig(index, 'balconies', e.target.value)}>
                           <option value="">Select</option>
-                          {[1, 2, 3, 4, 5, 6].map(n => (
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                             <option key={n} value={n}>{n}</option>
                           ))}
                         </select>
@@ -659,16 +674,6 @@ export default function CreateProperty() {
                         <label className="text-[10px] font-black text-gray-400 uppercase">Other Charges per Sqft (₹)</label>
                         <input type="number" className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
                           value={config.otherChargesPerSqft || ''} onChange={(e) => updateResidentialConfig(index, 'otherChargesPerSqft', e.target.value)} />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Possession Month</label>
-                        <select className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-green-500 font-bold"
-                          value={config.possessionMonth || ''} onChange={(e) => updateResidentialConfig(index, 'possessionMonth', e.target.value)}>
-                          <option value="">Select Month</option>
-                          {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
-                            <option key={m} value={m}>{m}</option>
-                          ))}
-                        </select>
                       </div>
                       <div className="space-y-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Possession Year</label>
