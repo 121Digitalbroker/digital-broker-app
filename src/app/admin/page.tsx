@@ -239,6 +239,7 @@ export default function AdminDashboard() {
                     <th className="px-8 py-5">Property</th>
                     <th className="px-8 py-5">Price</th>
                     <th className="px-8 py-5">Type</th>
+                    <th className="px-8 py-5 text-center">Towers</th>
                     <th className="px-8 py-5">Status</th>
                     <th className="px-8 py-5 text-center">⭐ Promote</th>
                     <th className="px-8 py-5 text-center">👁️ Visible</th>
@@ -268,6 +269,11 @@ export default function AdminDashboard() {
                       <td className="px-8 py-6">
                         <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                           {p.propertyType || p.type}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 text-center">
+                        <span className="font-bold text-[#0a1628] bg-blue-50 px-3 py-1 rounded-lg text-sm">
+                          {p.totalTowers || 'N/A'}
                         </span>
                       </td>
                       <td className="px-8 py-6">

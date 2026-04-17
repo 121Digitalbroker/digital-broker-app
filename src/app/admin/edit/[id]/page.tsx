@@ -349,17 +349,24 @@ export default function EditProperty() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Developer Logo (URL)</label>
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Developer Logo</label>
                 <div className="flex gap-4 items-center">
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-blue-500 transition-all font-medium text-[#0a1628]"
-                    value={formData.developerLogo || ''}
-                    onChange={(e) => setFormData({ ...formData, developerLogo: e.target.value })}
-                  />
+                  <div className="flex-1 flex gap-4">
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      className="flex-1 bg-gray-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-blue-500 transition-all font-medium text-[#0a1628]"
+                      value={formData.developerLogo || ''}
+                      onChange={(e) => setFormData({ ...formData, developerLogo: e.target.value })}
+                    />
+                    <label className={`cursor-pointer px-6 py-5 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${uploadingField === 'developerLogo' ? 'bg-gray-200 text-gray-400' : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'}`}>
+                      <Upload className="w-4 h-4" />
+                      {uploadingField === 'developerLogo' ? '...' : 'Upload'}
+                      <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'developerLogo')} />
+                    </label>
+                  </div>
                   {formData.developerLogo && (
-                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-100 bg-white flex items-center justify-center p-1 shrink-0">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-100 bg-white flex items-center justify-center p-1 shrink-0">
                       <img src={formData.developerLogo} alt="Logo" className="w-full h-full object-contain rounded-full" />
                     </div>
                   )}
