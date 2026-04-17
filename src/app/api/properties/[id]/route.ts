@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
-    const property = await Property.findByIdAndUpdate(id, body, { new: true });
+    const property = await Property.findByIdAndUpdate(id, body, { returnDocument: 'after' });
     if (!property) return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     return NextResponse.json(property);
   } catch (error: any) {
