@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
-import { Shield, Globe, Search, Save, Loader2, CheckCircle, Info, LayoutDashboard } from 'lucide-react';
+import { Shield, Globe, Search, Save, Loader2, CheckCircle, Info, LayoutDashboard, Star } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminSEOPage() {
