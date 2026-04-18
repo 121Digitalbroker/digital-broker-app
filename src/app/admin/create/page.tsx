@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 const citySectors: Record<string, string[]> = {
   'Noida': ['Sector 1', 'Sector 15', 'Sector 16', 'Sector 43', 'Sector 44', 'Sector 50', 'Sector 62', 'Sector 78', 'Sector 104', 'Sector 108', 'Sector 128', 'Sector 132', 'Sector 142', 'Sector 143', 'Sector 150', 'Sector 152', 'Sector 168'],
-  'Greater Noida': ['Alpha I', 'Alpha II', 'Beta I', 'Beta II', 'Gamma I', 'Gamma II', 'Delta I', 'Omega I', 'Knowledge Park I', 'Knowledge Park II', 'Knowledge Park V', 'Tech Zone IV', 'Zeta I'],
+  'Greater Noida': ['Alpha I', 'Alpha II', 'Beta I', 'Beta II', 'Gamma I', 'Gamma II', 'Delta I', 'Omega I', 'Knowledge Park I', 'Knowledge Park II', 'Knowledge Park V', 'Tech Zone IV', 'Zeta I', 'Sigma 3', 'Sigma 4', 'Omricon 1a', 'Sector 36 GN', 'Eta 2', 'Sector 16'],
   'Noida Extension': ['Tech Zone IV', 'Gaur City', 'Sector 16C', 'Sector 16D', 'Sector 10', 'Sector 12', 'Sector 1'],
   'Yamuna Expressway': ['Sector 22 A', 'Sector 22 D', 'Sector 22 C', 'Sector 18', 'Sector 20', 'Sector 19 A']
 };
