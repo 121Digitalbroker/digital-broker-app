@@ -6,7 +6,7 @@ import CommercialAssetCard from '@/components/CommercialAssetCard';
 import ChatWidget from '@/components/ChatWidget';
 import Footer from '@/components/Footer';
 import HomeBookingForm from '@/components/HomeBookingForm';
-import { ArrowRight, Star, Shield, TrendingUp, Headphones, Percent, CheckCircle, Home, Car, User } from 'lucide-react';
+import { ArrowRight, Star, Shield, TrendingUp, Headphones, Percent, CheckCircle, Home, Car, User, MapPin } from 'lucide-react';
 
 async function getPromotedProperties() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties?promoted=true`, { cache: 'no-store' });
