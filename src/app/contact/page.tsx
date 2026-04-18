@@ -33,8 +33,15 @@ const ContactPage = () => {
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
               <MapPin className="w-8 h-8 text-orange-500 mb-4" />
               <h3 className="text-lg font-bold text-[#0a1628] mb-1">Our Office</h3>
-              <p className="text-gray-500 mb-4">Visit us by appointment.</p>
-              <p className="font-bold text-[#0a1628]">Noida, Uttar Pradesh, India</p>
+              <p className="text-gray-500 mb-2">924, Tower B, Bhutani Alphathum, Sector 90, Noida</p>
+              <div className="mt-4 pt-4 border-t border-gray-50">
+                <h4 className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-3">Greater Noida Focus</h4>
+                <div className="flex flex-wrap gap-2">
+                  {["Sigma 4", "Omicron 1a", "Sector 36", "Sigma 3", "Eta 2", "Sector 16"].map((area) => (
+                    <span key={area} className="text-[10px] font-bold bg-gray-50 text-gray-500 px-2 py-1 rounded-md">{area}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 

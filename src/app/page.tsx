@@ -67,6 +67,38 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Prime Locations Selection */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="text-center mb-16">
+            <p className="text-sm font-bold text-orange-500 tracking-widest uppercase mb-4">Our Presence</p>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-[#0a1628]">Greater Noida Hubs</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {[
+              { name: "Sigma 4", tag: "Premium Living" },
+              { name: "Omicron 1a", tag: "Modern Hub" },
+              { name: "Sector 36 GN", tag: "Prime Access" },
+              { name: "Sigma 3", tag: "Elite Enclave" },
+              { name: "Eta 2", tag: "Growing Sector" },
+              { name: "Sector 16", tag: "Commercial Heart" }
+            ].map((loc, idx) => (
+              <a 
+                key={idx} 
+                href={`/search?q=${loc.name}`}
+                className="group p-8 bg-white rounded-3xl border border-gray-100 hover:border-orange-500/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center"
+              >
+                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-500 text-orange-500">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h4 className="font-bold text-[#0a1628] text-lg mb-1">{loc.name}</h4>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{loc.tag}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Bar */}
       <section className="py-16 border-t border-gray-100 bg-white">
         <div className="container mx-auto px-6 md:px-12">

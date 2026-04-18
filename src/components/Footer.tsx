@@ -35,6 +35,17 @@ const Footer = () => {
             </ul>
           </div>
           <div>
+            <h4 className="font-bold text-white mb-6 uppercase text-xs tracking-widest">Greater Noida Areas</h4>
+            <ul className="space-y-4 text-sm text-gray-400">
+              <li><a href="/search?q=Sigma 4" className="hover:text-orange-500 transition-colors">Sigma 4</a></li>
+              <li><a href="/search?q=Omicron 1a" className="hover:text-orange-500 transition-colors">Omicron 1a</a></li>
+              <li><a href="/search?q=Sector 36" className="hover:text-orange-500 transition-colors">Sector 36 GN</a></li>
+              <li><a href="/search?q=Sigma 3" className="hover:text-orange-500 transition-colors">Sigma 3</a></li>
+              <li><a href="/search?q=Eta 2" className="hover:text-orange-500 transition-colors">Eta 2</a></li>
+              <li><a href="/search?q=Sector 16" className="hover:text-orange-500 transition-colors">Sector 16</a></li>
+            </ul>
+          </div>
+          <div>
             <h4 className="font-bold text-white mb-6 uppercase text-xs tracking-widest">Contact</h4>
             <div className="space-y-6">
               <p className="text-sm text-gray-400 leading-relaxed">
