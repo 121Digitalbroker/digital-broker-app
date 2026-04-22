@@ -419,19 +419,19 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                 />
               </div>
               {nearbyLocations.length > 0 && (
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-                {nearbyLocations.map((l, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                      <MapPin className="w-5 h-5 text-orange-500" />
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                  {nearbyLocations.map((l, i) => (
+                    <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <MapPin className="w-5 h-5 text-orange-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-[#0a1628]">{l.name}</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">{l.distance}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-black text-[#0a1628]">{l.name}</p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">{l.distance}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
               )}
             </div>
 
