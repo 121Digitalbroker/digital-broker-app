@@ -32,12 +32,22 @@ const slides = [
   }
 ];
 
-const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory = (c: string) => { }, onSearch }: { activeCategory?: string, setActiveCategory?: (c: string) => void, onSearch?: (filters: any) => void }) => {
+const YamunaHeroSection = ({ 
+  activeCategory = 'Residential', 
+  setActiveCategory = (c: string) => { }, 
+  onSearch,
+  banners = []
+}: { 
+  activeCategory?: string, 
+  setActiveCategory?: (c: string) => void, 
+  onSearch?: (filters: any) => void,
+  banners?: any[]
+}) => {
   const router = useRouter();
   const searchBarRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [heroSlides, setHeroSlides] = useState(slides);
+  const [heroSlides, setHeroSlides] = useState(banners.length > 0 ? banners : slides);
 
   // Search bar states
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -56,22 +66,16 @@ const YamunaHeroSection = ({ activeCategory = 'Residential', setActiveCategory =
   useEffect(() => {
     setMounted(true);
 
-    // Fetch dynamic banners
-    fetch('/api/yamuna-banners', { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.length > 0) {
-          setHeroSlides(data);
-        }
-      })
-      .catch(err => console.error('Error fetching banners:', err));
+    if (banners && banners.length > 0) {
+      setHeroSlides(banners);
+    }
 
     // Cycle every 5 seconds
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % (banners.length > 0 ? banners.length : slides.length));
     }, 5000);
     return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  }, [banners]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import YamunaHeroSection from '@/components/YamunaHeroSection';
 import YamunaFeaturedProperties from '@/components/YamunaFeaturedProperties';
 
-export default function YamunaClientWrapper({ properties }: { properties: any[] }) {
+export default function YamunaClientWrapper({ properties, banners }: { properties: any[], banners: any[] }) {
   const [activeCategory, setActiveCategory] = useState('Residential');
   const [searchFilters, setSearchFilters] = useState<any>(null);
 
@@ -18,6 +18,7 @@ export default function YamunaClientWrapper({ properties }: { properties: any[] 
         activeCategory={activeCategory} 
         setActiveCategory={setActiveCategory} 
         onSearch={handleSearch}
+        banners={banners}
       />
       <YamunaFeaturedProperties 
         properties={properties} 
