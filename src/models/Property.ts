@@ -206,7 +206,7 @@ const PropertySchema = new Schema<IProperty>(
 );
 
 // Pre-save hook to generate slug
-PropertySchema.pre('save', function (next) {
+PropertySchema.pre('save', function (this: any, next: any) {
   if (this.isModified('projectName') || this.isModified('sector') || this.isModified('city') || !this.slug) {
     const slugBase = `${this.projectName}-${this.sector || ''}-${this.city}`.toLowerCase();
     this.slug = slugBase
