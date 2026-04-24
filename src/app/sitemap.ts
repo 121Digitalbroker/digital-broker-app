@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     await dbConnect();
     const properties = await Property.find({ isVisible: true }).select('_id updatedAt').lean();
-    
+
     propertyPages = properties.map((prop: any) => ({
       url: `${DOMAIN}/properties/${prop._id}`,
       lastModified: prop.updatedAt || new Date(),
