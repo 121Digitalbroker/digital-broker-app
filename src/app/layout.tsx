@@ -5,14 +5,22 @@ import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-export const metadata: Metadata = {
-  title: "Digital Broker | Premium Real Estate",
-  description: "Find exclusive homes and commercial properties with expert guidance.",
-  keywords: "Real Estate, Noida, Yamuna Expressway, Digital Broker, Premium Properties, Investment , ",
-  verification: {
-    google: "google5ea580b37fc40bfa",
-  },
-};
+import dbConnect from "@/lib/mongodb";
+import SiteSettings from "@/models/SiteSettings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  await dbConnect();
+  const settings = await SiteSettings.findOne();
+
+  return {
+    title: settings?.siteTitle || "Digital Broker | Premium Real Estate",
+    description: settings?.siteDescription || "Find exclusive homes and commercial properties with expert guidance.",
+    keywords: settings?.keywords || "Real Estate, Noida, Yamuna Expressway, Digital Broker",
+    verification: {
+      google: settings?.googleVerification || "google5ea580b37fc40bfa",
+    },
+  };
+}
 
 export default function RootLayout({
   children,
