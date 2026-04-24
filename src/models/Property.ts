@@ -58,6 +58,9 @@ export interface IProperty extends Document {
   developerLogo?: string;
   keywords?: string; // SEO Keywords
 
+  // SEO
+  slug: string;
+
   // Section 2 — Project
   projectName: string;
   city: 'Noida' | 'Greater Noida' | 'Noida Extension' | 'Yamuna Expressway';
@@ -159,6 +162,8 @@ const PropertySchema = new Schema<IProperty>(
     developerName: { type: String, required: true },
     developerLogo: { type: String },
     keywords: { type: String },
+    
+    slug: { type: String, unique: true },
 
     projectName: { type: String, required: true },
     city: { type: String, enum: ['Noida', 'Greater Noida', 'Noida Extension', 'Yamuna Expressway'], required: true },
@@ -199,6 +204,17 @@ const PropertySchema = new Schema<IProperty>(
   },
   { timestamps: true }
 );
+
+// Pre-save hook to generate slug
+PropertySchema.pre('save', function (next) {
+  if (this.isModified('projectName') || this.isModified('sector') || this.isModified('city') || !this.slug) {
+    const slugBase = `${this.projectName}-${this.sector || ''}-${this.city}`.toLowerCase();
+    this.slug = slugBase
+      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
+      .replace(/(^-|-$)+/g, ''); // Remove leading and trailing hyphens
+  }
+  next();
+});
 
 // Clear the model from cache to force schema update in development
 if (mongoose.models.Property) {

@@ -45,10 +45,16 @@ const PropertyCard = ({ property }: { property: any }) => {
     ? property.commercialConfigs[0].assuredReturnPct
     : (mounted ? 12 : 12); // Fallback mock ROI only for commi
 
+  // ── Generate SEO Slug ──
+  const slugBase = `${projectName}-${location}`.toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-') // replace non-alphanumeric with hyphen
+    .replace(/(^-|-$)+/g, ''); // remove leading/trailing hyphens
+  const propertyUrl = `/properties/${property.slug || `${slugBase}-${property._id}`}`;
+
   return (
     <div className="bg-white rounded-[2.5rem] p-4 shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 group hover:-translate-y-3 flex flex-col h-full">
       {/* Top Image Section with Badges */}
-      <Link href={`/properties/${property._id}`} className="relative h-[220px] overflow-hidden rounded-[2.2rem] block mb-5">
+      <Link href={propertyUrl} className="relative h-[220px] overflow-hidden rounded-[2.2rem] block mb-5">
         <img
           src={image}
           alt={projectName}
@@ -78,7 +84,7 @@ const PropertyCard = ({ property }: { property: any }) => {
         </div>
 
         {/* Title */}
-        <Link href={`/properties/${property._id}`}>
+        <Link href={propertyUrl}>
           <h3 className="font-semibold text-sm text-gray-500 mb-3 group-hover:text-orange-500 transition-colors line-clamp-1 leading-tight">
             {projectName}
           </h3>
@@ -166,7 +172,7 @@ const PropertyCard = ({ property }: { property: any }) => {
               </svg>
             </a>
             <Link
-              href={`/properties/${property._id}`}
+              href={propertyUrl}
               className="bg-[#0a1628] text-white p-2.5 rounded-2xl hover:bg-orange-500 transition-colors shadow-lg"
             >
               <ShieldCheck className="w-4 h-4" />

@@ -26,7 +26,16 @@ const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   await dbConnect();
-  const raw = await Property.findById(id).lean() as any;
+  
+  const extractedId = id.split('-').pop() || id;
+  const isValidId = extractedId.match(/^[0-9a-fA-F]{24}$/);
+  
+  const raw = await Property.findOne({
+    $or: [
+      { slug: id },
+      ...(isValidId ? [{ _id: extractedId }] : [])
+    ]
+  }).lean() as any;
   if (!raw) return { title: 'Property Not Found - Digital Broker' };
 
   const imgs: string[] = Array.isArray(raw.productImages) ? raw.productImages : Array.isArray(raw.images) ? raw.images : [];
@@ -46,7 +55,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 async function getProperty(id: string) {
   await dbConnect();
-  return Property.findById(id).lean();
+  
+  // The URL might be a clean SEO slug like "monarque-sector-22d-noida-65123abcd..."
+  // The last part after the hyphen is usually the ObjectId if we format it that way.
+  const extractedId = id.split('-').pop() || id;
+  
+  const isValidId = extractedId.match(/^[0-9a-fA-F]{24}$/);
+  
+  return Property.findOne({
+    $or: [
+      { slug: id }, // Exact slug match
+      ...(isValidId ? [{ _id: extractedId }] : []) // Fallback to extracted ID
+    ]
+  }).lean();
 }
 
 async function getSimilarProperties(city: string, propType: string, excludeId: string) {
@@ -447,8 +468,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   Similar Projects
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {similarProperties.map((sp: any) => (
-                    <a key={sp._id} href={`/properties/${sp._id}`} className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all group">
+                  {similarProperties.map((sp: any) => {
+                    const slugBase = `${sp.projectName || sp.title}-${sp.sector || ''}-${sp.city}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                    const propertyUrl = `/properties/${sp.slug || `${slugBase}-${sp._id}`}`;
+                    return (
+                    <a key={sp._id} href={propertyUrl} className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all group">
                       <div className="h-[220px] relative">
                         <img src={(sp.productImages && sp.productImages.length > 0) ? String(sp.productImages[0]) : FALLBACK_IMG} alt={sp.projectName} className="w-full h-full object-cover" />
                         <div className="absolute top-4 left-4 bg-orange-500 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase shadow-lg">{sp.projectStatus}</div>
@@ -465,7 +489,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                         </div>
                       </div>
                     </a>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

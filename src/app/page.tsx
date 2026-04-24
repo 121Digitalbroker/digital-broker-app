@@ -83,8 +83,8 @@ export default async function HomePage() {
               { name: "Eta 2", tag: "Growing Sector" },
               { name: "Sector 16", tag: "Commercial Heart" }
             ].map((loc, idx) => (
-              <a 
-                key={idx} 
+              <a
+                key={idx}
                 href={`/search?q=${loc.name}`}
                 className="group p-8 bg-white rounded-3xl border border-gray-100 hover:border-orange-500/30 hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center"
               >

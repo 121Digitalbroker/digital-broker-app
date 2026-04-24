@@ -305,8 +305,11 @@ export default function MobilePropertyView({
               Similar Projects
             </h3>
             <div className="flex flex-col gap-4">
-              {similarProperties.map((sp: any) => (
-                <a key={sp._id} href={`/properties/${sp._id}`} className="bg-white rounded-3xl flex overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-all">
+              {similarProperties.map((sp: any) => {
+                const slugBase = `${sp.projectName || sp.title}-${sp.sector || ''}-${sp.city}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                const propertyUrl = `/properties/${sp.slug || `${slugBase}-${sp._id}`}`;
+                return (
+                <a key={sp._id} href={propertyUrl} className="bg-white rounded-3xl flex overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-all">
                   <div className="w-32 h-32 shrink-0">
                     <img src={sp.productImages?.[0] || sp.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop'} alt={sp.projectName} className="w-full h-full object-cover" />
                   </div>
@@ -319,7 +322,8 @@ export default function MobilePropertyView({
                     <p className="text-xs font-black text-orange-600">₹{(sp.residentialConfigs?.[0]?.ticketSize / 10000000).toFixed(1)}Cr+</p>
                   </div>
                 </a>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
