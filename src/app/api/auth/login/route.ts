@@ -6,9 +6,13 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
-    // 1. Check Hardcoded Super Admin (For prototype ease without initial seeding)
+    // 1. Check Hardcoded Users
     if (username === 'superadmin' && password === 'superadmin123') {
       return NextResponse.json({ success: true, role: 'superadmin' });
+    }
+
+    if (username === 'Mansi' && password === 'Mansi123') {
+      return NextResponse.json({ success: true, role: 'bcms_editor' });
     }
 
     // 2. Check Database for CMS Users

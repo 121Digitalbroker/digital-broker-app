@@ -41,6 +41,7 @@ const Navbar = () => {
     { name: 'Home', href: '/' },
     { name: 'Explore', href: '/search' },
     { name: 'Yamuna Expressway', href: '/yamuna-expressway' },
+    { name: 'Blog', href: '/blog' },
     { name: 'About', href: '/about' },
     { name: 'Support', href: '/support' },
     { name: 'Contact', href: '/contact', special: true },
