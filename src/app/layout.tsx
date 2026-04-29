@@ -12,17 +12,29 @@ import dbConnect from "@/lib/mongodb";
 import SiteSettings from "@/models/SiteSettings";
 
 export async function generateMetadata(): Promise<Metadata> {
-  await dbConnect();
-  const settings = await SiteSettings.findOne();
+  try {
+    await dbConnect();
+    const settings = await SiteSettings.findOne();
 
-  return {
-    title: settings?.siteTitle || "Digital Broker | Premium Real Estate",
-    description: settings?.siteDescription || "Find exclusive homes and commercial properties with expert guidance.",
-    keywords: settings?.keywords || "Real Estate, Noida, Yamuna Expressway, Digital Broker",
-    verification: {
-      google: settings?.googleVerification || "google5ea580b37fc40bfa",
-    },
-  };
+    return {
+      title: settings?.siteTitle || "Digital Broker | Premium Real Estate",
+      description: settings?.siteDescription || "Find exclusive homes and commercial properties with expert guidance.",
+      keywords: settings?.keywords || "Real Estate, Noida, Yamuna Expressway, Digital Broker",
+      verification: {
+        google: settings?.googleVerification || "google5ea580b37fc40bfa",
+      },
+    };
+  } catch (error) {
+    console.error("generateMetadata fallback:", error);
+    return {
+      title: "Digital Broker | Premium Real Estate",
+      description: "Find exclusive homes and commercial properties with expert guidance.",
+      keywords: "Real Estate, Noida, Yamuna Expressway, Digital Broker",
+      verification: {
+        google: "google5ea580b37fc40bfa",
+      },
+    };
+  }
 }
 
 export default function RootLayout({

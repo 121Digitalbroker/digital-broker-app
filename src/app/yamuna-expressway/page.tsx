@@ -3,24 +3,32 @@ import Navbar from '@/components/Navbar';
 import YamunaClientWrapper from './YamunaClientWrapper';
 import ChatWidget from '@/components/ChatWidget';
 import Footer from '@/components/Footer';
-import { Home } from 'lucide-react';
-
 async function getYamunaBanners() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/yamuna-banners`,
-    { cache: 'no-store' }
-  );
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/yamuna-banners`,
+      { cache: 'no-store' }
+    );
+    if (!res.ok) return [];
+    return res.json();
+  } catch (error) {
+    console.error("getYamunaBanners failed:", error);
+    return [];
+  }
 }
 
 async function getYamunaProperties() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties?showOnYamunaExpressway=true`,
-    { cache: 'no-store' }
-  );
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties?showOnYamunaExpressway=true`,
+      { cache: 'no-store' }
+    );
+    if (!res.ok) return [];
+    return res.json();
+  } catch (error) {
+    console.error("getYamunaProperties failed:", error);
+    return [];
+  }
 }
 
 export default async function YamunaExpresswayPage() {

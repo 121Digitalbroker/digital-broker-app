@@ -9,16 +9,26 @@ import HomeBookingForm from '@/components/HomeBookingForm';
 import { ArrowRight, Star, Shield, TrendingUp, Headphones, Percent, CheckCircle, Home, Car, User, MapPin } from 'lucide-react';
 
 async function getPromotedProperties() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties?promoted=true`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties?promoted=true`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (error) {
+    console.error("getPromotedProperties failed:", error);
+    return [];
+  }
 }
 
 async function getAverageProperties() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  const all = await res.json();
-  return all.filter((p: any) => !p.isPromoted && !p.isFeatured && !p.isPreLeased);
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/properties`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const all = await res.json();
+    return all.filter((p: any) => !p.isPromoted && !p.isFeatured && !p.isPreLeased);
+  } catch (error) {
+    console.error("getAverageProperties failed:", error);
+    return [];
+  }
 }
 
 export default async function HomePage() {
