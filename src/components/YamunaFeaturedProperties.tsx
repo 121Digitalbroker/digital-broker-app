@@ -3,7 +3,21 @@ import React, { useState } from 'react';
 import PropertyCard from '@/components/PropertyCard';
 import { Home, Link } from 'lucide-react';
 
-export default function YamunaFeaturedProperties({ properties, activeCategory = 'Residential', searchFilters }: { properties: any[], activeCategory?: string, searchFilters?: any }) {
+function normalizeBedroomFilter(label: string): string {
+  return label.replace(/\s+/g, '').toLowerCase();
+}
+
+export default function YamunaFeaturedProperties({
+  properties,
+  activeCategory = 'Residential',
+  searchFilters,
+  searchLoading = false,
+}: {
+  properties: any[];
+  activeCategory?: string;
+  searchFilters?: any;
+  searchLoading?: boolean;
+}) {
 
   // Filter based on selected category + 'both'
   const filterCat = activeCategory.toLowerCase();
@@ -14,12 +28,22 @@ export default function YamunaFeaturedProperties({ properties, activeCategory = 
   if (searchFilters) {
     if (searchFilters.q) {
       const q = searchFilters.q.toLowerCase();
-      filteredProperties = filteredProperties.filter((p: any) => 
-        p.title?.toLowerCase().includes(q) || 
-        p.location?.address?.toLowerCase().includes(q) ||
-        p.location?.city?.toLowerCase().includes(q) ||
-        p.developer?.toLowerCase().includes(q)
-      );
+      filteredProperties = filteredProperties.filter((p: any) => {
+        const hay = [
+          p.projectName,
+          p.title,
+          p.developerName,
+          p.developer,
+          p.city,
+          p.sector,
+          p.keywords,
+          p.slug,
+        ]
+          .filter(Boolean)
+          .map((s: string) => String(s).toLowerCase())
+          .join(' ');
+        return hay.includes(q);
+      });
     }
     
     if (searchFilters.minPrice !== undefined) {
@@ -51,12 +75,13 @@ export default function YamunaFeaturedProperties({ properties, activeCategory = 
     }
 
     if (searchFilters.bedrooms) {
+      const want = normalizeBedroomFilter(String(searchFilters.bedrooms));
       filteredProperties = filteredProperties.filter((p: any) => {
         if (!p.residentialConfigs) return false;
-        return p.residentialConfigs.some((c: any) => 
-          c.typology?.toLowerCase().includes(searchFilters.bedrooms.toLowerCase()) || 
-          String(c.bedrooms) === searchFilters.bedrooms
-        );
+        return p.residentialConfigs.some((c: any) => {
+          const typ = normalizeBedroomFilter(String(c.typology ?? ''));
+          return typ === want || typ.includes(want) || String(c.bedrooms) === searchFilters.bedrooms;
+        });
       });
     }
 
@@ -84,7 +109,11 @@ export default function YamunaFeaturedProperties({ properties, activeCategory = 
           </div>
         </div>
 
-        {filteredProperties.length > 0 ? (
+        {searchLoading ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Searching properties…</p>
+          </div>
+        ) : filteredProperties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-fade-in-up">
             {filteredProperties.map((prop: any) => (
               <PropertyCard key={prop._id} property={prop} />

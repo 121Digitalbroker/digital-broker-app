@@ -26,7 +26,9 @@ export async function GET(request: Request) {
           { projectName: { $regex: escapedQ, $options: 'i' } },
           { city: { $regex: escapedQ, $options: 'i' } },
           { sector: { $regex: escapedQ, $options: 'i' } },
-          { developerName: { $regex: escapedQ, $options: 'i' } }
+          { developerName: { $regex: escapedQ, $options: 'i' } },
+          { keywords: { $regex: escapedQ, $options: 'i' } },
+          { slug: { $regex: escapedQ, $options: 'i' } },
         ]
       });
     }
@@ -95,8 +97,14 @@ export async function GET(request: Request) {
       andConditions.push({ isPromoted: true });
     }
 
-    // Yamuna Expressway filter
-    if (showOnYamunaExpressway === 'true') {
+    // Yamuna Expressway: curated page uses showOnYamunaExpressway only.
+    // yamuna=1 widens to "on Yamuna corridor" OR featured on Yamuna page (so search finds all YE listings).
+    const yamunaCorridor = searchParams.get('yamuna');
+    if (yamunaCorridor === '1') {
+      andConditions.push({
+        $or: [{ showOnYamunaExpressway: true }, { city: 'Yamuna Expressway' }],
+      });
+    } else if (showOnYamunaExpressway === 'true') {
       andConditions.push({ showOnYamunaExpressway: true });
     }
 
