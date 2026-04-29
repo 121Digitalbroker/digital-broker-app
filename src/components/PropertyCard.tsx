@@ -127,7 +127,7 @@ const PropertyCard = ({ property }: { property: any }) => {
           </div>
         </div>
 
-        {/* Location & Furnishing & Towers */}
+        {/* Location & Furnishing */}
         <div className="flex flex-col gap-3 mb-6">
           {location && (
             <div className="flex items-start text-xs font-semibold text-gray-400">
@@ -139,11 +139,6 @@ const PropertyCard = ({ property }: { property: any }) => {
             {property.furnishingType && (
               <div className="flex items-center text-[10px] font-bold text-blue-600 bg-blue-50 w-fit px-3 py-1 rounded-full border border-blue-100 uppercase tracking-widest">
                 {property.furnishingType}
-              </div>
-            )}
-            {property.totalTowers && (
-              <div className="flex items-center text-[10px] font-bold text-orange-600 bg-orange-50 w-fit px-3 py-1 rounded-full border border-orange-100 uppercase tracking-widest">
-                {property.totalTowers} {property.totalTowers === 1 ? 'Tower' : 'Towers'}
               </div>
             )}
           </div>

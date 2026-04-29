@@ -64,13 +64,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-left">
-            <p className="text-[10px] text-gray-500 font-medium leading-relaxed max-w-xl">
-              <span className="text-gray-400 font-bold uppercase tracking-widest block mb-1">Compliance Disclaimer</span>
-              UP RERA Registration No: UPRERAAGT22341. All project details should be verified before any commercial or residential transaction.
-            </p>
-          </div>
+        <div className="pt-12 border-t border-white/5 flex justify-center md:justify-end items-center">
           <div className="text-xs text-gray-500 font-bold uppercase tracking-widest">
             &copy; {new Date().getFullYear()} Digital Broker. All Rights Reserved.
           </div>
