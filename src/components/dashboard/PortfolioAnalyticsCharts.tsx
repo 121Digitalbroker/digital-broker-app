@@ -280,15 +280,6 @@ export default function PortfolioAnalyticsCharts({
     .slice()
     .sort((a, b) => b.investment - a.investment)
     .slice(0, 4);
-  const activeAssetIndex = assetAllocation.reduce(
-    (bestIdx, item, idx, arr) => (item.value > arr[bestIdx].value ? idx : bestIdx),
-    0
-  );
-  const activeFundIndex = fundAllocation.reduce(
-    (bestIdx, item, idx, arr) => (item.investment > arr[bestIdx].investment ? idx : bestIdx),
-    0
-  );
-
   return (
     <div className="space-y-6">
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -327,7 +318,6 @@ export default function PortfolioAnalyticsCharts({
                   data={assetAllocation}
                   dataKey="value"
                   nameKey="name"
-                  activeIndex={activeAssetIndex}
                   activeShape={activeSliceShape}
                   outerRadius={104}
                   innerRadius={62}
@@ -401,7 +391,6 @@ export default function PortfolioAnalyticsCharts({
                   data={fundAllocation}
                   dataKey="investment"
                   nameKey="propertyName"
-                  activeIndex={activeFundIndex}
                   activeShape={activeSliceShape}
                   outerRadius={104}
                   innerRadius={58}
