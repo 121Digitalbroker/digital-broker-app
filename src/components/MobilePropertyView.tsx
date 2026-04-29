@@ -250,7 +250,12 @@ export default function MobilePropertyView({
 
         {/* ── PRICE BREAKUP ── */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 overflow-hidden break-inside-avoid">
-          <InteractivePriceBreakup resConfigs={resConfigs} comConfigs={comConfigs} />
+          <InteractivePriceBreakup
+            resConfigs={resConfigs}
+            comConfigs={comConfigs}
+            propertyId={String(p._id || '')}
+            propertyTitle={title}
+          />
         </div>
 
         {/* ── DOCUMENTS & APPROVALS ── */}

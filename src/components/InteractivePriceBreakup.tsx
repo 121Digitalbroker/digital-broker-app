@@ -1,11 +1,34 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Image as ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp, Image as ImageIcon, X, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import LeadForm from './LeadForm';
 
-export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { resConfigs: any[]; comConfigs: any[] }) {
+export default function InteractivePriceBreakup({
+  resConfigs,
+  comConfigs,
+  propertyId,
+  propertyTitle,
+}: {
+  resConfigs: any[];
+  comConfigs: any[];
+  propertyId: string;
+  propertyTitle: string;
+}) {
   const [expandedIndex, setExpandedIndex] = useState<string | null>(null);
   const [overlayImage, setOverlayImage] = useState<{ url: string; allImages: string[]; currentIndex: number } | null>(null);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+
+  const unlockStorageKey = `floor-plans-unlocked:${propertyId}`;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const storedUnlockStatus = window.localStorage.getItem(unlockStorageKey);
+    if (storedUnlockStatus === 'true') {
+      setIsUnlocked(true);
+    }
+  }, [unlockStorageKey]);
 
   if (resConfigs.length === 0 && comConfigs.length === 0) return null;
 
@@ -16,6 +39,16 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
 
   const closeOverlay = () => {
     setOverlayImage(null);
+  };
+
+  const handleUnlockSuccess = () => {
+    setIsUnlocked(true);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(unlockStorageKey, 'true');
+    }
+    window.setTimeout(() => {
+      setShowUnlockModal(false);
+    }, 900);
   };
 
   const navigateImage = (direction: 'prev' | 'next') => {
@@ -100,10 +133,23 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                     <td className="p-4">
                       {hasLayouts ? (
-                        <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
-                          <ImageIcon className="w-3.5 h-3.5" />
-                          <span>View {layoutsToRender.length} Plans</span>
-                        </div>
+                        isUnlocked ? (
+                          <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
+                            <ImageIcon className="w-3.5 h-3.5" />
+                            <span>View {layoutsToRender.length} Plans</span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowUnlockModal(true);
+                            }}
+                            className="inline-flex items-center gap-2 bg-orange-500 text-white px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide hover:bg-orange-600 transition-colors"
+                          >
+                            <Lock className="w-3 h-3" />
+                            View Free
+                          </button>
+                        )
                       ) : (
                         <span className="text-[10px] text-gray-300 font-bold uppercase">N/A</span>
                       )}
@@ -115,14 +161,29 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                       <td colSpan={3} className="p-6 border-b border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {layoutsToRender.map((img: string, idx: number) => (
-                            <div key={idx} className="relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 cursor-pointer" onClick={() => openOverlay(img, layoutsToRender)}>
+                            <div
+                              key={idx}
+                              className={`relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 ${isUnlocked ? 'cursor-pointer' : 'pointer-events-none'}`}
+                              onClick={() => isUnlocked && openOverlay(img, layoutsToRender)}
+                            >
                               <div className="block relative aspect-square md:aspect-video w-full">
-                                <img src={img} alt={`Floor Plan ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <img src={img} alt={`Floor Plan ${idx + 1}`} className={`w-full h-full object-cover transition-transform duration-500 ${isUnlocked ? 'group-hover:scale-105' : 'blur-md scale-105'}`} />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
                                   <span className="bg-white text-orange-600 px-4 py-2 rounded-xl text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300 flex items-center gap-2">
                                     <ImageIcon className="w-4 h-4" /> Expand
                                   </span>
                                 </div>
+                                {!isUnlocked && (
+                                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center pointer-events-auto">
+                                    <button
+                                      onClick={() => setShowUnlockModal(true)}
+                                      className="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wide hover:bg-orange-600 transition-colors shadow-lg"
+                                    >
+                                      <Lock className="w-3.5 h-3.5" />
+                                      View Free
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ))}
@@ -153,10 +214,23 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                     <td className="p-4 text-gray-600">{c.unitSize} sqft</td>
                     <td className="p-4">
                       {hasLayouts ? (
-                        <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
-                          <ImageIcon className="w-3.5 h-3.5" />
-                          <span>View {layoutsToRender.length} Plans</span>
-                        </div>
+                        isUnlocked ? (
+                          <div className="flex items-center gap-1.5 text-orange-500 font-bold text-[10px] uppercase">
+                            <ImageIcon className="w-3.5 h-3.5" />
+                            <span>View {layoutsToRender.length} Plans</span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowUnlockModal(true);
+                            }}
+                            className="inline-flex items-center gap-2 bg-orange-500 text-white px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide hover:bg-orange-600 transition-colors"
+                          >
+                            <Lock className="w-3 h-3" />
+                            View Free
+                          </button>
+                        )
                       ) : (
                         <span className="text-[10px] text-gray-300 font-bold uppercase">N/A</span>
                       )}
@@ -168,14 +242,29 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                       <td colSpan={3} className="p-6 border-b border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {layoutsToRender.map((img: string, idx: number) => (
-                            <div key={idx} className="relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 cursor-pointer" onClick={() => openOverlay(img, layoutsToRender)}>
+                            <div
+                              key={idx}
+                              className={`relative group overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 ${isUnlocked ? 'cursor-pointer' : 'pointer-events-none'}`}
+                              onClick={() => isUnlocked && openOverlay(img, layoutsToRender)}
+                            >
                               <div className="block relative aspect-square md:aspect-video w-full">
-                                <img src={img} alt={`Floor Plan ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <img src={img} alt={`Floor Plan ${idx + 1}`} className={`w-full h-full object-cover transition-transform duration-500 ${isUnlocked ? 'group-hover:scale-105' : 'blur-md scale-105'}`} />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
                                   <span className="bg-white text-orange-600 px-4 py-2 rounded-xl text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300 flex items-center gap-2">
                                     <ImageIcon className="w-4 h-4" /> Expand
                                   </span>
                                 </div>
+                                {!isUnlocked && (
+                                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center pointer-events-auto">
+                                    <button
+                                      onClick={() => setShowUnlockModal(true)}
+                                      className="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-wide hover:bg-orange-600 transition-colors shadow-lg"
+                                    >
+                                      <Lock className="w-3.5 h-3.5" />
+                                      View Free
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ))}
@@ -233,6 +322,27 @@ export default function InteractivePriceBreakup({ resConfigs, comConfigs }: { re
                 {overlayImage.currentIndex + 1} / {overlayImage.allImages.length}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showUnlockModal && !isUnlocked && (
+        <div className="fixed inset-0 z-[1001] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowUnlockModal(false)}>
+          <div className="w-full max-w-md rounded-3xl bg-[#0b1324] p-6 border border-white/10 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">Unlock Floor Plans</p>
+                <h3 className="text-xl font-black text-white">View All Layouts Free</h3>
+              </div>
+              <button
+                onClick={() => setShowUnlockModal(false)}
+                className="w-9 h-9 rounded-full bg-white/10 text-white/80 hover:text-white flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-blue-100/70 mb-5">Submit your details once and get full access to all available floor plans for this project.</p>
+            <LeadForm propertyId={propertyId} propertyTitle={propertyTitle} onSuccess={handleUnlockSuccess} />
           </div>
         </div>
       )}

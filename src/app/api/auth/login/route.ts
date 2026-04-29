@@ -8,11 +8,11 @@ export async function POST(request: Request) {
 
     // 1. Check Hardcoded Users
     if (username === 'superadmin' && password === 'superadmin123') {
-      return NextResponse.json({ success: true, role: 'superadmin' });
+      return NextResponse.json({ success: true, role: 'superadmin', username });
     }
 
     if (username === 'Mansi' && password === 'Mansi123') {
-      return NextResponse.json({ success: true, role: 'bcms_editor' });
+      return NextResponse.json({ success: true, role: 'bcms_editor', username });
     }
 
     // 2. Check Database for CMS Users
@@ -20,12 +20,12 @@ export async function POST(request: Request) {
     const user = await User.findOne({ username, password });
 
     if (user) {
-      return NextResponse.json({ success: true, role: user.role });
+      return NextResponse.json({ success: true, role: user.role, username });
     }
 
     // 3. Fallback to old simple prototype login temporarily until fully migrated
     if (username === 'admin' && password === 'AdminG924') {
-      return NextResponse.json({ success: true, role: 'cms_user' });
+      return NextResponse.json({ success: true, role: 'cms_user', username });
     }
 
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });

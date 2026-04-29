@@ -391,7 +391,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <InteractivePriceBreakup resConfigs={resConfigs} comConfigs={comConfigs} />
+            <InteractivePriceBreakup
+              resConfigs={resConfigs}
+              comConfigs={comConfigs}
+              propertyId={id}
+              propertyTitle={title}
+            />
 
             <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-gray-100">
               <h2 className="text-3xl font-black text-[#0a1628] mb-8 flex items-center gap-4">

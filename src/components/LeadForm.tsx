@@ -5,9 +5,10 @@ import { Send, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 interface LeadFormProps {
   propertyId: string;
   propertyTitle: string;
+  onSuccess?: () => void;
 }
 
-export default function LeadForm({ propertyId, propertyTitle }: LeadFormProps) {
+export default function LeadForm({ propertyId, propertyTitle, onSuccess }: LeadFormProps) {
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -27,6 +28,7 @@ export default function LeadForm({ propertyId, propertyTitle }: LeadFormProps) {
       if (res.ok) {
         setStatus('success');
         setForm({ name: '', email: '', phone: '' });
+        onSuccess?.();
       } else {
         setStatus('error');
       }

@@ -47,5 +47,4 @@ async function migrate() {
     await newClient.close();
   }
 }
-
 migrate();

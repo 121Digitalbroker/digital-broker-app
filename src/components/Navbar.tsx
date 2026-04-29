@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Search, User, Menu, X } from 'lucide-react';
+import { Search, Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -11,30 +11,33 @@ const Navbar = () => {
   const forceSolid = !isTransparentPage || scrolled;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [role, setRole] = useState('');
+  const [isUser, setIsUser] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('user_auth') === 'true' : false
+  );
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-
-    // Check admin auth
-    const auth = typeof window !== 'undefined' ? localStorage.getItem('admin_auth') : null;
-    const currentRole = typeof window !== 'undefined' ? localStorage.getItem('admin_role') : null;
-    setIsAdmin(auth === 'true');
-    setRole(currentRole || '');
+    const syncUserAuth = () => {
+      const userAuth = typeof window !== 'undefined' ? localStorage.getItem('user_auth') : null;
+      setIsUser(userAuth === 'true');
+    };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('storage', syncUserAuth);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('storage', syncUserAuth);
+    };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_auth');
-    localStorage.removeItem('admin_role');
-    setIsAdmin(false);
-    setRole('');
-    window.location.href = '/';
+  const handleUserLogout = () => {
+    localStorage.removeItem('user_auth');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_username');
+    setIsUser(false);
+    window.location.href = '/login';
   };
 
   const navLinks = [
@@ -94,6 +97,20 @@ const Navbar = () => {
             <Link href="/search" className="text-white hover:text-orange-500 transition-colors p-2 rounded-full hover:bg-white/5">
               <Search className="w-5 h-5" />
             </Link>
+
+            {isUser && (
+              <>
+                <Link href="/dashboard" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/90 hover:text-orange-500 transition-colors">
+                  <LayoutDashboard className="w-4 h-4" /> Dashboard
+                </Link>
+                <button
+                  onClick={handleUserLogout}
+                  className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/90 hover:text-orange-500 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" /> Logout
+                </button>
+              </>
+            )}
 
             <button
               onClick={() => setIsMobileMenuOpen(true)}

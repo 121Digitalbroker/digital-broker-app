@@ -98,6 +98,8 @@ export interface IProperty extends Document {
   amenities?: string[];
 
   // Metadata for listing compatibility
+  ownerId?: string;
+  ownerType?: 'admin' | 'dashboard_user';
   isFeatured: boolean;
   isPromoted: boolean;
   showOnYamunaExpressway: boolean;
@@ -197,6 +199,8 @@ const PropertySchema = new Schema<IProperty>(
     aboutProject: { type: String },
     amenities: [{ type: String }],
 
+    ownerId: { type: String, index: true },
+    ownerType: { type: String, enum: ['admin', 'dashboard_user'], default: 'admin' },
     isFeatured: { type: Boolean, default: false },
     isPromoted: { type: Boolean, default: false },
     showOnYamunaExpressway: { type: Boolean, default: false },

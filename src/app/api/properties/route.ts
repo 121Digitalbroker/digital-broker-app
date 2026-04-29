@@ -17,7 +17,6 @@ export async function GET(request: Request) {
     const q = searchParams.get('q');
     const promoted = searchParams.get('promoted');
     const showOnYamunaExpressway = searchParams.get('showOnYamunaExpressway');
-
     let andConditions: any[] = [];
     
     if (q && q.trim() !== '') {
