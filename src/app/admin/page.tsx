@@ -133,25 +133,64 @@ export default function AdminDashboard() {
   };
 
   const exportProperties = () => {
-    const headers = ['Project Name', 'Price', 'Type', 'Location', 'City', 'Towers', 'Status', 'Featured', 'Promoted', 'Visible'];
-    downloadCSV(properties, 'properties_export', headers, (p) => {
+    const headers = [
+      'Project Name', 'Developer', 'Price Display', 'Type', 'Location', 'City', 
+      'Towers', 'Status', 'RERA Number', 'Project Size', 'Loanable', 
+      'Amenities', 'Nearby Locations', 'About Project', 'Residential Configs', 'Commercial Configs',
+      'SEO Keywords', 'Slug', 'Featured', 'Promoted', 'Visible', 
+      'Brochure URL', 'Google Maps URL', 'Owner Info', 'Created At'
+    ];
+    
+    downloadCSV(properties, 'properties_detailed_export', headers, (p) => {
+      // Calculate display price
       const price = p.propertyType === 'commercial'
-        ? (p.commercialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.commercialConfigs[0].ticketSize / 100000)}L+` : p.price)
+        ? (p.commercialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.commercialConfigs[0].ticketSize / 100000)}L+` : p.price || 'N/A')
         : (p.propertyType === 'residential' || p.propertyType === 'both')
-          ? (p.residentialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.residentialConfigs[0].ticketSize / 10000000)}Cr+` : p.price)
-          : p.price;
+          ? (p.residentialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.residentialConfigs[0].ticketSize / 10000000)}Cr+` : p.price || 'N/A')
+          : p.price || 'N/A';
+
+      // Format Amenities
+      const amenitiesStr = p.amenities?.join(' | ') || '';
+
+      // Format Nearby Locations
+      const nearbyStr = p.nearbyLocations?.map((loc: any) => `${loc.name}: ${loc.distance}`).join(' | ') || '';
+
+      // Summarize Residential Configs
+      const resConfigStr = p.residentialConfigs?.map((rc: any) => 
+        `${rc.typology}: ${rc.unitSize} sqft (₹${rc.ticketSize >= 10000000 ? (rc.ticketSize/10000000).toFixed(2) + 'Cr' : (rc.ticketSize/100000).toFixed(2) + 'L'})`
+      ).join(' | ') || '';
+
+      // Summarize Commercial Configs
+      const commConfigStr = p.commercialConfigs?.map((cc: any) => 
+        `${cc.commercialType}: ${cc.unitSize} sqft (₹${cc.ticketSize >= 10000000 ? (cc.ticketSize/10000000).toFixed(2) + 'Cr' : (cc.ticketSize/100000).toFixed(2) + 'L'})`
+      ).join(' | ') || '';
 
       return [
         p.projectName || p.title || 'Untitled',
+        p.developerName || '',
         price,
         p.propertyType || p.type || '',
         p.sector || '',
         p.city || p.location || '',
         p.totalTowers || 'N/A',
         p.projectStatus || '',
+        p.reraNumber || '',
+        p.projectSize ? `${p.projectSize} Sq.Ft.` : '',
+        p.loanable || 'NO',
+        amenitiesStr,
+        nearbyStr,
+        p.aboutProject || '',
+        resConfigStr,
+        commConfigStr,
+        p.keywords || '',
+        p.slug || '',
         p.isFeatured ? 'Yes' : 'No',
         p.isPromoted ? 'Yes' : 'No',
-        p.isVisible !== false ? 'Yes' : 'No'
+        p.isVisible !== false ? 'Yes' : 'No',
+        p.brochureUrl || '',
+        p.googleMapsUrl || '',
+        p.ownerType ? `${p.ownerType} (${p.ownerId || 'system'})` : 'admin',
+        p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-IN') : ''
       ];
     });
   };
