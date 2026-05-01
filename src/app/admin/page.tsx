@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
-import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink, Star, Image as ImageIcon, Eye, EyeOff, Shield } from 'lucide-react';
+import { Plus, Edit, Trash2, LayoutDashboard, Database, TrendingUp, Users, ExternalLink, Star, Image as ImageIcon, Eye, EyeOff, Shield, Download } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -115,6 +115,58 @@ export default function AdminDashboard() {
     }
   };
 
+  const downloadCSV = (data: any[], filename: string, headers: string[], rowMapper: (item: any) => string[]) => {
+    const csvRows = data.map(item => rowMapper(item).map(val => {
+      const stringVal = String(val || '');
+      return `"${stringVal.replace(/"/g, '""')}"`;
+    }).join(','));
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportProperties = () => {
+    const headers = ['Project Name', 'Price', 'Type', 'Location', 'City', 'Towers', 'Status', 'Featured', 'Promoted', 'Visible'];
+    downloadCSV(properties, 'properties_export', headers, (p) => {
+      const price = p.propertyType === 'commercial'
+        ? (p.commercialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.commercialConfigs[0].ticketSize / 100000)}L+` : p.price)
+        : (p.propertyType === 'residential' || p.propertyType === 'both')
+          ? (p.residentialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.residentialConfigs[0].ticketSize / 10000000)}Cr+` : p.price)
+          : p.price;
+
+      return [
+        p.projectName || p.title || 'Untitled',
+        price,
+        p.propertyType || p.type || '',
+        p.sector || '',
+        p.city || p.location || '',
+        p.totalTowers || 'N/A',
+        p.projectStatus || '',
+        p.isFeatured ? 'Yes' : 'No',
+        p.isPromoted ? 'Yes' : 'No',
+        p.isVisible !== false ? 'Yes' : 'No'
+      ];
+    });
+  };
+
+  const exportLeads = () => {
+    const headers = ['Name', 'Email', 'Phone', 'Source Property', 'Date'];
+    downloadCSV(leads, 'leads_export', headers, (l) => [
+      l.name,
+      l.email,
+      l.phone,
+      l.propertyTitle || 'General Inquiry',
+      new Date(l.createdAt).toLocaleDateString('en-IN')
+    ]);
+  };
+
 
 
 
@@ -224,12 +276,20 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-left">
             <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-xl font-bold text-[#0a1628]">Property Listings</h3>
-              <Link
-                href="/admin/create"
-                className="bg-[#0a1628] hover:bg-[#1a2d4a] text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg"
-              >
-                <Plus className="w-5 h-5" /> Add Property
-              </Link>
+              <div className="flex gap-4">
+                <button
+                  onClick={exportProperties}
+                  className="bg-white hover:bg-gray-100 text-[#0a1628] border border-gray-200 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-sm"
+                >
+                  <Download className="w-5 h-5" /> Export CSV
+                </button>
+                <Link
+                  href="/admin/create"
+                  className="bg-[#0a1628] hover:bg-[#1a2d4a] text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg"
+                >
+                  <Plus className="w-5 h-5" /> Add Property
+                </Link>
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -345,6 +405,12 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-left">
             <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-xl font-bold text-[#0a1628]">Customer Inquiries</h3>
+              <button
+                onClick={exportLeads}
+                className="bg-white hover:bg-gray-100 text-[#0a1628] border border-gray-200 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-sm"
+              >
+                <Download className="w-5 h-5" /> Export CSV
+              </button>
             </div>
 
             <div className="overflow-x-auto">
