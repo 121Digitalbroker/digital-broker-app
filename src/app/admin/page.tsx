@@ -136,8 +136,7 @@ export default function AdminDashboard() {
     const headers = [
       'Project Name', 'Developer', 'Price Display', 'Type', 'Location', 'City', 
       'Status', 'RERA Number', 'Project Size', 'Loanable', 
-      'Nearby Locations', 'About Project', 'Residential Configs', 'Commercial Configs',
-      'SEO Keywords', 'Slug', 'Featured', 'Promoted', 'Visible', 'Created At'
+      'Nearby Locations', 'Residential Configs', 'Featured', 'Promoted', 'Visible', 'Created At'
     ];
     
     downloadCSV(properties, 'properties_detailed_export', headers, (p) => {
@@ -156,11 +155,6 @@ export default function AdminDashboard() {
         `${rc.typology}: ${rc.unitSize} sqft (₹${rc.ticketSize >= 10000000 ? (rc.ticketSize/10000000).toFixed(2) + 'Cr' : (rc.ticketSize/100000).toFixed(2) + 'L'})`
       ).join(' | ') || '';
 
-      // Summarize Commercial Configs
-      const commConfigStr = p.commercialConfigs?.map((cc: any) => 
-        `${cc.commercialType}: ${cc.unitSize} sqft (₹${cc.ticketSize >= 10000000 ? (cc.ticketSize/10000000).toFixed(2) + 'Cr' : (cc.ticketSize/100000).toFixed(2) + 'L'})`
-      ).join(' | ') || '';
-
       return [
         p.projectName || p.title || 'Untitled',
         p.developerName || '',
@@ -173,11 +167,7 @@ export default function AdminDashboard() {
         p.projectSize ? `${p.projectSize} Acres` : '',
         p.loanable || 'NO',
         nearbyStr,
-        p.aboutProject || '',
         resConfigStr,
-        commConfigStr,
-        p.keywords || '',
-        p.slug || '',
         p.isFeatured ? 'Yes' : 'No',
         p.isPromoted ? 'Yes' : 'No',
         p.isVisible !== false ? 'Yes' : 'No',
