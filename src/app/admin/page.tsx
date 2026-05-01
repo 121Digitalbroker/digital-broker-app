@@ -135,10 +135,9 @@ export default function AdminDashboard() {
   const exportProperties = () => {
     const headers = [
       'Project Name', 'Developer', 'Price Display', 'Type', 'Location', 'City', 
-      'Towers', 'Status', 'RERA Number', 'Project Size', 'Loanable', 
-      'Amenities', 'Nearby Locations', 'About Project', 'Residential Configs', 'Commercial Configs',
-      'SEO Keywords', 'Slug', 'Featured', 'Promoted', 'Visible', 
-      'Brochure URL', 'Google Maps URL', 'Owner Info', 'Created At'
+      'Status', 'RERA Number', 'Project Size', 'Loanable', 
+      'Nearby Locations', 'About Project', 'Residential Configs', 'Commercial Configs',
+      'SEO Keywords', 'Slug', 'Featured', 'Promoted', 'Visible', 'Created At'
     ];
     
     downloadCSV(properties, 'properties_detailed_export', headers, (p) => {
@@ -148,9 +147,6 @@ export default function AdminDashboard() {
         : (p.propertyType === 'residential' || p.propertyType === 'both')
           ? (p.residentialConfigs?.[0]?.ticketSize ? `₹ ${Math.round(p.residentialConfigs[0].ticketSize / 10000000)}Cr+` : p.price || 'N/A')
           : p.price || 'N/A';
-
-      // Format Amenities
-      const amenitiesStr = p.amenities?.join(' | ') || '';
 
       // Format Nearby Locations
       const nearbyStr = p.nearbyLocations?.map((loc: any) => `${loc.name}: ${loc.distance}`).join(' | ') || '';
@@ -172,12 +168,10 @@ export default function AdminDashboard() {
         p.propertyType || p.type || '',
         p.sector || '',
         p.city || p.location || '',
-        p.totalTowers || 'N/A',
         p.projectStatus || '',
         p.reraNumber || '',
-        p.projectSize ? `${p.projectSize} Sq.Ft.` : '',
+        p.projectSize ? `${p.projectSize} Acres` : '',
         p.loanable || 'NO',
-        amenitiesStr,
         nearbyStr,
         p.aboutProject || '',
         resConfigStr,
@@ -187,9 +181,6 @@ export default function AdminDashboard() {
         p.isFeatured ? 'Yes' : 'No',
         p.isPromoted ? 'Yes' : 'No',
         p.isVisible !== false ? 'Yes' : 'No',
-        p.brochureUrl || '',
-        p.googleMapsUrl || '',
-        p.ownerType ? `${p.ownerType} (${p.ownerId || 'system'})` : 'admin',
         p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-IN') : ''
       ];
     });
