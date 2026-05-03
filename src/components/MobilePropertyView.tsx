@@ -40,6 +40,14 @@ export default function MobilePropertyView({
   const [isReadMore, setIsReadMore] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsModalOpen(true);
+    }, 10000); // 10 seconds delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const heroImage = allImgs.length > 0 ? allImgs[0] : '';
   const locationStr = sector ? `${sector}, ${city}` : city;
   const propType = String(p.propertyType || p.type || '');
