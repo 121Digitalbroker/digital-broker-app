@@ -83,6 +83,19 @@ export default function LeadForm({ propertyId, propertyTitle, onSuccess }: LeadF
         />
       </div>
 
+      <div className="px-1">
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <input 
+            type="checkbox" 
+            required
+            className="mt-1 w-4 h-4 rounded border-white/10 bg-white/5 text-orange-500 focus:ring-orange-500 focus:ring-offset-0"
+          />
+          <span className="text-[10px] text-blue-200/60 leading-tight group-hover:text-white transition-colors font-medium">
+            I agree to the <a href="/privacy-policy" target="_blank" className="text-orange-500 underline underline-offset-2">Privacy Policy</a> and authorize Digitalbroker.in to contact me via Call/WhatsApp.
+          </span>
+        </label>
+      </div>
+
       <button 
         type="submit"
         disabled={status === 'loading'}
