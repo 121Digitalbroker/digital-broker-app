@@ -43,7 +43,7 @@ export default function MobilePropertyView({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsModalOpen(true);
-    }, 10000); // 10 seconds delay
+    }, 5000); // 5 seconds delay
 
     return () => clearTimeout(timer);
   }, []);
