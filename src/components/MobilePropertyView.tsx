@@ -322,19 +322,19 @@ export default function MobilePropertyView({
                 const slugBase = `${sp.projectName || sp.title}-${sp.sector || ''}-${sp.city}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
                 const propertyUrl = `/properties/${sp.slug || `${slugBase}-${sp._id}`}`;
                 return (
-                <a key={sp._id} href={propertyUrl} className="bg-white rounded-3xl flex overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-all">
-                  <div className="w-32 h-32 shrink-0">
-                    <img src={sp.productImages?.[0] || sp.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop'} alt={sp.projectName} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-4 flex flex-col justify-center min-w-0 flex-1">
-                    <p className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 truncate">{sp.developerName}</p>
-                    <h4 className="text-sm font-black text-[#0a1628] leading-tight mb-1 truncate">{sp.projectName || sp.title}</h4>
-                    <div className="flex items-center gap-1 text-[10px] text-gray-400 mb-2 truncate">
-                      <MapPin className="w-3 h-3 text-orange-400" /> {sp.sector}, {sp.city}
+                  <a key={sp._id} href={propertyUrl} className="bg-white rounded-3xl flex overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-all">
+                    <div className="w-32 h-32 shrink-0">
+                      <img src={sp.productImages?.[0] || sp.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2670&auto=format&fit=crop'} alt={sp.projectName} className="w-full h-full object-cover" />
                     </div>
-                    <p className="text-xs font-black text-orange-600">₹{(sp.residentialConfigs?.[0]?.ticketSize / 10000000).toFixed(1)}Cr+</p>
-                  </div>
-                </a>
+                    <div className="p-4 flex flex-col justify-center min-w-0 flex-1">
+                      <p className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1 truncate">{sp.developerName}</p>
+                      <h4 className="text-sm font-black text-[#0a1628] leading-tight mb-1 truncate">{sp.projectName || sp.title}</h4>
+                      <div className="flex items-center gap-1 text-[10px] text-gray-400 mb-2 truncate">
+                        <MapPin className="w-3 h-3 text-orange-400" /> {sp.sector}, {sp.city}
+                      </div>
+                      <p className="text-xs font-black text-orange-600">₹{(sp.residentialConfigs?.[0]?.ticketSize / 10000000).toFixed(1)}Cr+</p>
+                    </div>
+                  </a>
                 );
               })}
             </div>
