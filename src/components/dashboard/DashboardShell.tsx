@@ -16,19 +16,19 @@ export default function DashboardShell({ children, actions }: Props) {
             <span className="text-[#F56A22]">Broker</span>
           </Link>
           <nav className="flex flex-1 flex-wrap items-center gap-x-6 gap-y-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/65 sm:justify-center">
-            <Link href="/dashboard" className="hover:text-[#F56A22] transition-colors whitespace-nowrap">
+            <Link href="/" className="hover:text-[#F56A22] transition-colors whitespace-nowrap">
               Portfolio
             </Link>
             <Link
-              href="/dashboard/my-properties"
+              href="/my-properties"
               className="hover:text-[#F56A22] transition-colors whitespace-nowrap"
             >
               My properties
             </Link>
-            <Link href="/dashboard/profile" className="hover:text-[#F56A22] transition-colors whitespace-nowrap">
+            <Link href="/profile" className="hover:text-[#F56A22] transition-colors whitespace-nowrap">
               My details
             </Link>
-            <Link href="/dashboard/create" className="hover:text-[#F56A22] transition-colors whitespace-nowrap">
+            <Link href="/create" className="hover:text-[#F56A22] transition-colors whitespace-nowrap">
               Add property
             </Link>
           </nav>

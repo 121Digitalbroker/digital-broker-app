@@ -11,6 +11,6 @@ export async function requirePortfolioProfileComplete(
   const doc = await PortfolioUser.findOne({ clerkUserId: userId }).lean();
   if (!isPortfolioProfileComplete(doc)) {
     const q = new URLSearchParams({ next: nextPath });
-    redirect(`/dashboard/profile?${q.toString()}`);
+    redirect(`/profile?${q.toString()}`);
   }
 }

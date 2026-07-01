@@ -1,13 +1,11 @@
 import mongoose from "mongoose";
 
 /**
- * Portfolio / customer listings DB — separate from public `mongodb.ts`.
- * Set `MONGODB_URI_PORTFOLIO` to a different database or cluster URI.
- * If unset, falls back to `MONGODB_URI` (same host, set a different DB name in the URI for isolation).
+ * Portfolio MongoDB connection.
+ * Set `MONGODB_URI_PORTFOLIO` in `.env.local`.
  */
 const MONGODB_URI_PORTFOLIO =
   process.env.MONGODB_URI_PORTFOLIO ||
-  process.env.MONGODB_URI ||
   "mongodb://localhost:27017/digital-broker-portfolio";
 
 interface PortfolioConnectionCache {

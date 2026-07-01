@@ -140,10 +140,7 @@ function buildDocPayload(userId: string, parsed: ReturnType<typeof parsePortfoli
   };
 }
 
-/**
- * Portfolio API — uses portfolio MongoDB only (`mongodb-portfolio.ts`).
- * Public site must keep using `/api/properties`.
- */
+/** Portfolio properties API — list, create, update, delete. */
 export async function GET() {
   try {
     const { userId } = await auth();
@@ -206,7 +203,7 @@ export async function POST(request: Request) {
     const docPayload = buildDocPayload(userId, parsed);
 
     const PortfolioProperty = await getPortfolioPropertyModel();
-    const doc = await PortfolioProperty.create(docPayload);
+    const doc = await PortfolioProperty.create(docPayload as Parameters<typeof PortfolioProperty.create>[0]);
 
     return NextResponse.json(doc, { status: 201 });
   } catch (error: unknown) {
