@@ -1,0 +1,13 @@
+# Coolify / Docker build context — keep image small
+node_modules
+.next
+.git
+.env*
+*.tsbuildinfo
+auth-demo
+README.md
+AGENTS.md
+CLAUDE.md
+.cursor
+.vscode
+.DS_Store
