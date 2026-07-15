@@ -58,7 +58,7 @@ export async function PATCH(request: Request) {
     const profile = await PortfolioUser.findOneAndUpdate(
       { clerkUserId: userId },
       { $set: { clerkUserId: userId, ...update } },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     ).lean();
 
     return NextResponse.json({

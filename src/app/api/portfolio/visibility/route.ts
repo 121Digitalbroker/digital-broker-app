@@ -20,7 +20,7 @@ export async function PATCH(request: Request) {
     const updated = await PortfolioProperty.findOneAndUpdate(
       { _id: id, ownerId: userId },
       { $set: { includeInDashboard: !hidden } },
-      { new: true }
+      { returnDocument: "after" }
     )
       .select({ _id: 1, includeInDashboard: 1 })
       .lean();

@@ -239,7 +239,7 @@ export async function PATCH(request: Request) {
     const updated = await PortfolioProperty.findOneAndUpdate(
       { _id: editId, ownerId: userId },
       { $set: updatePayload },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!updated) {
