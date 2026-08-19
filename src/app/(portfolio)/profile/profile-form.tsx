@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { dashInput, dashLabel, dashTextarea } from "@/lib/dashboard-ui";
+import { dashInput, dashLabel, dashSelect, dashTextarea } from "@/lib/dashboard-ui";
+import { citiesForState, INDIAN_STATES, matchOption } from "@/lib/india-locations";
 
 export type PortfolioProfileInitial = {
   fullName: string;
@@ -25,9 +26,28 @@ type Props = {
 
 export default function PortfolioProfileForm({ initial, nextPath }: Props) {
   const router = useRouter();
-  const [form, setForm] = useState<PortfolioProfileInitial>(initial);
+  const [form, setForm] = useState<PortfolioProfileInitial>(() => {
+    const stateOrRegion = matchOption(INDIAN_STATES, initial.stateOrRegion);
+    const city = matchOption(citiesForState(stateOrRegion), initial.city);
+    return { ...initial, stateOrRegion, city };
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const cityOptions = useMemo(() => {
+    const cities = citiesForState(form.stateOrRegion);
+    if (form.city && !cities.includes(form.city)) {
+      return [form.city, ...cities];
+    }
+    return cities;
+  }, [form.stateOrRegion, form.city]);
+
+  const stateOptions = useMemo(() => {
+    if (form.stateOrRegion && !INDIAN_STATES.includes(form.stateOrRegion as (typeof INDIAN_STATES)[number])) {
+      return [form.stateOrRegion, ...INDIAN_STATES];
+    }
+    return [...INDIAN_STATES];
+  }, [form.stateOrRegion]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -117,25 +137,44 @@ export default function PortfolioProfileForm({ initial, nextPath }: Props) {
         </div>
         <div>
           <label className={dashLabel}>
-            City <span className="text-[#F56A22]">*</span>
+            State / region <span className="text-[#F56A22]">*</span>
           </label>
-          <input
+          <select
             required
-            className={dashInput}
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-          />
+            className={dashSelect}
+            value={form.stateOrRegion}
+            onChange={(e) =>
+              setForm({ ...form, stateOrRegion: e.target.value, city: "" })
+            }
+          >
+            <option value="">Select state</option>
+            {stateOptions.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className={dashLabel}>
-            State / region <span className="text-[#F56A22]">*</span>
+            City <span className="text-[#F56A22]">*</span>
           </label>
-          <input
+          <select
             required
-            className={dashInput}
-            value={form.stateOrRegion}
-            onChange={(e) => setForm({ ...form, stateOrRegion: e.target.value })}
-          />
+            className={dashSelect}
+            value={form.city}
+            disabled={!form.stateOrRegion}
+            onChange={(e) => setForm({ ...form, city: e.target.value })}
+          >
+            <option value="">
+              {form.stateOrRegion ? "Select city" : "Select state first"}
+            </option>
+            {cityOptions.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className={dashLabel}>
